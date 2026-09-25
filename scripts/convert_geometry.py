@@ -197,7 +197,18 @@ def write_ug2(parts, dest: Path):
         cloned = dict(part)
         cloned["info"] = info
         verts, vcount = ug2_vertices(part)
+        indices = part["indices"]
+        # Underground 2 stops the game when one solid carries more than 65535 indices.
+        if len(indices) > 60000 * 2 and part["groups"]:
+            indices = indices[: 60000 * 2]
+            group = dict(part["groups"][0])
+            group["length"] = 60000
+            group["tris"] = 20000
+            group["verts"] = vcount
+            cloned["groups"] = [group]
+            cloned["info"]["tris"] = 20000
         cloned["vertices"] = verts
+        cloned["indices"] = indices
         cloned["vcount"] = vcount
         renamed.append(cloned)
 
