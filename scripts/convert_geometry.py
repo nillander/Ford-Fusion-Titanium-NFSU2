@@ -228,11 +228,12 @@ def write_ug2(parts, dest: Path):
     # Retail Underground 2 header is 144 bytes: 16 unknown, counts, 0x38 path, 0x20 class, tail.
     # Unk1 0x1C is the UG2 value from mwgc (MW uses 0x1D).
     path = b"..\\PC\\CDUG2\\CARS\\FOCUS\\GEOMETRY.BIN".ljust(0x38, b"\x00")
-    klass = b"Geometry".ljust(0x20, b"\x00")
-    buf.extend(struct.pack("<4I", 0, 0, 0x1C, len(renamed)))
+    klass = b"DEFAULT".ljust(0x20, b"\x00")
+    # Retail cars use header value 0x1D and a 144-byte descriptor.
+    buf.extend(struct.pack("<4I", 0, 0, 0x1D, len(renamed)))
     buf.extend(path)
     buf.extend(klass)
-    buf.extend(struct.pack("<6I", 0, 0, 0x80, 0, 0, 0))
+    buf.extend(struct.pack("<10I", 0, 0, 0x80, 0, 0, 0, 0, 0, 0, 0))
     end(desc)
 
     hashes = begin(0x134003)
@@ -292,6 +293,7 @@ def write_ug2(parts, dest: Path):
         plat = begin(0x134900)
         while len(buf) % 16:
             buf.append(0)
+        desc_at = len(buf)
         flags = part.get("plat", {}).get("flags", 0x4000) | 0x80
         buf.extend(struct.pack("<5i", 0, 0, 0x10, flags, len(groups)))
         buf.extend(b"\x00" * 16)
@@ -308,16 +310,26 @@ def write_ug2(parts, dest: Path):
         grp = begin(0x134B02)
         while len(buf) % 16:
             buf.append(0)
+        # The game asserts when one shading group has more than 65535 indices.
         cursor = 0
+        written_groups = 0
         for group in groups:
             length = group["length"] or group["tris"] * 3
-            buf.extend(group["min"])
-            buf.extend(struct.pack("<I", length))
-            buf.extend(group["max"])
-            buf.extend(struct.pack("<6I", group["tex"], group["shader"], 0, 0, 0, 0))
-            buf.extend(struct.pack("<II", cursor, group["flags"] | 0x100))
+            piece = 0
+            while piece < length:
+                take = min(60000, length - piece)
+                buf.extend(group["min"])
+                buf.extend(struct.pack("<I", take))
+                buf.extend(group["max"])
+                buf.extend(struct.pack("<6I", group["tex"], group["shader"], 0, 0, 0, 0))
+                buf.extend(struct.pack("<II", cursor + piece, group["flags"] | 0x100))
+                piece += take
+                written_groups += 1
             cursor += length
         end(grp)
+        # Patch the group count in the plat descriptor now that groups may have been split.
+        # Descriptor layout: 5 ints, 16 zero bytes, NumTris, three zeros, NumVerts, three zeros.
+        struct.pack_into("<i", buf, desc_at + 16, written_groups)
 
         idx = begin(0x134B03)
         while len(buf) % 16:
