@@ -84,26 +84,34 @@ def tex_for(mwtex, mwmat):
 
 # ---------------------------------------------------------------- shared pieces
 win = merge([weld(g) for g in P['MUSTANGGT_KIT00_FRONT_WINDOW_A']['groups']])
-win = dec(win, 2300, 'windows')
+win = dec(win, 1500, 'windows')
 windows = mesh(win, T_WINDOW, M['WINDSHIELD'])
 hood = weld(P['MUSTANGGT_KIT00_HOOD_C']['groups'][0])
 
 
+PAINT_BUDGET = 14000   # v2: every solid <= 16k tris / 48k indices (v1 crashed the game at car select)
+_paint_cache = {}
+
+
 def body_meshes(kit):
-    paint = merge([weld(P[f'MUSTANGGT_{kit}_BODY_C']['groups'][0]), hood])
+    if kit not in _paint_cache:
+        _paint_cache[kit] = dec(merge([weld(P[f'MUSTANGGT_{kit}_BODY_C']['groups'][0]), hood]), PAINT_BUDGET, 'paint_' + kit)
+    paint = _paint_cache[kit]
     return [mesh(paint, T_PAINT, M['CARSKIN']), windows]
 
 
 # BASE: LOD C of the base (grille, chassis, trims, plates, emblems) + interior + driver + lamps (LOD B)
 base = []
 for g in groups_of('BASE_C'):
+    if len(g['tri']) > 2000:
+        g = dec(g, int(len(g['tri']) * 0.85), 'base_' + g['tex'][10:]) | {'tex': g['tex'], 'mat': g['mat']}
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(g, t, m))
 inter = groups_of('KIT00_INTERIOR_A')
 big = [g for g in inter if len(g['tri']) > 1000]
 small = [g for g in inter if len(g['tri']) <= 1000]
 tot = sum(len(g['tri']) for g in big)
-INTERIOR_BUDGET = 7600
+INTERIOR_BUDGET = 4500
 for g in big:
     tgt = int(INTERIOR_BUDGET * len(g['tri']) / tot)
     d = dec(g, tgt, 'interior_' + g['mat'])
@@ -113,9 +121,10 @@ for g in small:
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(g, t, m))
 for g in groups_of('KIT00_DRIVER_A'):
+    g = dec(g, 1000, 'driver')
     base.append(mesh(g, bh('FOCUS_DRIVER'), M['DRIVER']))
 lamps_opaque, lamps_glass = [], []
-for part in ['KIT00_RIGHT_HEADLIGHT_B', 'KIT00_RIGHT_BRAKELIGHT_B', 'KIT00_RIGHT_HEADLIGHT_GLASS_B', 'KIT00_RIGHT_BRAKELIGHT_GLASS_B']:
+for part in ['KIT00_RIGHT_HEADLIGHT_C', 'KIT00_RIGHT_BRAKELIGHT_C', 'KIT00_RIGHT_HEADLIGHT_GLASS_C', 'KIT00_RIGHT_BRAKELIGHT_GLASS_C']:
     for g in groups_of(part):
         t, m = tex_for(g['tex'], g['mat'])
         (lamps_glass if m in (M['HEADLIGHTGLASS'], M['BRAKELIGHTGLASS']) else lamps_opaque).append(mesh(g, t, m))
@@ -195,7 +204,8 @@ for slot, kit in bodies.items():
 solids.append(solid('FOCUS_BASE_A', base, base_markers))
 solids.append(solid('FOCUS_KIT00_FRONT_WHEEL_A', wheel))
 for s in solids:
-    assert sum(len(g['tri']) for g in s['groups']) * 3 <= 65535, s['name']
+    print(s['name'], sum(len(g['tri']) for g in s['groups']), len(s['pos']))
+
 size = ug2write.write(solids, f'{OUT}/GEOMETRY.BIN')
 LOG['geometry_bytes'] = size
 

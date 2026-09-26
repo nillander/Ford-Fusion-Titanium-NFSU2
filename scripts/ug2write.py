@@ -46,6 +46,9 @@ def marker_bytes(markers):
 
 
 def write(solids, path, filename_field=b'NFS:U2 Geometry Compiler by nfsu360'):
+    # the nfsu360 compiler (and every mod that loads) stores the solids sorted by name hash,
+    # in the same order as the 0x134004 offset table
+    solids = sorted(solids, key=lambda s: bh(s['name']))
     B = Buf()
     root = B.begin(0x80134000)
     z = B.begin(0); B.end(z)                       # empty 0x0 chunk, as in the compiler output

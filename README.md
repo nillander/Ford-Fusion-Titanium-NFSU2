@@ -4,6 +4,8 @@ Substitui o **Ford Focus** (slot `FOCUS`). O modelo vem do port aprovado de Most
 (`fusion-mw2005`, V1prime-z10); os arquivos de lá não foram alterados. O doador de estrutura é o
 **Escort RS** (`source/Ford-Focus-ESCORT-RS`), o mod sedã que já funciona neste jogo.
 
+> **Estado:** a v1 fechou o jogo ao selecionar o carro. A v2 (peças ≤ 46.500 índices e sólidos em ordem de hash) está instalada e aguarda teste. Detalhes e plano de bisseção em [CONTINUACAO.md](CONTINUACAO.md).
+
 ![prévia](docs/previa-fusion-ug2.png)
 
 ## O que entra no jogo
@@ -20,13 +22,13 @@ Substitui o **Ford Focus** (slot `FOCUS`). O modelo vem do port aprovado de Most
 
 | Peça UG2 | Origem (MW z10) | Triângulos |
 | --- | --- | --- |
-| `KIT00_BODY_A` (padrão) e `KITW03` | carroceria LOD C + capô LOD C + vidros | 17.102 |
-| `KITW01` ("Street": lábio, saias, lábio traseiro) e `KITW04` | KIT01 LOD C + capô + vidros | 18.514 |
-| `KITW02` ("Race": splitter, saias, difusor) | KIT02 LOD C + capô + vidros | 18.530 |
-| `BASE_A` | base LOD C (grade, frisos, chassi, placas, emblemas) + interior + motorista + faróis e lanternas (LOD B) | 20.962 |
+| `KIT00_BODY_A` (padrão) e `KITW03` | carroceria LOD C + capô LOD C (14.000) + vidros (1.500) | 15.500 |
+| `KITW01` ("Street": lábio, saias, lábio traseiro) e `KITW04` | KIT01 LOD C + capô + vidros | 15.500 |
+| `KITW02` ("Race": splitter, saias, difusor) | KIT02 LOD C + capô + vidros | 15.499 |
+| `BASE_A` | base LOD C (grade, frisos, chassi, placas, emblemas) + interior + motorista + faróis e lanternas (LOD C) | 15.435 |
 | `KIT00_FRONT_WHEEL_A` | roda de 20 raios aro 18" (LOD B) | 8.614 |
 
-Todas abaixo de 65.535 índices por peça, o limite que fez o port anterior fechar o jogo.
+Todas com no máximo 46.500 índices e 19 mil vértices por peça (a v1, com até 62.886 índices, fechou o jogo).
 
 ## Aprendizados aplicados (do MW2005 e deste port)
 
@@ -68,7 +70,7 @@ O backup do estado anterior (Escort RS + GlobalB) está em `backup/antes-fusion-
 
 | Arquivo instalado | SHA-256 |
 | --- | --- |
-| `CARS/FOCUS/GEOMETRY.BIN` | `23558CAD2EBFA893D99A69AB97B7CC7CF2D02FC5C8C0530D8DABDD7A8AF96497` |
+| `CARS/FOCUS/GEOMETRY.BIN` | `54AB592EF1262099DD2D9E3B32719B0405A0E0509805F868A09D09AB7EB0A5E1` |
 | `CARS/FOCUS/TEXTURES.BIN` | `5C2D9E1D7BCDBC61FA650665291C9607651B8CF747295189A46A171416068C10` |
 | `GLOBAL/GlobalB.lzc` | `1A4537153D0B89FE9B3FA37AC7B5B6A79CB3993C9E17A7C6196EED5290C65A9C` |
 
