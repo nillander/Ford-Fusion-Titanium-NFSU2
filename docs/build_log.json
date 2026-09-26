@@ -1,0 +1,174 @@
+{
+ "decimation": {
+  "windows": [
+   11993,
+   2300
+  ],
+  "interior_DULLPLASTIC": [
+   3395,
+   1396
+  ],
+  "interior_INTERIOR": [
+   15081,
+   6203
+  ]
+ },
+ "markers": {
+  "LEFT_BRAKELIGHT": [
+   -2.222,
+   0.653,
+   0.688
+  ],
+  "RIGHT_BRAKELIGHT": [
+   -2.223,
+   -0.653,
+   0.688
+  ],
+  "RIGHT_EXHAUST": [
+   -2.32,
+   -0.635,
+   0.135
+  ],
+  "LEFT_EXHAUST": [
+   -2.32,
+   0.635,
+   0.135
+  ],
+  "CENTRE_BRAKELIGHT": [
+   -1.17,
+   0.0,
+   1.172
+  ],
+  "RIGHT_HEADLIGHT": [
+   2.15,
+   -0.577,
+   0.515
+  ],
+  "LEFT_HEADLIGHT": [
+   2.15,
+   0.577,
+   0.515
+  ],
+  "SPOILER": [
+   -2.15,
+   0.0,
+   0.868
+  ],
+  "ROOF_SCOOP": [
+   0.3,
+   0.0,
+   1.207
+  ]
+ },
+ "solids": {
+  "FOCUS_KIT00_BODY_A": {
+   "tris": 17102,
+   "indices": 51306,
+   "verts": 20110,
+   "groups": 2
+  },
+  "FOCUS_KITW01_BODY_A": {
+   "tris": 18514,
+   "indices": 55542,
+   "verts": 21574,
+   "groups": 2
+  },
+  "FOCUS_KITW02_BODY_A": {
+   "tris": 18530,
+   "indices": 55590,
+   "verts": 21606,
+   "groups": 2
+  },
+  "FOCUS_KITW03_BODY_A": {
+   "tris": 17102,
+   "indices": 51306,
+   "verts": 20110,
+   "groups": 2
+  },
+  "FOCUS_KITW04_BODY_A": {
+   "tris": 18514,
+   "indices": 55542,
+   "verts": 21574,
+   "groups": 2
+  },
+  "FOCUS_BASE_A": {
+   "tris": 20962,
+   "indices": 62886,
+   "verts": 24303,
+   "groups": 13
+  },
+  "FOCUS_KIT00_FRONT_WHEEL_A": {
+   "tris": 8614,
+   "indices": 25842,
+   "verts": 5386,
+   "groups": 2
+  }
+ },
+ "fixed_normals": {
+  "FOCUS_BASE_A": 24
+ },
+ "geometry_bytes": 5571072,
+ "textures": {
+  "FOCUS_MISC": [
+   "DXT1",
+   512
+  ],
+  "FOCUS_LOGO": [
+   "DXT1",
+   512
+  ],
+  "FOCUS_INTERIOR": [
+   "DXT1",
+   512
+  ],
+  "FOCUS_BADGING": [
+   "DXT1",
+   512
+  ],
+  "FOCUS_KIT00_HEADLIGHT": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_HEADLIGHT_GLASS": [
+   "DXT3",
+   256
+  ],
+  "FOCUS_KIT00_BRAKELIGHT": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_BRAKELIGHT_GLASS": [
+   "DXT3",
+   256
+  ],
+  "FOCUS_RIM": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_TIRE": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_DRIVER": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_KIT00_BRAKELIGHT_": [
+   "DXT3",
+   256
+  ],
+  "FOCUS_SHADOWFE": [
+   "DXT3",
+   128
+  ],
+  "FOCUS_SHADOWIG": [
+   "DXT3",
+   128
+  ],
+  "FOCUS_NEON": [
+   "DXT3",
+   128
+  ]
+ },
+ "textures_bytes": 163158
+}
