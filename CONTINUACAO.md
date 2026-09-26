@@ -1,6 +1,6 @@
 # Continuação — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
 
-Documento para retomar o trabalho em outra sessão. Atualizado em 26/09/2026.
+Documento para retomar o trabalho em outra sessão. Atualizado em 26/09/2026 (v3, teste A).
 
 ## 1. Pedido
 
@@ -13,36 +13,45 @@ Documento para retomar o trabalho em outra sessão. Atualizado em 26/09/2026.
 
 ## 2. Estado atual
 
-| Versão | O que é | Resultado no jogo |
+| Versão | O que muda | Resultado no jogo |
 | --- | --- | --- |
-| v1 (commit `28a6a9c`) | peças até 62.886 índices / 24.303 vértices; sólidos gravados fora da ordem de hash | **Fechou o jogo ao selecionar o carro** |
-| v2 (instalada agora) | todas as peças ≤ 46.500 índices e ≤ 19.000 vértices; sólidos gravados em ordem de hash como o nfsu360 | **aguardando teste** |
+| v1 (`28a6a9c`) | peças até 62.886 índices / 24.303 vértices; sólidos fora da ordem de hash; TPK JDLZ; GlobalB com performance | **fechou ao selecionar o carro** |
+| v2 (`f3ff5b4`) | peças ≤ 46.500 índices / 19 mil vértices; sólidos em ordem de hash; resto igual à v1 | **fechou ao selecionar o carro** |
+| **v3 — teste A (instalado)** | GEOMETRY da v2 + **TPK sem compressão (RAWW, layout do mwtc)** + **GlobalB original** (sem performance) | aguardando |
 
-SHA-256 da v2: GEOMETRY `54AB592E…A5E1`, TEXTURES `5C2D9E1D…0C10` (igual à v1), GlobalB `1A453715…5A9C` (igual à v1).
+Como a v2 também fechou, o tamanho das peças e a ordem dos sólidos não eram (só) o problema. Restam os
+dois componentes que a v1 e a v2 tinham iguais:
 
-### Hipóteses para o fechamento da v1 (em ordem de probabilidade)
+- **TEXTURES.BIN com o compressor JDLZ próprio.** Ele usa cópias longas (até 4.098 bytes) que o
+  compilador nfsu360 nunca gera (máximo 710 no Escort) e termina o blob sem o byte extra que o nfsu360
+  deixa. O port antigo do Cursor usava o TPK do MW como estava (RAWW, sem compressão).
+  → v3 grava RAWW, igual ao `mwtc`.
+- **GlobalB** (registro FOCUS). → teste A usa o GlobalB original do backup. Com ele, as rodas ficam nas
+  posições do Escort (entre-eixos curto) — é só para ver se o carro carrega.
 
-1. **Tamanho da peça.** O port antigo do Cursor também fechava na ficha do carro e só parou ao limitar
-   cada peça a 60.000 índices. A `BASE_A` da v1 tinha 62.886. Os mods que funcionam ficam em
-   41–52 mil índices (Senna tem uma peça com 61.458) e no máximo 17.702 vértices por peça.
-   → v2 reduz tudo para ≤ 46.500 índices e ≤ 19 mil vértices.
-2. **Ordem dos sólidos no arquivo.** Todos os mods que funcionam (Escort, Focus RS, Senna, F-150) gravam os
-   sólidos ordenados pelo hash do nome, na mesma ordem da tabela `0x134004`. A v1 gravava em outra ordem.
-   → v2 corrigido (`ug2write.py` ordena).
-3. **TEXTURES.BIN** (compressor JDLZ próprio). Ida e volta confere com o descompressor que lê os blobs
-   do Escort, mas nunca foi lido pelo jogo. Não mudou na v2.
-4. **GlobalB** (registro FOCUS). Só números copiados de Corolla/Lancer + rodas/massa/inércia. Pouco provável.
+SHA-256 instalados no teste A: GEOMETRY `54AB592E…A5E1`, TEXTURES `349F6BEC…26B4`,
+GlobalB `10A8EAE6…BBB9` (o do backup, sem alteração).
+GlobalB com performance (v3, sem mexer nos bytes de aro): `variantes/performance/GlobalB.lzc`
+(`F45D3B2D…8926`, fora do git).
 
-### Se a v2 também fechar — bisseção (um teste por vez, jogo fechado)
+### Próximos passos conforme o resultado do teste A
 
-1. Voltar só o `GLOBAL/GlobalB.lzc` do backup e manter a v2 → se abrir, o culpado é o GlobalB.
-2. Com o GlobalB do backup: `CARS/FOCUS/TEXTURES.BIN` do Escort (backup) + GEOMETRY v2 → se abrir
-   (carro sem textura), o culpado é o TPK/JDLZ.
-3. Se ainda fechar, é a GEOMETRY: gerar uma versão só com `KIT00_BODY_A` + `BASE_A` do Escort trocando
-   uma peça por vez pela do Fusion.
+- **Abriu:** copiar `variantes/performance/GlobalB.lzc` para `GLOBAL/` (teste B).
+  Se abrir → o culpado era o TPK JDLZ; se fechar → o culpado é o GlobalB: aplicar o patch em partes
+  (só rodas; depois chassi do Lancer; depois motor do Corolla) até achar o bloco.
+- **Fechou:** o culpado é a GEOMETRY. Montar híbridos a partir do GEOMETRY do Escort trocando uma peça por
+  vez pela do Fusion (`BASE_A`, depois `KIT00_BODY_A`, depois a roda), sempre com o GlobalB original.
+  Diferenças a investigar: marcadores (matrizes do MW), número de grupos da BASE (13), materiais
+  HEADLIGHTREFLECTOR/BRAKELIGHTGLASS/DRIVER/USER_RIMS, vértices com cor/UV do MW.
 
-Backup do estado anterior ao Fusion (Escort RS + GlobalB do usuário):
-`fusion-nfsu2/backup/antes-fusion-2026-09-25` (fora do git; tem `SHA256SUMS.txt`).
+Híbridos já prontos em `variantes/hibridos/` (usar com `TEXTURES_uniao.BIN`, que tem as texturas do
+Escort + as do Fusion, e com o GlobalB original):
+`H0_escort_regravado` (Escort passado pelo `ug2write.py` — controle), `H1_base` (Escort com a `BASE_A` do
+Fusion), `H2_body` (Escort com o `KIT00_BODY_A` do Fusion), `H3_roda` (Escort com a roda do Fusion).
+Gerados por `scripts/hybrids.py`.
+
+Port antigo do Cursor (para comparação): `backup/port-antigo-cursor/` (GEOMETRY de 31 MB com 159 peças,
+flags 0x4080, TPK do MW). Não se sabe se ele chegou a exibir o carro.
 
 ## 3. O que foi descoberto sobre os formatos
 

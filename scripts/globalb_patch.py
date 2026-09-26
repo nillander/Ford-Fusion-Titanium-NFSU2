@@ -35,7 +35,7 @@ def setf(o, v):
 
 
 # --- handling from the Lancer Evo VIII
-copy(L, 220, 224)            # rim size range (17-19", outer 25) - stock 18" wheel
+# v3: rim size bytes (220) stay the Focus ones: a saved Focus with 16" rims must remain valid
 copy(L, 272, 288)            # per-axle values next to the wheels
 for w in range(4):           # the two unknown per-wheel values (keep the Lancer ones)
     copy(L, 288 + 48 * w + 28, 288 + 48 * w + 36)

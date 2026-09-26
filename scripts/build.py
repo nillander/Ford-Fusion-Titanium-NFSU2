@@ -233,6 +233,6 @@ for t in tex_e:
         place += t['size']
         out_tex.append(dict(hash=t['hash'], info=bytes(info), dds=t['dds'], data=t['data'], tail=t['tail'], name=t['name'], fmt=t['fmt'].decode(), size=t['w']))
 LOG['textures'] = {t['name']: [t['fmt'], t['size']] for t in out_tex}
-LOG['textures_bytes'] = tpkwrite.write(out_tex, f'{OUT}/TEXTURES.BIN')
+LOG['textures_bytes'] = tpkwrite.write_raw(out_tex, f'{OUT}/TEXTURES.BIN')  # v3: RAWW (mwtc layout) instead of JDLZ
 json.dump(LOG, open(f'{OUT}/build_log.json', 'w'), indent=1)
 print(json.dumps(LOG, indent=1))
