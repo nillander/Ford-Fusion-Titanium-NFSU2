@@ -5,7 +5,7 @@ O método fica neste repositório. O `fusion-mw2005` só fornece o ZIP da releas
 | Port | Most Wanted | Underground 2 | Carro |
 | --- | --- | --- | --- |
 | `2018` | `MUSTANGGT` | `MUSTANGGT` | Fusion Titanium 2018 AWD |
-| `2012` | `COBALTSS` | `FOCUS` | Fusion 2012 FWD |
+| `2012` | `COBALTSS` | `FOCUS` | Fusion Titanium 2012 FWD |
 
 A tabela está em `scripts/ports.py`. Os dois ports usam o mesmo caminho do 2018: corte entre LOD A e LOD B, teto de 21.500 triângulos, vidros de `docs/vidros_v5.npz`, adesivos e UV de vinil. O 2012 só troca a origem (`COBALTSS`), o slot de destino (`FOCUS`) e a tração (dianteira). As luzes do 2012 já vêm nos dois lados do BIN do Most Wanted; o script inclui `LEFT_*` quando essa peça existe. O 2018, que só tem `RIGHT_*`, segue como antes.
 

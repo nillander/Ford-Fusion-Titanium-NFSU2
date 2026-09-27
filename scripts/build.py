@@ -2,7 +2,7 @@
 
 Usage: python build.py <out-dir> [2018|2012]
   2018  MUSTANGGT -> MUSTANGGT (Fusion Titanium 2018 AWD; mesmo nome de slot dos dois jogos)
-  2012  COBALTSS  -> FOCUS     (Fusion 2012 FWD; same part split, clip, glass and decals as 2018)
+  2012  COBALTSS  -> FOCUS     (Fusion Titanium 2012 FWD; same part split, clip, glass and decals as 2018)
 
 The destination names follow the nfsu360 layout proved on the Focus slot:
   <SLOT>_KIT00_BODY_A, <SLOT>_KITW01..04_BODY_A, <SLOT>_BASE_A, <SLOT>_KIT00_FRONT_WHEEL_A

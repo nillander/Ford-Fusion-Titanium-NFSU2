@@ -5,7 +5,7 @@ Dois ports, a partir dos ZIPs do Most Wanted 2005. Os arquivos de lá não são 
 | Most Wanted | Underground 2 | Carro |
 | --- | --- | --- |
 | `MUSTANGGT` | `MUSTANGGT` | Fusion Titanium 2018 AWD |
-| `COBALTSS` | `FOCUS` | Fusion 2012 FWD |
+| `COBALTSS` | `FOCUS` | Fusion Titanium 2012 FWD |
 
 O 2012 reaproveita o caminho do 2018 (corte, vidros, adesivos, vinil, chassi). O que muda é o slot e a tração, dianteira no 2012. O método está em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md).
 
