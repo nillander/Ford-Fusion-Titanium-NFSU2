@@ -7,7 +7,7 @@ Dois ports, a partir dos ZIPs do Most Wanted 2005. Os arquivos de lá não são 
 | `MUSTANGGT` | `MUSTANGGT` | Fusion Titanium 2018 AWD |
 | `COBALTSS` | `FOCUS` | Fusion Titanium 2012 FWD |
 
-O 2012 reaproveita o caminho do 2018 (corte, vidros, adesivos, vinil, chassi). O que muda é o slot e a tração, dianteira no 2012. O método está em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md).
+O Fusion Titanium 2012 reaproveita o caminho do 2018 (corte, vidros, adesivos, vinil, chassi). O que muda é o slot e a tração, dianteira no 2012. O método está em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md).
 
 > **Estado:** a v9 do 2018 foi aprovada no jogo em 27/09/2026 (pintura LOD B + LOD A nas áreas que deformavam, sem o emblema do bico, 248 cv, tração integral, chassi do Lancer). Ela substitui o Mustang GT: no Underground 2 o slot também se chama `MUSTANGGT`, em `CARS/MUSTANGGT`. O 2012, quando for gerado, ocupa o `FOCUS`. O histórico está em [TODO.md](TODO.md).
 
