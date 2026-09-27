@@ -1,3 +1,4 @@
+release/instalar.bat text eol=crlf
 /CARS/FOCUS/GEOMETRY.BIN filter=lfs diff=lfs merge=lfs -text
 /CARS/FOCUS/TEXTURES.BIN filter=lfs diff=lfs merge=lfs -text
 /CARS/FOCUS/VINYLS.BIN filter=lfs diff=lfs merge=lfs -text

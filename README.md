@@ -73,10 +73,9 @@ Valores finais em `docs/globalb_focus.json`.
 
 ## Instalação
 
-Na cópia de desenvolvimento já está instalado. Para instalar em outra cópia do jogo: feche o jogo, copie `CARS/FOCUS` e rode
-`scripts/globalb_patch.py GlobalB.lzc GlobalB.lzc.novo` sobre o `GLOBAL/GlobalB.lzc` descompactado.
-O backup do estado anterior (Escort RS + GlobalB) está em `backup/antes-fusion-2026-09-25`
-(fora do git).
+Feche o jogo e execute `instalar.bat` (na release ele fica ao lado de `CARS`; no repositório, `release/instalar.bat`). O script procura o Underground 2, copia `CARS/FOCUS` e aplica no `GLOBAL/GlobalB.lzc` o mesmo ajuste de `scripts/globalb_patch.py`: 248 cv, tração integral e chassi do Lancer. Na primeira execução o GlobalB anterior fica em `GLOBAL/GlobalB.lzc.antes-fusion`. Se o arquivo estiver compactado (JDLZ), salve-o descompactado no Nikki e rode de novo.
+
+O backup do estado anterior desta cópia (Escort RS + GlobalB) está em `backup/antes-fusion-2026-09-25` (fora do git).
 
 | Arquivo instalado | SHA-256 |
 | --- | --- |
