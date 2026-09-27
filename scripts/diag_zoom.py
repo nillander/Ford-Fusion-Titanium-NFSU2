@@ -6,7 +6,7 @@ names = sys.argv[3].split(','); cen = tuple(map(float, sys.argv[4].split(':')));
 views = [tuple(map(float, v.split(':'))) for v in sys.argv[6].split(',')]
 light = tuple(map(float, sys.argv[7].split(':'))) if len(sys.argv) > 7 else (0.4, 0.3, 0.85)
 COL = {**{0x910E6654+i: c for i, c in enumerate([(255,0,0),(0,200,0),(0,120,255),(255,140,0),(160,0,255),(0,220,220),(255,0,160),(120,80,0)])}, 0x3C84D757: (230, 200, 40), bh('WINDOW'): (90, 120, 200), bh('FOCUS_LOGO'): (60, 60, 60), bh('FOCUS_MISC'): (130, 130, 130),
-       bh('FOCUS_BRAKELIGHT_GLASS'): (220, 30, 30), bh('FOCUS_KIT00_BRAKELIGHT'): (200, 200, 220), bh('FOCUS_INTERIOR'): (100, 70, 40)}
+       bh('FOCUS_BRAKELIGHT_GLASS'): (220, 30, 30), bh('FOCUS_KIT00_BRAKELIGHT'): (200, 200, 220), bh('FOCUS_INTERIOR'): (100, 70, 40), bh('FOCUS_BADGING'): (255, 255, 255), bh('FOCUS_DRIVER'): (255, 150, 150), bh('FOCUS_KIT00_HEADLIGHT'): (150, 220, 255), bh('FOCUS_HEADLIGHT_GLASS'): (200, 255, 255)}
 d, cl, h, S = ug2.parse(geo); M = []
 for s in S:
     if s['name'] not in names and not ('DECAL' in s['name'] and 'WIDE' not in s['name'] and 'DECALS' in names): continue

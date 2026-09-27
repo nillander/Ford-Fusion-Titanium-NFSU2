@@ -96,7 +96,7 @@ def write(solids, path, filename_field=b'NFS:U2 Geometry Compiler by nfsu360'):
         B.b += struct.pack('<3fI', *bmax, 0)
         B.b += np.eye(4, dtype='<f4').tobytes()
         B.b += struct.pack('<II', 0, 0)
-        B.b += struct.pack('<IIIf', 0xEE580, 0xEE580, 0, 1.0)
+        B.b += struct.pack('<IIIf', 0xEE580, 0xEE580, 0, float(np.linalg.norm(bmax - bmin) / 2))
         B.b += struct.pack('<fII', float(ntri), 0, 0)
         B.b += (s['name'].encode('latin1')[:27] + b'\0').ljust(28, b'\0')
         B.end(h)
@@ -131,7 +131,9 @@ def write(solids, path, filename_field=b'NFS:U2 Geometry Compiler by nfsu360'):
         off = 0
         for gr in s['groups']:
             ln = len(gr['tri']) * 3
-            B.b += struct.pack('<3fI3f', -5000.0, -5000.0, -5000.0, ln, 5000.0, 5000.0, 5000.0)
+            tp = np.asarray(s['pos'])[np.asarray(gr['tri']).reshape(-1)]      # real group bounds (as retail)
+            gmn = tp.min(0); gmx = tp.max(0)
+            B.b += struct.pack('<3fI3f', *gmn, ln, *gmx)
             B.b += struct.pack('<8I', gr['tex_i'], gr['sh_i'], 0, 0, 0, 0, off, 0x4180)
             off += ln
         B.end(g)

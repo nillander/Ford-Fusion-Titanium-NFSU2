@@ -1,12 +1,12 @@
 # TODO — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
 
-Estado em 27/09/2026: **v6 instalada, aguardando teste no jogo.** A v6 ataca os itens A, B e C do teste da
+Estado em 27/09/2026 (manhã): **v8 instalada, aguardando teste no jogo.** (A v6 também está descrita abaixo.) A v6 ataca os itens A, B e C do teste da
 v5 (adesivos, para-brisa, traseira). A v5 trouxe os vidros novos (gerados do zero, sem frestas). A v4 ataca os itens 1–8 da lista abaixo. Leia também [CONTINUACAO.md](CONTINUACAO.md).
 
-- Instalado agora: GEOMETRY `BF79EABD…B532` (v6), TEXTURES `830FD72B…457F` (v6: lente da lanterna mais clara),
+- Instalado agora: GEOMETRY `F5F7215C…A569` (v8), TEXTURES `830FD72B…457F` (o da v6),
   GlobalB `27F9944B…CF97` (o original do backup **só com as rodas mudadas**: X +1,431 / −1,311, Y ±0,78).
 - Backups (fora do git): v3 em `backup/v3-instalada-2026-09-26/`, GEOMETRY da v4 em `backup/v4-instalada/`,
-  GEOMETRY + TEXTURES da v5 em `backup/v5-instalada/`.
+  GEOMETRY + TEXTURES da v5 em `backup/v5-instalada/`, da v6 em `backup/v6-instalada/`.
 - Diagnóstico: `docs/diagnostico-v4/` (magenta = face vista por trás, que o jogo não desenha → buraco;
   verde = normal do vértice contrária à face → mancha escura).
 
@@ -39,6 +39,41 @@ nova (Delaunay, pontos a cada 6 cm; 3.174 triângulos no total). O resultado fic
 `.npz`). Textura continua a `WINDOW` (as texturas por janela dos carros originais não existem como
 globais nos arquivos do jogo). Imagens: `docs/diagnostico-v4/v5-vidros-*.png`.
 A faixa preta com o triângulo no alto do para-brisa é a cerâmica do Fusion real (peça da base), não defeito.
+
+## v8 — o que mudou (teste da v6: deformações, emblema, vinis)
+
+- **Pintura inteira do LOD A (o mais detalhado), sem nenhuma decimação.** Para caber no limite por peça, ela
+  foi dividida nas peças que os carros originais usam e que o jogo desenha com qualquer kit:
+  `KIT00_BODY_A` (e KITW01–04) 19.707 · `KIT00_ROOF_A` (teto acima da linha de cintura z > 0,95 + capô
+  LOD A) 18.685 · `KIT00_DOOR_LEFT_A` 17.718 · `KIT00_DOOR_RIGHT_A` 13.427 (portas = faixa |x| < 1,1 m) ·
+  `KIT00_TRUNK_A` 18.021. Os cortes são exatos (`scripts/clip.py`): as peças se encontram sem degrau.
+  Isso resolve de uma vez as ondulações/deformações da traseira, do para-choque, das portas e do teto
+  (vinham da malha LOD B/C mais pobre).
+- **Emblema Ford do bico removido** (46 triângulos da base) e **rebaixo preenchido**: uma superfície lisa
+  ajustada ao redor dele empurra 97 vértices da pintura para fora e recebe normais lisas.
+- **Escapamentos e difusor** vêm da base LOD B (a C era grosseira).
+- **Vinis.** Causa encontrada: a pintura usava a UV do MW, mas os vinis do UG2 são desenhados sobre o molde
+  UV de cada carro. O `VINYLS.BIN` do Focus traz o molde sem compressão (`FOCUS_DEBUG`, salvo em
+  `docs/diagnostico-v8/FOCUS_DEBUG-molde.png`). A pintura agora recebe UVs planas nesse molde
+  (`scripts/vinyluv.py`): lado esquerdo em cima, teto no meio, lado direito embaixo, frente e traseira
+  embaixo à esquerda/direita, escala tirada dos círculos das rodas do molde (u 0,251/0,803 ↔ eixos
+  −1,311/+1,431). A orientação foi conferida no Corolla original (mesma convenção); render de conferência:
+  `docs/diagnostico-v8/vinil-molde-focus.png` (LEFT/RIGHT/TOP aparecem legíveis nos lugares certos).
+- **Adesivos (para-brisa, portas).** Nenhuma diferença de nome foi encontrada (os nomes batem com o que o
+  GlobalB monta). Diferença corrigida: os grupos de todas as peças agora gravam os limites reais (os
+  originais fazem assim; o nosso gravava ±5000) e o cabeçalho grava o raio da peça. Se ainda não aparecerem,
+  ver pendência abaixo.
+- Interior 21.300 − fixo (5.1k → 6,2k triângulos), motorista 700.
+
+Peças: 35 sólidos, maior `BASE_A` 21.298 (63.894 índices). Imagens: `docs/diagnostico-v8/`.
+
+### Pendências depois da v8
+- [ ] **Testar a v8 no jogo**: vinis na carroceria, adesivos no para-brisa/portas/capô, traseira, bico, teto.
+- [ ] Se os adesivos continuarem sem aparecer: comparar com um mod que comprovadamente mostra adesivos
+  (Mustang em `source/`) instalando-o num slot de teste; testar decal com matriz/`0x134017-19` do Corolla.
+- [ ] Se os vinis saírem deslocados/esticados: ajustar escala vertical `S_V` e os deslocamentos de frente/
+  traseira em `scripts/vinyluv.py` pelas fotos.
+- [ ] A peça `TRUNK_A` inclui a parte da lanterna central (anima junto com a tampa na loja de som).
 
 ## v6 — o que mudou (itens A, B, C)
 

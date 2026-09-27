@@ -152,8 +152,56 @@ def trunk_region(g):
 
 # v6: the trunk lid comes from LOD A (the TRUNK_A solid has room for it; LOD B showed waves in the game)
 wA = weld(P['MUSTANGGT_KIT00_BODY_A']['groups'][0])
-trunk_paint = drop_inward_twins(compact(wA, trunk_region(wA)), 'trunk_A')
-hood = outward_only(weld(P['MUSTANGGT_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
+_tA = trunk_region(wA)
+trunk_paint = drop_inward_twins(compact(wA, _tA), 'trunk_A')
+# v8: ALL paint from LOD A, no decimation, split over the retail part slots that are drawn with every kit
+# (doors and roof are separate parts in the retail cars; the KITW bodies do not cover the doors).
+# Cuts are exact (same mesh on both sides), so the pieces meet without steps.
+import clip, vinyluv
+restA = drop_inward_twins(compact(wA, ~_tA), 'paint_A')
+import smooth
+FAIR = {  # v8: local fairing of dents/waves seen in the game (vertices move only along their normal)
+}
+for nm_, f_ in FAIR.items():
+    restA, n_ = smooth.fair_region(restA, f_)
+    LOG.setdefault('faired_vertices', {})[nm_] = n_
+
+# nose: fill the recess of the removed Ford oval. Fit x = f(y, z) (quadratic) on the nose around it and push
+# the vertices of the recess out to that surface (only outwards, only inside the oval area + margin)
+def fill_recess(m, y0=0.24, z0=0.52, z1=0.70, xmin=2.12):
+    p = m['pos']
+    ring = (p[:, 0] > xmin) & (np.abs(p[:, 1]) > y0) & (np.abs(p[:, 1]) < y0 + 0.2) & (p[:, 2] > z0) & (p[:, 2] < z1)
+    ins = (p[:, 0] > xmin) & (np.abs(p[:, 1]) <= y0) & (p[:, 2] > z0 + 0.01) & (p[:, 2] < z1 - 0.01)
+    if ring.sum() < 20 or not ins.any(): return m, 0
+    Y, Z = p[ring, 1], p[ring, 2]
+    A = np.c_[np.ones_like(Y), Y ** 2, Z, Z ** 2, Z * Y ** 2]
+    c, *_ = np.linalg.lstsq(A, p[ring, 0], rcond=None)
+    Yi, Zi = p[ins, 1], p[ins, 2]
+    xf = np.c_[np.ones_like(Yi), Yi ** 2, Zi, Zi ** 2, Zi * Yi ** 2] @ c
+    newp = p.copy(); sel = np.nonzero(ins)[0]
+    push = xf > p[ins, 0]
+    newp[sel[push], 0] = xf[push]
+    near = np.abs(newp[sel, 0] - xf) < 0.012            # on the surface now (pushed or already there)
+    push = push | near
+    n = m['nrm'].copy()
+    dx = np.c_[np.zeros_like(Yi), 2 * c[1] * Yi + 2 * c[4] * Zi * Yi, c[2] + 2 * c[3] * Zi + c[4] * Yi ** 2]
+    nn = np.c_[np.ones_like(Yi), -dx[:, 1], -dx[:, 2]]; nn /= np.linalg.norm(nn, axis=1, keepdims=True)
+    n[sel[push]] = nn[push]
+    out = dict(m); out['pos'] = newp; out['nrm'] = n
+    return out, int(push.sum())
+
+
+restA, n_ = fill_recess(restA)
+LOG['nose_recess_filled_vertices'] = n_
+BELT_Z, DOOR_X = 0.95, 1.1
+roofA, lower = clip.split_box(restA, dict(zmin=BELT_Z))
+doors, bodyA = clip.split_box(lower, dict(xmin=-DOOR_X, xmax=DOOR_X))
+doorL, doorR = clip.split_box(doors, dict(ymin=0.0))
+body_paint = bodyA
+hood = outward_only(weld(P['MUSTANGGT_KIT00_HOOD_A']['groups'][0]), 'hood_A', clamp=(1.2, 1.9), zc=0.35)
+noseA = None
+A_parts = dict(roof=roofA, door_left=doorL, door_right=doorR, body=bodyA, trunk=trunk_paint, hood=hood)
+LOG['paint_lods'] = {k + '_A': int(len(v['tri'])) for k, v in A_parts.items()}
 
 # ---------------------------------------------------------------- lamps (LOD C). Lenses double-sided;
 # brake lens uses the BRAKELIGHT material (BRAKELIGHTGLASS is only the glow shown when braking)
@@ -167,7 +215,7 @@ for part in ['KIT00_RIGHT_HEADLIGHT_C', 'KIT00_RIGHT_HEADLIGHT_GLASS_C']:
 for part in ['KIT00_RIGHT_BRAKELIGHT_B', 'KIT00_RIGHT_BRAKELIGHT_GLASS_B']:
     for g in groups_of(part):
         if g['mat'] == 'HEADLIGHTGLASS':
-            brake_parts.append(mesh(double_sided(g), bh('FOCUS_BRAKELIGHT_GLASS'), M['BRAKELIGHT']))
+            brake_parts.append(mesh(double_sided(g), bh('FOCUS_BRAKELIGHT_GLASS'), bh('MOLDINGS')))   # v7: retail lens material
         else:
             brake_parts.append(mesh(g, bh('FOCUS_KIT00_BRAKELIGHT'), M['DULLPLASTIC']))
 # draw order inside a solid: opaque first, lenses (DXT3) last
@@ -189,8 +237,12 @@ def split_y(ms, lim=0.6):
 
 brake_opaque_in, brake_opaque = split_y(brake_opaque)
 brake_glass_in, brake_glass = split_y(brake_glass)
-body_list = [mesh(body_paint, T_PAINT, M['CARSKIN'])] + head_opaque + head_glass
-trunk_list = [mesh(trunk_paint, T_PAINT, M['CARSKIN'])] + brake_opaque_in + brake_glass_in
+VP = lambda m: mesh(vinyluv.apply(m), T_PAINT, M['CARSKIN'])       # paint with vinyl UVs
+body_list = [VP(body_paint)] + head_opaque + head_glass
+roof_list = [VP(roofA), VP(hood)]
+doorL_list = [VP(doorL)]
+doorR_list = [VP(doorR)]
+trunk_list = [VP(trunk_paint)] + brake_opaque_in + brake_glass_in
 
 # ---------------------------------------------------------------- BASE
 _G = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'vidros_v5.npz')) \
@@ -211,14 +263,27 @@ def near_glass(c, tol=0.015, lat=0.08):
 
 
 base = []
+_rear_low = lambda c: (c[:, 0] < -1.85) & (c[:, 2] < 0.5)
+_baseC = []
 for g in groups_of('BASE_C'):
+    c = g['pos'][g['tri']].mean(1)
+    k = ~_rear_low(c)
+    if g['tex'] == 'MUSTANGGT_MISC':      # v7: Ford oval on the nose removed (the nose paint is now smooth LOD A)
+        emb = (c[:, 0] > 2.24) & (np.abs(c[:, 1]) < 0.075) & (c[:, 2] > 0.58) & (c[:, 2] < 0.64)
+        LOG['emblem_removed'] = int(emb.sum()); k &= ~emb
+    if k.any(): _baseC.append(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']})
+for g in groups_of('BASE_B'):             # v7: exhaust tips and diffuser from LOD B (C was too coarse)
+    c = g['pos'][g['tri']].mean(1); k = _rear_low(c)
+    if k.any() and g['tex'] in ('MUSTANGGT_MISC', 'MUSTANGGT_LOGO'):
+        _baseC.append(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']}); LOG.setdefault('rear_low_from_B', {})[g['tex']] = int(k.sum())
+for g in _baseC:
     if g['tex'] in ('MUSTANGGT_LOGO', 'MUSTANGGT_MISC'):
         fr = near_glass(g['pos'][g['tri']].mean(1))
         if fr.any():
             LOG.setdefault('frit_removed', {})[g['tex']] = int(fr.sum())
             g = compact(g, ~fr) | {'tex': g['tex'], 'mat': g['mat']}
     if len(g['tri']) > 2000:
-        g = dec(g, int(len(g['tri']) * 0.85), 'base_' + g['tex'][10:]) | {'tex': g['tex'], 'mat': g['mat']}
+        g = dec(g, int(len(g['tri']) * 0.9), 'base_' + g['tex'][10:]) | {'tex': g['tex'], 'mat': g['mat']}
     if g['tex'] in ('MUSTANGGT_LOGO', 'MUSTANGGT_MISC'):
         # v6: MW draws both faces; the black valances of the bumpers were modelled facing inwards and vanish
         # in UG2 (back-face culling) -> lower front/rear areas made double-sided
@@ -231,9 +296,8 @@ for g in groups_of('BASE_C'):
             g = gg | {'tex': g['tex'], 'mat': g['mat']}
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(g, t, m))
-base.append(mesh(hood, T_PAINT, M['CARSKIN']))
 for g in groups_of('KIT00_DRIVER_A'):
-    base.append(mesh(dec(g, 1000, 'driver'), bh('FOCUS_DRIVER'), M['DRIVER']))
+    base.append(mesh(dec(g, 700, 'driver'), bh('FOCUS_DRIVER'), M['DRIVER']))
 base += brake_opaque
 # glass (v5): new sheets generated by scripts/newglass.py (needs scipy + contourpy): one clean single-sided
 # surface per window fitted to the MW glass shape, outline widened 30 mm and bent inwards under the frame
@@ -242,14 +306,59 @@ _G = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'doc
 glass = merge([{k: _G[f'{i}_{k}'] for k in ('pos', 'nrm', 'uv', 'col', 'tri')} for i in range(int(_G['n']))])
 LOG['glass'] = dict(source='docs/vidros_v5.npz', windows=int(_G['n']), tris=int(len(glass['tri'])), under_frame_m=0.03)
 inter = groups_of('KIT00_INTERIOR_A')
-fixed = ntris(base) + len(glass['tri']) + ntris(brake_glass) + ntris([m for m in base if m['mat'] == M['HEADLIGHTGLASS']]) * 0
-INTERIOR_BUDGET = 21000 - fixed
+fixed = ntris(base) + len(glass['tri']) + ntris(brake_glass)
+INTERIOR_BUDGET = 21300 - fixed
 big = [g for g in inter if len(g['tri']) > 1000]
 small = [g for g in inter if len(g['tri']) <= 1000]
 avail = INTERIOR_BUDGET - sum(len(g['tri']) for g in small)
 tot = sum(len(g['tri']) for g in big)
+def dec_cluster(g, target, name):
+    """vertex clustering on a grid (any target reachable); UV/colour of the first vertex of each cell"""
+    lo = g['pos'].min(0); best = None
+    for cell in np.geomspace(0.005, 0.2, 40):
+        k = np.floor((g['pos'] - lo) / cell).astype(np.int64)
+        _, first, inv = np.unique(k, axis=0, return_index=True, return_inverse=True); inv = inv.ravel()
+        t = inv[g['tri']]
+        t = t[(t[:, 0] != t[:, 1]) & (t[:, 1] != t[:, 2]) & (t[:, 0] != t[:, 2])]
+        t = np.unique(np.sort(t, 1), axis=0, return_index=True)[1]
+        tt = inv[g['tri']]; tt = tt[(tt[:, 0] != tt[:, 1]) & (tt[:, 1] != tt[:, 2]) & (tt[:, 0] != tt[:, 2])]
+        _, ui = np.unique(np.sort(tt, 1), axis=0, return_index=True); tt = tt[np.sort(ui)]
+        best = (cell, first, inv, tt)
+        if len(tt) <= target: break
+    cell, first, inv, F = best
+    cnt = np.bincount(inv); pos = np.zeros((len(first), 3)); np.add.at(pos, inv, g['pos']); pos /= cnt[:, None]
+    used = np.unique(F); remap = np.full(len(pos), -1); remap[used] = np.arange(len(used)); F = remap[F]
+    pos = pos[used]; fi = first[used]
+    fn = np.cross(pos[F[:, 1]] - pos[F[:, 0]], pos[F[:, 2]] - pos[F[:, 0]]); acc = np.zeros_like(pos)
+    for kk in range(3): np.add.at(acc, F[:, kk], fn)
+    nrm = acc / (np.linalg.norm(acc, axis=1, keepdims=True) + 1e-12)
+    LOG.setdefault('decimation', {})[name] = [int(len(g['tri'])), int(len(F)), 'cluster %.3f m' % cell]
+    return dict(pos=pos, nrm=nrm, uv=g['uv'][fi], col=g['col'][fi], tri=F)
+
+
+def dec_free(g, target, name):
+    k = np.round(g['pos'] / 1e-4).astype(np.int64)
+    _, first, inv = np.unique(k, axis=0, return_index=True, return_inverse=True); inv = inv.ravel()
+    gp = g['pos'][first]; gt = inv[g['tri']]
+    gt = gt[(gt[:, 0] != gt[:, 1]) & (gt[:, 1] != gt[:, 2]) & (gt[:, 0] != gt[:, 2])]
+    used, F = decimate.decimate(gp, gt, target)
+    pos = gp[used]
+    # UV and colour from the nearest original vertex
+    j = np.empty(len(pos), np.int64)
+    for i in range(0, len(pos), 512):
+        j[i:i + 512] = ((pos[i:i + 512, None] - g['pos'][None]) ** 2).sum(-1).argmin(1)
+    fn = np.cross(pos[F[:, 1]] - pos[F[:, 0]], pos[F[:, 2]] - pos[F[:, 0]]); acc = np.zeros_like(pos)
+    for kk in range(3): np.add.at(acc, F[:, kk], fn)
+    nrm = acc / (np.linalg.norm(acc, axis=1, keepdims=True) + 1e-12)
+    LOG.setdefault('decimation', {})[name] = [int(len(g['tri'])), int(len(F))]
+    return dict(pos=pos, nrm=nrm, uv=g['uv'][j], col=g['col'][j], tri=F)
+
+
 for g in big:
-    d = dec(g, int(avail * len(g['tri']) / tot), 'interior_' + g['mat'])
+    tgt = int(avail * len(g['tri']) / tot)
+    d = dec_free(g, tgt, 'interior_' + g['mat'])
+    if len(d['tri']) > tgt:                                 # QEM stops on open borders: finish with a fine grid
+        d = dec_cluster(d, tgt, 'interior_grid_' + g['mat'])
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(d, t, m))
 for g in small:
@@ -259,7 +368,7 @@ base_glass = [b for b in base if b['mat'] == M['HEADLIGHTGLASS']]
 base = [b for b in base if b['mat'] != M['HEADLIGHTGLASS']] + [mesh(glass, T_WINDOW, M['WINDSHIELD'])] + base_glass + brake_glass
 LOG['base_parts'] = [(hex(m['tex']), hex(m['mat']), len(m['tri'])) for m in base]
 print(LOG['base_parts'])
-LOG['budget'] = dict(body=ntris(body_list), trunk=ntris(trunk_list), base=ntris(base))
+LOG['budget'] = dict(body=ntris(body_list), trunk=ntris(trunk_list), base=ntris(base), roof=ntris(roof_list), door_left=ntris(doorL_list), door_right=ntris(doorR_list))
 print(LOG['budget'])
 
 # wheel: LOD B of the 20-spoke 18" wheel
@@ -344,12 +453,15 @@ solids = []
 for slot in ['KIT00', 'KITW01', 'KITW02', 'KITW03', 'KITW04']:   # the MW kits share the same paint mesh at LOD B
     solids.append(solid(f'FOCUS_{slot}_BODY_A', body_list, exhaust_markers))
 solids.append(solid('FOCUS_KIT00_TRUNK_A', trunk_list))
+solids.append(solid('FOCUS_KIT00_ROOF_A', roof_list))
+solids.append(solid('FOCUS_KIT00_DOOR_LEFT_A', doorL_list))
+solids.append(solid('FOCUS_KIT00_DOOR_RIGHT_A', doorR_list))
 solids.append(solid('FOCUS_BASE_A', base, base_markers))
 solids.append(solid('FOCUS_KIT00_FRONT_WHEEL_A', wheel))
 
 # ---------------------------------------------------------------- v6: decal placement solids
 import decals
-paint_all = merge([body_paint, trunk_paint, hood])
+paint_all = merge([body_paint, trunk_paint, hood, roofA, doorL, doorR])
 PT = (paint_all['pos'], paint_all['tri'])
 glass_all = merge(_panes)
 GT = (glass_all['pos'], glass_all['tri'])

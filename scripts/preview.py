@@ -25,7 +25,7 @@ def meshes(s, xf=None):
         out.append(m)
     return out
 parts = {s['name']: s for s in S}
-M = meshes(parts[body]) + meshes(parts['FOCUS_BASE_A']) + (meshes(parts['FOCUS_KIT00_TRUNK_A']) if 'FOCUS_KIT00_TRUNK_A' in parts else [])
+M = meshes(parts[body]) + meshes(parts['FOCUS_BASE_A']) + sum((meshes(parts[n]) for n in ('FOCUS_KIT00_TRUNK_A', 'FOCUS_KIT00_ROOF_A', 'FOCUS_KIT00_DOOR_LEFT_A', 'FOCUS_KIT00_DOOR_RIGHT_A') if n in parts), [])
 wh = parts['FOCUS_KIT00_FRONT_WHEEL_A']
 for x, y, z in WHEELS:
     def xf(p, n, x=x, y=y, z=z):
