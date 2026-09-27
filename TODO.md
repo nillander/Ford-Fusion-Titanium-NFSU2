@@ -1,14 +1,34 @@
 # TODO — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
 
-Estado em 27/09/2026: **finalizado e aprovado no jogo.** Capturas em `docs/in-game-final/`. A v8 abriu mas sem teto, portas e capô (ver abaixo). A v6 ataca os itens A, B e C do teste da
-v5 (adesivos, para-brisa, traseira). A v5 trouxe os vidros novos (gerados do zero, sem frestas). A v4 ataca os itens 1–8 da lista abaixo. Leia também [CONTINUACAO.md](CONTINUACAO.md).
+Estado em 27/09/2026: **finalizado e aprovado no jogo.** Capturas em `docs/in-game-final/`. O resultado publicado está no [README.md](README.md).
 
-- Instalado agora: GEOMETRY da v9 (SHA em README), TEXTURES `830FD72B…457F` (o da v6),
-  GlobalB `27F9944B…CF97` (o original do backup **só com as rodas mudadas**: X +1,431 / −1,311, Y ±0,78).
+Pedido: portar o Ford Fusion Titanium 2018 AWD do MW2005 (`C:\Users\nillander\NoDocuments\fusion-mw2005`, V1prime-z10; aqueles arquivos não são alterados) para o slot do Ford Focus, com o Escort RS (`source/Ford-Focus-ESCORT-RS`) como doador de estrutura. Performance: motor do Corolla levado a 248 cv, tração integral e dirigibilidade do Lancer Evo VIII.
+
+A v8 abriu mas sem teto, portas e capô (ver abaixo). A v6 ataca os itens A, B e C do teste da
+v5 (adesivos, para-brisa, traseira). A v5 trouxe os vidros novos (gerados do zero, sem frestas). A v4 ataca os itens 1–8 da lista abaixo. As v1–v3 explicam por que o jogo fechava na seleção.
+
+- Instalado: GEOMETRY da v9 e TEXTURES `830FD72B…457F` (SHA no README), GlobalB de performance `689B5935…2462`.
+  O GlobalB anterior, só com as rodas (X +1,431 / −1,311, Y ±0,78), é o `27F9944B…CF97` em `backup/v9-antes-performance/`.
 - Backups (fora do git): v3 em `backup/v3-instalada-2026-09-26/`, GEOMETRY da v4 em `backup/v4-instalada/`,
   GEOMETRY + TEXTURES da v5 em `backup/v5-instalada/`, da v6 em `backup/v6-instalada/`, GEOMETRY da v8 em `backup/v8-instalada/`.
 - Diagnóstico: `docs/diagnostico-v4/` (magenta = face vista por trás, que o jogo não desenha → buraco;
   verde = normal do vértice contrária à face → mancha escura).
+
+## v1–v3 — o jogo fechava na seleção
+
+| Versão | O que muda | Resultado no jogo |
+| --- | --- | --- |
+| v1 (`28a6a9c`) | peças até 62.886 índices / 24.303 vértices; sólidos fora da ordem de hash; TPK JDLZ; GlobalB com performance | fechou ao selecionar o carro |
+| v2 (`f3ff5b4`) | peças ≤ 46.500 índices / 19 mil vértices; sólidos em ordem de hash; resto igual à v1 | fechou ao selecionar o carro |
+| v3 — teste A | GEOMETRY da v2 + TPK sem compressão (RAWW, layout do mwtc) + GlobalB original | abriu, com rodas fora do lugar, vidros furados, capô manchado e lanternas sem lente |
+
+A v2 também fechou, então o tamanho das peças e a ordem dos sólidos não eram o único problema. A v1 e a v2 compartilhavam o compressor JDLZ próprio: cópias de até 4.098 bytes (o nfsu360 no Escort chega a 710) e o blob sem o byte extra que o nfsu360 deixa. A v3 grava RAWW, como o `mwtc`, e foi essa troca que fez o carro abrir. O GlobalB com performance ficou para o teste B, feito na build final.
+
+SHA do teste A: GEOMETRY `54AB592E…A5E1`, TEXTURES `349F6BEC…26B4`, GlobalB `10A8EAE6…BBB9` (backup, sem alteração). O GlobalB de performance da v3, sem mexer no aro, está em `variantes/performance/GlobalB.lzc` (`F45D3B2D…8926`, fora do git).
+
+Híbridos preparados para bissectar a geometria, e que não foram necessários: `variantes/hibridos/`, gerados por `scripts/hybrids.py`, para usar com `TEXTURES_uniao.BIN` e o GlobalB original. `H0_escort_regravado` (Escort reescrito por `ug2write.py`), `H1_base`, `H2_body`, `H3_roda`. O port antigo do Cursor está em `backup/port-antigo-cursor/` (GEOMETRY de 31 MB, 159 peças, flags 0x4080, TPK do MW); não se sabe se ele chegou a exibir o carro.
+
+A montagem da v2 usava LOD C decimado (carroceria e base em torno de 15.500 triângulos, roda LOD B com 8.614). Decimar o LOD A/B por QEM deformava a junção para-lama/porta; a v4 em diante deixa de fazer isso.
 
 ## O que a v4 mudou (causas encontradas)
 
@@ -189,3 +209,39 @@ A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e
 - [ ] Freios (`KIT00_FRONT/REAR_BRAKE_A`) não incluídos.
 - [ ] `VINYLS.BIN` do slot é o do Focus (adesivos podem sair tortos).
 - [x] Release `v1.0.0` publicada na `main`.
+
+## Referência — geometria medida no MW
+
+- Arcos: dianteira X = +1,431, traseira X = −1,311 (entre-eixos 2,74 m); para-lama em |y| = 0,91.
+- No jogo ficaram Y = ±0,78 e, de altura, o Z, o raio e a largura do Escort (Z ≈ 0,098, raio ≈ 0,308). A primeira gravação usava Z = 0,13, raio 0,3225 e largura 0,235; `scripts/globalb_patch.py` não sobrescreve esses três valores do GlobalB de entrada.
+- Marcadores (esquerda/direita trocados em relação ao MW; +Y é o lado esquerdo): faróis (2,15; ±0,577; 0,515), lanternas (−2,22; ±0,653; 0,688), escapamentos (−2,32; ±0,635; 0,135), brake light central, aerofólio (−2,15; 0; 0,868), entrada de ar do teto (0,3; 0; 1,207).
+
+## Referência — formatos
+
+### GEOMETRY.BIN (layout nfsu360)
+
+- Raiz `0x80134000` → chunk vazio → `0x80134001` { `0x134002` (144 bytes: 8 zeros, `0x1D`, nº de peças, "NFS:U2 Geometry Compiler by nfsu360" em 0x38, "DEFAULT" em 0x20, `0x80`), `0x134003` (hash,0), `0x134004` (hash, offset absoluto, tamanho, tamanho, 0, 0), `0x80134008` vazio }.
+- Antes de cada sólido um chunk `0x0` de preenchimento para alinhar em 0x80 (sempre, mesmo alinhado), e um no fim do arquivo.
+- Sólido `0x80134010`: `0x134011` cabeçalho (12 zeros, versão 0x16, flags 0x40, hash, NumPolys u16, NumVerts u16 = 0, bytes [0, nTex, nLuz, 0], bounds, matriz identidade, 8 zeros, `0xEE580` ×2, 0, 1.0f, NumPolys como float, 0, 0, nome em 28 bytes fixos), `0x134012` texturas (hash,0), `0x134013` materiais de luz (hash,0), `0x13401A` marcadores (80 bytes: hash, 3 zeros, matriz 4×4), `0x80134100` { `0x134900` (68 bytes: 8 zeros, 0x10, 0x4180, nGrupos, 4 zeros, nTris, 3 zeros, nVerts, 3 zeros), `0x134B01` vértices alinhados em 0x80 (36 bytes: pos, normal, cor u32, uv), `0x134B02` grupos de 60 bytes (nº de índices, idx textura, idx material, offset em índices, flags 0x4180), `0x134B03` índices u16 globais do sólido }.
+- Os grupos dos carros originais gravam os limites reais. O escritor das primeiras versões gravava ±5000; a partir da v8 os grupos e o raio do cabeçalho são os da peça.
+- `scripts/ug2write.py` reescreve o Escort com a mesma estrutura chunk a chunk (só bounds e bytes de preenchimento diferem).
+- O slot FOCUS, como o Escort deixou, desenha `BODY` (e KITW), `BASE`, `TRUNK`, `FRONT_WHEEL` e os adesivos. `ROOF` e `DOOR_*` são ignorados.
+- Hash = `h = 0xFFFFFFFF; h = h*33 + c` (`scripts/hashes.py`).
+
+### TEXTURES.BIN
+
+- Raiz `0xB3300000` → `0x0` (48) → `0xB3310000` { `0x33310001` (versão 5, caminho "NFS:U2/MW Texture Compiler by nfsu360"), `0x33310002` hashes, `0x33310003` (hash, offset absoluto, tamanho comprimido, tamanho, 0x100, 0) } → `0x0` até 0x80 → blobs em sequência.
+- Blob descomprimido = dados + (cauda) + info de 124 bytes + 32 bytes DDS. `ImagePlacement` é cumulativo na ordem de hash. Byte 74: 0x22 = DXT1, 0x24 = DXT3. DXT1 opaca usa classe `1B81E7B0`; DXT3 `001A93CF` com flags de alfa.
+- O Escort usa blobs JDLZ. O Fusion instalado grava RAWW (o JDLZ próprio fechava o jogo; ver v1–v3). `scripts/jdlz.py` comprime e `scripts/tpk2.py` descomprime, conferido com os blobs do Escort. Retail usa HUFF (não implementado).
+- Pintura: textura global `3C84D757` + material `CARSKIN`. Vidro: textura `WINDOW` + material `WINDSHIELD`.
+- Materiais de luz no GlobalB: DULLPLASTIC, INTERIOR, LICENSEPLATE, HEADLIGHTGLASS, HEADLIGHTREFLECTOR, BRAKELIGHT, BRAKELIGHTGLASS, DRIVER, RUBBER, USER_RIMS, CHROME, METPAINTBLACK.
+
+### GlobalB.lzc — CarTypeInfo (chunk `0x34600`, 2.192 bytes por carro)
+
+- O `GlobalB.lzc` desta cópia está descomprimido (salvo pelo Nikki); o original em `_backup-ptbr` é JDLZ. O instalador recusa o arquivo compactado.
+- Offsets no registro: 220 bytes de aro (externo, mín, máx); 288 + 48·i = roda i (x, y, z, 0, raio, largura, índice, 2 valores); ordem FL(+y), FR(−y), RR(−y), RL(+y); +y é o lado esquerdo; 544 massa (t), 548–556 comprimento/largura/altura, 560/580/600 inércias (m/12·(a²+b²)); 704–880 câmbio/motor/turbo de estoque (720 = divisão de torque para trás: FWD 0, RWD 1, AWD 0,5; 736 ré, 744+ marchas, 768 marcha lenta, 772 corte, 776 rpm máx, 784–816 curva de torque); 992–1616 tabelas de upgrade de motor/câmbio (divisão de torque também em 1136/1200/1264); 480–704, 880–992, 1616–2032 pneus/suspensão/direção/freios (e upgrades).
+- `scripts/globalb_patch.py` (e o `release/instalar.bat`, que grava os mesmos bytes) aplica motor/câmbio do COROLLA com torque ×2,212 (248 cv), chassi do LANCEREVO8, divisão 0,5, X/Y das rodas do Fusion, dimensões 4,73 × 1,85 × 1,46, massa 1,63 t e inércia recalculada. Z, raio e largura da roda ficam os do arquivo de entrada.
+
+## Referência — reconstruir
+
+Os comandos estão no [README.md](README.md). Entradas que o README não nomeia: `mw/` é o ZIP `fusion-mw2005/release/Fusion2018_AWD_MW2005.zip` extraído; `escort/` é o `FOCUS.7z` extraído com `scripts/sevenz.py` (o header é LZMA puro, sem 7-Zip). `python build.py` gera a geometria atual (v9), não o layout da v2/v4. O `globalb_patch.py` roda sempre sobre o GlobalB atual do jogo. Decimador, DXT, JDLZ e o extrator 7z são próprios, em Python e numpy, porque o ambiente não tinha pip.
