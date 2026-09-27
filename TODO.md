@@ -1,12 +1,12 @@
 # TODO — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
 
-Estado em 27/09/2026 (manhã): **v8 instalada, aguardando teste no jogo.** (A v6 também está descrita abaixo.) A v6 ataca os itens A, B e C do teste da
+Estado em 27/09/2026: **v9 instalada, aguardando teste no jogo.** A v8 abriu mas sem teto, portas e capô (ver abaixo). A v6 ataca os itens A, B e C do teste da
 v5 (adesivos, para-brisa, traseira). A v5 trouxe os vidros novos (gerados do zero, sem frestas). A v4 ataca os itens 1–8 da lista abaixo. Leia também [CONTINUACAO.md](CONTINUACAO.md).
 
-- Instalado agora: GEOMETRY `F5F7215C…A569` (v8), TEXTURES `830FD72B…457F` (o da v6),
+- Instalado agora: GEOMETRY da v9 (SHA em README), TEXTURES `830FD72B…457F` (o da v6),
   GlobalB `27F9944B…CF97` (o original do backup **só com as rodas mudadas**: X +1,431 / −1,311, Y ±0,78).
 - Backups (fora do git): v3 em `backup/v3-instalada-2026-09-26/`, GEOMETRY da v4 em `backup/v4-instalada/`,
-  GEOMETRY + TEXTURES da v5 em `backup/v5-instalada/`, da v6 em `backup/v6-instalada/`.
+  GEOMETRY + TEXTURES da v5 em `backup/v5-instalada/`, da v6 em `backup/v6-instalada/`, GEOMETRY da v8 em `backup/v8-instalada/`.
 - Diagnóstico: `docs/diagnostico-v4/` (magenta = face vista por trás, que o jogo não desenha → buraco;
   verde = normal do vértice contrária à face → mancha escura).
 
@@ -39,6 +39,29 @@ nova (Delaunay, pontos a cada 6 cm; 3.174 triângulos no total). O resultado fic
 `.npz`). Textura continua a `WINDOW` (as texturas por janela dos carros originais não existem como
 globais nos arquivos do jogo). Imagens: `docs/diagnostico-v4/v5-vidros-*.png`.
 A faixa preta com o triângulo no alto do para-brisa é a cerâmica do Fusion real (peça da base), não defeito.
+
+## v9 — correção da v8
+
+**Teste da v8 (27/09, `docs/in-game-v8/`):** o carro apareceu sem teto, sem portas e sem capô (motor à mostra).
+**Causa:** o slot FOCUS, como configurado pelo mod do Escort, só desenha `BODY` (e KITW), `BASE`, `TRUNK`,
+`FRONT_WHEEL` e os adesivos. As peças `KIT00_ROOF_A` e `KIT00_DOOR_LEFT/RIGHT_A` são ignoradas.
+**Regra:** toda a pintura tem de caber nessas peças (≤ 21.500 triângulos cada).
+
+A v9 volta a esse layout e mantém o que a v8 trouxe de bom:
+- pintura LOD B (sem porta-malas; 16.964 → 14.900 nas áreas planas) + **LOD A** no para-choque traseiro
+  (x < −1,9), no bico (acima da grade) e na frente do teto (junto ao para-brisa), com cortes exatos;
+  tampa do porta-malas LOD A na `TRUNK_A`; capô LOD B (só a face de cima), bico A e frente do teto A na `BASE_A`;
+- bico sem o emblema Ford e com o rebaixo preenchido;
+- **UV de vinil no molde do Focus** em toda a pintura (`scripts/vinyluv.py`);
+- limites reais nos grupos; escapamentos/difusor da base B;
+- interior reduzido (≈ 3.700 triângulos) para dar lugar ao LOD A.
+
+Peças: carrocerias 21.228 · `TRUNK_A` 18.021 · `BASE_A` 21.255 · roda 8.614 + adesivos.
+
+- [ ] **Testar a v9 no jogo** (carro completo; vinis; adesivos; traseira/bico/teto).
+- [ ] Para usar mais LOD A seria preciso descobrir como o slot pode desenhar mais peças (ex.: editar a lista de
+  peças do FOCUS no GlobalB, que o instalador `.u2car` alterou), ou o jogo aceitar dois sólidos com o mesmo
+  nome (o mod Focus RS tem dois `FOCUS_BASE_A`; não confirmado).
 
 ## v8 — o que mudou (teste da v6: deformações, emblema, vinis)
 
