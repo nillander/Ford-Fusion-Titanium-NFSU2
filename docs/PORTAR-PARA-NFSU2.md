@@ -35,7 +35,16 @@ O Codex montou o hábito de partir de um doador. O Claude fechou a malha que o M
 A pasta de trabalho é este repositório:
 
 - `mw/` = ZIP da release do `fusion-mw2005`, extraído. Dele saem `GEOMETRY.BIN` e `TEXTURES.BIN` do carro aprovado.
-- `escort/` (ou o nome do doador) = arquivos do mod UG2 que já funciona naquele slot. O `FOCUS.7z` do Escort tem header LZMA puro; `scripts/sevenz.py` extrai sem 7-Zip.
+- `escort/` (ou o nome do doador) = arquivos do mod UG2 que já funciona naquele slot. O `FOCUS.7z` do Escort tem header LZMA puro; `scripts/sevenz.py` extrai sem 7-Zip. A pasta que permanece no repositório é `source/Ford-Focus-ESCORT-RS`.
+
+Os outros mods de `source/` saíram depois que o Fusion foi aprovado. O que cada um ensinou já está no diário; o arquivo não entra na reconstrução:
+
+| Mod | O que ficou anotado | Por que saiu |
+| --- | --- | --- |
+| Ford Focus RS 2018 | Mesmo layout nfsu360 no slot FOCUS. Dois sólidos `FOCUS_BASE_A` no mesmo arquivo; não foi confirmado se o jogo desenha os dois | Não foi o doador. A lista de peças que o slot desenha é a do Escort |
+| McLaren Senna (slot LANCEREVO8) | 20.486 triângulos / 61.458 índices abrem o jogo | Supercarro. A física do Lancer vem do registro `LANCEREVO8` no `GlobalB.lzc` do jogo, não deste mod. As rodas medidas nele não entraram |
+| Cadillac Escalade (F-150) | Uma peça com 17,7 mil vértices abre | Picape. A posição das rodas não entrou |
+| Mustang Shelby GT | Um mod UG2 tem as peças `DECAL_*` que o Escort não tem | Os adesivos saíram das peças do MW e do molde de capô do Corolla. A v9 aprovada já mostra o carro |
 
 ```
 python extract_mw.py    # mw/CARS/<SLOT>/ -> mw_parts.pkl e texdump/

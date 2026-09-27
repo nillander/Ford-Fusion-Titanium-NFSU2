@@ -81,7 +81,7 @@ Peças: carrocerias 21.228 · `TRUNK_A` 18.021 · `BASE_A` 21.255 · roda 8.614 
 - [x] **Testar a v9 no jogo** — aprovado em 27/09 (garagem, cidade e largada): `docs/in-game-final/`.
 - [ ] Para usar mais LOD A seria preciso descobrir como o slot pode desenhar mais peças (ex.: editar a lista de
   peças do FOCUS no GlobalB, que o instalador `.u2car` alterou), ou o jogo aceitar dois sólidos com o mesmo
-  nome (o mod Focus RS tem dois `FOCUS_BASE_A`; não confirmado).
+  nome (o mod Focus RS tinha dois `FOCUS_BASE_A`; não confirmado. O arquivo saiu de `source/`).
 
 ## v8 — o que mudou (teste da v6: deformações, emblema, vinis)
 
@@ -112,8 +112,9 @@ Peças: 35 sólidos, maior `BASE_A` 21.298 (63.894 índices). Imagens: `docs/dia
 
 ### Pendências depois da v8
 - [ ] **Testar a v8 no jogo**: vinis na carroceria, adesivos no para-brisa/portas/capô, traseira, bico, teto.
-- [ ] Se os adesivos continuarem sem aparecer: comparar com um mod que comprovadamente mostra adesivos
-  (Mustang em `source/`) instalando-o num slot de teste; testar decal com matriz/`0x134017-19` do Corolla.
+- [ ] Se os adesivos continuarem sem aparecer: comparar com um mod que comprovadamente mostra adesivos,
+  instalando-o num slot de teste; testar decal com matriz/`0x134017-19` do Corolla. O Mustang Shelby
+  saiu de `source/`: os nomes `DECAL_*` já tinham sido conferidos e a v9 aprovada desenha o carro.
 - [ ] Se os vinis saírem deslocados/esticados: ajustar escala vertical `S_V` e os deslocamentos de frente/
   traseira em `scripts/vinyluv.py` pelas fotos.
 - [ ] A peça `TRUNK_A` inclui a parte da lanterna central (anima junto com a tampa na loja de som).

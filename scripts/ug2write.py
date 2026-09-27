@@ -1,5 +1,5 @@
 """Writes an NFS Underground 2 car GEOMETRY.BIN in the same layout the nfsu360 compiler uses
-(the layout of the Escort RS / Focus RS / Senna mods that load in the game)."""
+(validated by rewriting the Escort RS, the donor that loads in the FOCUS slot)."""
 import struct
 import numpy as np
 from hashes import bh
