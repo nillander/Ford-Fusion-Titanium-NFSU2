@@ -2,6 +2,8 @@
 
 Documento para retomar o trabalho em outra sessão. Atualizado em 26/09/2026 (v4). O estado mais recente e a lista de pendências estão em [TODO.md](TODO.md).
 
+> O port foi **finalizado e aprovado no jogo** em 27/09/2026. Este arquivo guarda o diário até a v4. O resultado está no [README.md](README.md).
+
 ## 1. Pedido
 
 - Construir um Ford Fusion Titanium 2018 AWD para o NFS Underground 2, instalado **sobre o Ford Focus**,

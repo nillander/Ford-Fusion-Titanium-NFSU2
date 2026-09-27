@@ -4,16 +4,23 @@ Substitui o **Ford Focus** (slot `FOCUS`). O modelo vem do port aprovado de Most
 (`fusion-mw2005`, V1prime-z10); os arquivos de lá não foram alterados. O doador de estrutura é o
 **Escort RS** (`source/Ford-Focus-ESCORT-RS`), o mod sedã que já funciona neste jogo.
 
-> **Estado:** a v9 (instalada) usa pintura LOD B + LOD A nas áreas que deformavam (só nas peças que o slot desenha: carroceria, base, porta-malas), tira o emblema do bico e mapeia a pintura no molde de vinil do Focus; aguarda teste. Detalhes em [TODO.md](TODO.md).
+> **Estado:** finalizado e aprovado no jogo em 27/09/2026. A v9 desenha o carro completo no slot FOCUS (pintura LOD B + LOD A nas áreas que deformavam, sem o emblema do bico, UV de vinil no molde do Focus) com o GlobalB de performance (248 cv, tração integral, chassi do Lancer). O histórico das versões está em [TODO.md](TODO.md).
 
-![prévia](docs/previa-fusion-ug2.png)
+## No jogo
+
+| Garagem | Cidade |
+| --- | --- |
+| ![Garagem](docs/in-game-final/final-garagem.png) | ![Frente na cidade](docs/in-game-final/final-cidade-frente.png) |
+| ![Traseira na cidade](docs/in-game-final/final-cidade-traseira.png) | ![Largada em Bayview](docs/in-game-final/final-largada.png) |
+
+![Detalhe da frente, com faróis acesos](docs/in-game-final/final-frente.png)
 
 ## O que entra no jogo
 
 | Arquivo | Conteúdo |
 | --- | --- |
-| `CARS/FOCUS/GEOMETRY.BIN` | 7 peças no layout do Escort RS (compilador nfsu360): `KIT00_BODY_A`, `KITW01–04_BODY_A`, `BASE_A`, `KIT00_FRONT_WHEEL_A` |
-| `CARS/FOCUS/TEXTURES.BIN` | 15 texturas (JDLZ, como o Escort). Opacas em DXT1; só as lentes de farol/lanterna em DXT3 |
+| `CARS/FOCUS/GEOMETRY.BIN` | peças que o slot FOCUS desenha: `KIT00_BODY_A`, `KITW01–04_BODY_A`, `KIT00_TRUNK_A`, `BASE_A`, `KIT00_FRONT_WHEEL_A` e os adesivos |
+| `CARS/FOCUS/TEXTURES.BIN` | 15 texturas sem compressão (RAWW). Opacas em DXT1; lentes, sombras e neon em DXT3 |
 | `GLOBAL/GlobalB.lzc` | registro `FOCUS` alterado (rodas, massa, inércia, motor, câmbio, tração, chassi). Editado no próprio arquivo do jogo |
 
 `VINYLS.BIN` e `PARTS_ANIMATIONS.bin` continuam os do jogo.
@@ -22,23 +29,23 @@ Substitui o **Ford Focus** (slot `FOCUS`). O modelo vem do port aprovado de Most
 
 | Peça UG2 | Origem (MW z10) | Triângulos |
 | --- | --- | --- |
-| `KIT00_BODY_A` (padrão) e `KITW03` | carroceria LOD C + capô LOD C (14.000) + vidros (1.500) | 15.500 |
-| `KITW01` ("Street": lábio, saias, lábio traseiro) e `KITW04` | KIT01 LOD C + capô + vidros | 15.500 |
-| `KITW02` ("Race": splitter, saias, difusor) | KIT02 LOD C + capô + vidros | 15.499 |
-| `BASE_A` | base LOD C (grade, frisos, chassi, placas, emblemas) + interior + motorista + faróis e lanternas (LOD C) | 15.435 |
-| `KIT00_FRONT_WHEEL_A` | roda de 20 raios aro 18" (LOD B) | 8.614 |
+| `KIT00_BODY_A` e `KITW01–04` | pintura LOD B nas áreas planas + LOD A no bico, na frente do teto e no para-choque traseiro. As cinco carrocerias são a mesma malha | 21.228 |
+| `KIT00_TRUNK_A` | tampa do porta-malas em LOD A, com a lanterna central | 18.021 |
+| `BASE_A` | base, capô LOD B (só a face de cima), bico e frente do teto em LOD A, vidros, faróis, lanternas, interior e motorista | 21.255 |
+| `KIT00_FRONT_WHEEL_A` | roda de 20 raios, aro 18" (LOD B) | 8.614 |
 
-Todas com no máximo 46.500 índices e 19 mil vértices por peça (a v1, com até 62.886 índices, fechou o jogo).
+Cada peça fica em até 21.500 triângulos (64.500 índices). A v1, com até 62.886 índices concentrados, fechou o jogo.
 
 ## Aprendizados aplicados (do MW2005 e deste port)
 
 1. **Limite de índices por peça.** O UG2 fecha o jogo quando uma peça passa de 65.535 índices
-   (~21.800 triângulos). O LOD A do Fusion tem ~190 mil triângulos. O port anterior *truncava* as
-   malhas; aqui a malha não é cortada:
-   - carroceria e base usam o **LOD C autoral do GTA V** (liso, sem facetas); decimar o LOD B por
-     QEM deformava o encontro para-lama/porta (as "manchas" do MW voltavam);
-   - vidros (12 mil → 2.300) e interior (18,5 mil → 7.600) passam por decimação que preserva
-     costuras de UV, bordas e troca de material (`scripts/decimate.py`), com normais recalculadas.
+   (~21.800 triângulos). O LOD A do Fusion tem ~190 mil triângulos, e o slot FOCUS só desenha
+   carroceria, base, porta-malas, roda e adesivos. A pintura foi repartida nessas peças
+   (≤ 21.500 triângulos), sem truncar a malha:
+   - áreas planas ficam no LOD B; o bico, a frente do teto e o para-choque traseiro usam o LOD A,
+     com corte exato (`scripts/clip.py`). Decimar o LOD B por QEM deformava o encontro para-lama/porta;
+   - os vidros são uma lâmina nova por janela (`scripts/newglass.py`); o interior foi reduzido para
+     caber o LOD A na base.
 2. **DXT1 para peças opacas.** DXT3 desliga a gravação de profundidade (lição da grade do MW).
    MISC, LOGO, INTERIOR, BADGING, roda, pneu, motorista e as carcaças dos faróis/lanternas são DXT1.
    As lentes usam uma cópia DXT3 separada da mesma folha e ficam por último na ordem de desenho.
@@ -66,7 +73,7 @@ Valores finais em `docs/globalb_focus.json`.
 
 ## Instalação
 
-Já está instalado. Para reinstalar em outra cópia do jogo: feche o jogo, copie `CARS/FOCUS` e rode
+Na cópia de desenvolvimento já está instalado. Para instalar em outra cópia do jogo: feche o jogo, copie `CARS/FOCUS` e rode
 `scripts/globalb_patch.py GlobalB.lzc GlobalB.lzc.novo` sobre o `GLOBAL/GlobalB.lzc` descompactado.
 O backup do estado anterior (Escort RS + GlobalB) está em `backup/antes-fusion-2026-09-25`
 (fora do git).
@@ -89,13 +96,16 @@ python globalb_patch.py GlobalB.lzc out/GlobalB.lzc
 python preview.py out/GEOMETRY.BIN out/TEXTURES.BIN previa.png
 ```
 
+![prévia offline](docs/previa-fusion-ug2.png)
+
 O leitor/escritor de GEOMETRY foi validado reescrevendo o Escort RS: estrutura idêntica chunk a chunk.
 O compressor JDLZ foi validado com ida e volta contra o descompressor que lê os blobs do Escort.
 
-## Limites conhecidos / não testado
+## Limites conhecidos
 
-- Não foi aberto no jogo. Pontos a conferir: rodas dentro dos arcos (se ficarem para fora/dentro,
-  ajuste Y no Nikki), sombra, brilho de faróis/lanternas.
-- Freios e porta-malas (`TRUNK_A`) não entram (o Escort também não tem).
-- Logo da tela de seleção (`FrontB.lzc`) e nome no menu continuam os do Escort/Focus.
-- Adesivos: o `VINYLS.BIN` do slot foi feito para a UV do Focus; o mapa da pintura é o do MW.
+Aprovado na garagem, no modo exploração e na largada: carroceria completa (teto, portas e capô), faróis, lanternas e rodas dentro dos arcos.
+
+- Freios (`KIT00_FRONT/REAR_BRAKE_A`) não entram.
+- Na tela de som o jogo anima a `TRUNK_A` com o pivô do Focus.
+- Logo da tela de seleção (`FrontB.lzc`) e o nome no menu continuam os do Escort/Focus.
+- O `VINYLS.BIN` do slot continua o do Focus; a pintura usa a UV projetada no molde dele.

@@ -1,6 +1,6 @@
 # TODO — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
 
-Estado em 27/09/2026: **v9 instalada, aguardando teste no jogo.** A v8 abriu mas sem teto, portas e capô (ver abaixo). A v6 ataca os itens A, B e C do teste da
+Estado em 27/09/2026: **finalizado e aprovado no jogo.** Capturas em `docs/in-game-final/`. A v8 abriu mas sem teto, portas e capô (ver abaixo). A v6 ataca os itens A, B e C do teste da
 v5 (adesivos, para-brisa, traseira). A v5 trouxe os vidros novos (gerados do zero, sem frestas). A v4 ataca os itens 1–8 da lista abaixo. Leia também [CONTINUACAO.md](CONTINUACAO.md).
 
 - Instalado agora: GEOMETRY da v9 (SHA em README), TEXTURES `830FD72B…457F` (o da v6),
@@ -58,7 +58,7 @@ A v9 volta a esse layout e mantém o que a v8 trouxe de bom:
 
 Peças: carrocerias 21.228 · `TRUNK_A` 18.021 · `BASE_A` 21.255 · roda 8.614 + adesivos.
 
-- [ ] **Testar a v9 no jogo** (carro completo; vinis; adesivos; traseira/bico/teto).
+- [x] **Testar a v9 no jogo** — aprovado em 27/09 (garagem, cidade e largada): `docs/in-game-final/`.
 - [ ] Para usar mais LOD A seria preciso descobrir como o slot pode desenhar mais peças (ex.: editar a lista de
   peças do FOCUS no GlobalB, que o instalador `.u2car` alterou), ou o jogo aceitar dois sólidos com o mesmo
   nome (o mod Focus RS tem dois `FOCUS_BASE_A`; não confirmado).
@@ -163,9 +163,9 @@ A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e
 
 ## Lista
 
-- [ ] **Testar a v6 no jogo** (adesivos em vidros/portas/capô, para-brisa, lanternas, tampa e para-choque).
+- [x] **Testar a v6 no jogo** — superado pela v8/v9; a v9 aprovada está em `docs/in-game-final/`.
 - [x] Testar a v5 no jogo: abriu. Novos problemas em "Problemas vistos no teste da v5" (A, B, C).
-- [ ] **0. Teste B — GlobalB com performance: instalado em 27/09** (`689B5935…2462`, gerado sobre o GlobalB
+- [x] **0. Teste B — GlobalB com performance: faz parte da build final** (`689B5935…2462`, gerado sobre o GlobalB
   com as rodas; o anterior em `backup/v9-antes-performance/`). Motor do Corolla com todas as curvas de torque ×2,212
   (248 cv, 288 Nm), AWD 0,5, chassi do Lancer, massa 1,63 t; Z/raio/largura das rodas mantidos os do Escort. Antes disso o menu
   mostrava a potência do Focus porque o patch nunca tinha sido instalado. Plano original: depois que a v4 for aprovada, aplicar
@@ -188,4 +188,4 @@ A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e
 - [ ] Logo da tela de seleção (`FrontB.lzc`) e nome no menu ainda são do Escort/Focus.
 - [ ] Freios (`KIT00_FRONT/REAR_BRAKE_A`) não incluídos.
 - [ ] `VINYLS.BIN` do slot é o do Focus (adesivos podem sair tortos).
-- [ ] Commit local ao final de cada etapa (sem push).
+- [x] Release `v1.0.0` publicada na `main`.
