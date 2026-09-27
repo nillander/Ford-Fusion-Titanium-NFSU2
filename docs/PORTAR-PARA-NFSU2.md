@@ -70,17 +70,33 @@ No Fusion o LOD A tem cerca de 190 mil triângulos. O que coube:
 | `KIT00_FRONT_WHEEL_A` | roda LOD B | 8.614 |
 | `DECAL_*` | vagas de adesivo, malhas pequenas | — |
 
+Azul é a carroceria, cinza a base, laranja a tampa, preto a roda. O render lê o `GEOMETRY.BIN` instalado.
+
+![Peças do BIN por cor](geometria/pecas-por-cor.png)
+
+![Seis vistas da v9](diagnostico-v8/v9-carro-completo.png)
+
 Cortes entre LOD A e LOD B são exatos (`scripts/clip.py`): as peças se encontram sem degrau. Decimar o LOD B por QEM deformou o encontro para-lama/porta; o LOD C autoral aguenta área plana, o LOD A fica onde o reflexo acusa faceta.
 
 Os quatro `KITW` existem mesmo quando a malha é igual à de fábrica. Carro da IA aplica kit aleatório; kit ausente some com a carroceria. No Most Wanted isso já era verdade para os presets do `GLOBALB.BUN` (Razor, cutscenes). Aqui a regra é a mesma, com menos nomes de peça.
 
 **Vidros.** O vidro do MW é dupla face e está partido em `FRONT_WINDOW_A` e `REAR_WINDOW_A`. Decimar as duas camadas juntas abre fresta. O que funcionou foi gerar uma lâmina por janela, face única, alargada e dobrada para baixo da moldura (`scripts/newglass.py`, resultado em `docs/vidros_v5.npz`). Textura `WINDOW`, material `WINDSHIELD`.
 
+![Lâminas de vidro da v5, encaixadas na moldura](diagnostico-v4/v5-vidros-detalhe.png)
+
 **Capô.** O capô do MW tem duas faces coincidentes. Ficar só com a de cima. As duas, depois de decimadas, viram mancha preta.
 
-**Normais e faces de costas.** O jogo não desenha o verso. Magenta no render = buraco. Normal do vértice contra a face = mancha escura. Recalcular só o vértice ruim; suavizar a malha toda piora (lição já fechada no Most Wanted).
+**Normais e faces de costas.** O jogo não desenha o verso. Magenta no render = buraco. Normal do vértice contra a face = mancha escura. Recalcular só o vértice ruim; suavizar a malha toda piora (lição já fechada no Most Wanted). Neste render o para-lama por dentro sai verde.
+
+![Conferência de faces da v5](diagnostico-v4/v5-faces.png)
 
 **Emblema.** Sólido pequeno no bico pode ser removido; o rebaixo que ele deixa é preenchido empurrando os vértices da pintura e regravando as normais.
+
+![Bico sem o emblema, com o rebaixo preenchido](diagnostico-v8/bico-sem-emblema.png)
+
+A pintura que para em `ROOF` e `DOOR_*` some no jogo: o slot FOCUS não desenha essas peças. A v8 ficou sem teto, sem portas e sem capô.
+
+![v8 no menu, com a pintura fora das peças que o slot desenha](in-game-v8/v8-sem-teto-portas.png)
 
 ### 3. Texturas
 
@@ -99,6 +115,8 @@ Os grupos gravam os limites reais da peça e o cabeçalho grava o raio. As prime
 
 O `VINYLS.BIN` do slot continua o do carro original. A pintura é que foi entortada para o molde dele.
 
+![Pintura com a UV do molde do Focus: LEFT na lateral esquerda, TOP no teto, RIGHT na direita](diagnostico-v8/vinil-molde-focus.png)
+
 ### 5. Rodas, marcadores e performance
 
 Medir os arcos na malha. No Fusion: dianteira X = +1,431, traseira X = −1,311 (entre-eixos 2,74 m), para-lama em |y| = 0,91. Um port anterior tinha gravado 3,3 m de entre-eixos.
@@ -106,6 +124,8 @@ Medir os arcos na malha. No Fusion: dianteira X = +1,431, traseira X = −1,311 
 No `GlobalB.lzc`, cada roda é x, y, z, raio e largura. Ordem FL, FR, RR, RL. **+Y é o lado esquerdo** no Underground 2; os marcadores vindos do MW trocam esquerda e direita. Y = ±0,78 entrou. Z, raio e largura ficaram os do Escort (Z ≈ 0,098, raio ≈ 0,308, largura 0,195), que o jogo aprovou. A primeira conta (Z 0,13, raio 0,3225, largura 0,235) não é a que está instalada. O patch não sobrescreve esses três campos do arquivo de entrada.
 
 Marcadores que acompanharam o MW: faróis (2,15; ±0,577; 0,515), lanternas (−2,22; ±0,653; 0,688), escapamentos (−2,32; ±0,635; 0,135), brake light central, aerofólio (−2,15; 0; 0,868), entrada de ar do teto (0,3; 0; 1,207).
+
+![Lanternas lidas da malha do Most Wanted, antes do enxerto](diagnostico-v4/mw-lanternas.png)
 
 Performance não está na malha. No Most Wanted ela mora no `ATTRIBUTES.BIN` / `ATTRIBUTES.MWPS`. No Underground 2 mora no registro `CarTypeInfo` do `GlobalB.lzc`: chunk `0x34600`, 2.192 bytes por carro. `scripts/globalb_patch.py` copia blocos de outros carros do mesmo arquivo e escala o torque. No Fusion: motor e câmbio do Corolla com todas as curvas ×2,212 (248 cv, 288 Nm), divisão de torque 0,5 do Lancer (integral, no estoque e nos três upgrades), pneus, suspensão, direção e freios do Lancer, massa 1,63 t, dimensões 4,73 × 1,85 × 1,46 m e inércia recalculada. O Focus original tem entre-eixos 2,54 m e massa 1,15 t; copiar o registro inteiro do Focus deixa o carro longo com física de carro curto.
 

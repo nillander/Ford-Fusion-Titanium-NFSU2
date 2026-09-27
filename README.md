@@ -36,6 +36,56 @@ Substitui o **Ford Focus** (slot `FOCUS`). O modelo vem do port aprovado de Most
 
 Cada peça fica em até 21.500 triângulos (64.500 índices). A v1, com até 62.886 índices concentrados, fechou o jogo.
 
+### A malha nas imagens
+
+Azul é `KIT00_BODY_A`. Cinza é `BASE_A`: capô, frente do teto, vidros, faróis e lanternas. Laranja é `KIT00_TRUNK_A`. A roda preta está nos quatro arcos medidos na malha. Os quatro `KITW` repetem a malha azul e ficam de fora deste render. A imagem sai do `GEOMETRY.BIN` instalado.
+
+![Peças do GEOMETRY.BIN por cor](docs/geometria/pecas-por-cor.png)
+
+A v9 inteira, nas seis vistas de `scripts/preview.py`. Magenta é face de costas ou a lente; o para-lama por dentro sai verde.
+
+![Seis vistas da geometria aprovada](docs/diagnostico-v8/v9-carro-completo.png)
+
+| Uma lâmina de vidro por janela | Pintura no molde de vinil do Focus |
+| --- | --- |
+| ![Vidros da v5](docs/diagnostico-v4/v5-vidros-detalhe.png) | ![UV LEFT, TOP e RIGHT no molde do Focus](docs/diagnostico-v8/vinil-molde-focus.png) |
+
+| As cinco carrocerias são a mesma malha | v8: pintura em peças que o slot não desenha |
+| --- | --- |
+| ![Frente e traseira dos kits](docs/previa-kits.png) | ![Garagem da v8, sem teto, portas e capô](docs/in-game-v8/v8-sem-teto-portas.png) |
+
+### Da v3 à v5
+
+A v3 decimou a pintura. Magenta é face de costas ou buraco: o capô, o teto e a coluna ficaram partidos.
+
+![Faces da v3](docs/diagnostico-v4/v3-faces.png)
+
+A v4 fechou essa lataria e devolveu o vidro traseiro que vinha do Most Wanted. As faixas douradas são o `REAR_WINDOW` de origem. A v5 substituiu o vidro decimado por uma lâmina nova em cada janela.
+
+| Vidro traseiro do MW, com a faixa que faltava | As lâminas da v5, sem a carroceria |
+| --- | --- |
+| ![Vidro traseiro herdado](docs/diagnostico-v4/mw-rear-window.png) | ![Vidros sozinhos](docs/diagnostico-v4/v5-vidros-sozinhos.png) |
+
+Na v4 o para-lama por dentro já sai verde e o miolo da lataria deixa de ser mancha magenta.
+
+![Faces da v4](docs/diagnostico-v4/v4-faces.png)
+
+### Bico, tampa, adesivos e molde
+
+| Rebaixo do emblema, preenchido na pintura | Tampa e lanternas da malha aprovada |
+| --- | --- |
+| ![Bico sem o emblema](docs/diagnostico-v8/bico-sem-emblema.png) | ![Traseira da v9](docs/diagnostico-v8/traseira.png) |
+
+| Molde de vinil do Focus, antes de projetar a pintura | Lanternas lidas do Most Wanted |
+| --- | --- |
+| ![Molde LEFT, TOP e RIGHT](docs/diagnostico-v8/FOCUS_DEBUG-molde.png) | ![Lanternas do MW](docs/diagnostico-v4/mw-lanternas.png) |
+
+As faixas coloridas são as peças `DECAL`, não a pintura. Elas sentam no para-brisa, no capô e nas portas. No centro do para-brisa a v6 ainda mostra a emenda das duas lâminas.
+
+| Adesivos de teste na v6 | Emenda do para-brisa |
+| --- | --- |
+| ![Adesivos sobre a carroceria](docs/diagnostico-v4/v6-adesivos.png) | ![Para-brisa, com a coluna no meio](docs/diagnostico-v4/v6-para-brisa.png) |
+
 ## Aprendizados aplicados (do MW2005 e deste port)
 
 1. **Limite de índices por peça.** O UG2 fecha o jogo quando uma peça passa de 65.535 índices
@@ -45,7 +95,7 @@ Cada peça fica em até 21.500 triângulos (64.500 índices). A v1, com até 62.
    - áreas planas ficam no LOD B; o bico, a frente do teto e o para-choque traseiro usam o LOD A,
      com corte exato (`scripts/clip.py`). Decimar o LOD B por QEM deformava o encontro para-lama/porta;
    - os vidros são uma lâmina nova por janela (`scripts/newglass.py`); o interior foi reduzido para
-     caber o LOD A na base.
+     caber o LOD A na base. A mancha magenta da v3 e o fechamento na v4 estão na seção anterior.
 2. **DXT1 para peças opacas.** DXT3 desliga a gravação de profundidade (lição da grade do MW).
    MISC, LOGO, INTERIOR, BADGING, roda, pneu, motorista e as carcaças dos faróis/lanternas são DXT1.
    As lentes usam uma cópia DXT3 separada da mesma folha e ficam por último na ordem de desenho.
