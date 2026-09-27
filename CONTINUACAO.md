@@ -1,6 +1,6 @@
 # Continuação — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
 
-Documento para retomar o trabalho em outra sessão. Atualizado em 26/09/2026 (v3, teste A).
+Documento para retomar o trabalho em outra sessão. Atualizado em 26/09/2026 (v4). O estado mais recente e a lista de pendências estão em [TODO.md](TODO.md).
 
 ## 1. Pedido
 
@@ -17,7 +17,8 @@ Documento para retomar o trabalho em outra sessão. Atualizado em 26/09/2026 (v3
 | --- | --- | --- |
 | v1 (`28a6a9c`) | peças até 62.886 índices / 24.303 vértices; sólidos fora da ordem de hash; TPK JDLZ; GlobalB com performance | **fechou ao selecionar o carro** |
 | v2 (`f3ff5b4`) | peças ≤ 46.500 índices / 19 mil vértices; sólidos em ordem de hash; resto igual à v1 | **fechou ao selecionar o carro** |
-| **v3 — teste A (instalado)** | GEOMETRY da v2 + **TPK sem compressão (RAWW, layout do mwtc)** + **GlobalB original** (sem performance) | aguardando |
+| v3 — teste A | GEOMETRY da v2 + **TPK sem compressão (RAWW, layout do mwtc)** + **GlobalB original** (sem performance) | **abriu**, mas com rodas fora do lugar, vidros furados, capô manchado, lanternas sem lente |
+| **v4 (instalada)** | pintura LOD B sem decimação + `KIT00_TRUNK_A`; vidros das duas peças do MW só com a camada externa; capô B só com a face de cima; lente da lanterna com `BRAKELIGHT` e dupla face; GlobalB original só com X/Y das rodas; TEXTURES da v3 | aguardando — ver [TODO.md](TODO.md) |
 
 Como a v2 também fechou, o tamanho das peças e a ordem dos sólidos não eram (só) o problema. Restam os
 dois componentes que a v1 e a v2 tinham iguais:
@@ -137,7 +138,7 @@ A área de trabalho na nuvem é temporária. Tudo o que é preciso está em `scr
 1. Pasta de trabalho com `mw/` = ZIP `fusion-mw2005/release/Fusion2018_AWD_MW2005.zip` extraído e
    `escort/` = `FOCUS.7z` extraído (`python sevenz.py`; o header é LZMA puro, sem 7-Zip).
 2. `python extract_mw.py` → `mw_parts.pkl` e `texdump/`.
-3. `python build.py out` → `out/GEOMETRY.BIN`, `out/TEXTURES.BIN`, `out/build_log.json`.
+3. `python build.py out` (v4) → `out/GEOMETRY.BIN`, `out/TEXTURES.BIN`, `out/build_log.json`.
 4. `python globalb_patch.py <GlobalB atual> out/GlobalB.lzc` (sempre sobre o GlobalB **atual** do jogo:
    o usuário edita com o Nikki).
 5. `python preview.py out/GEOMETRY.BIN out/TEXTURES.BIN previa.png` (lê de volta o binário).

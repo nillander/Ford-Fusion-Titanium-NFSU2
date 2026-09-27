@@ -20,3 +20,9 @@ for s in S:
 pickle.dump(out,open('mw_parts.pkl','wb'))
 for n in ['MUSTANGGT_KIT00_BODY_A','MUSTANGGT_BASE_A','MUSTANGGT_KIT00_FRONT_WINDOW_A']:
     for g in out[n]['groups']: print(n,g['tex'],g['mat'],len(g['pos']),len(g['tri']),g['stride'])
+# texture sheets as PNG (build.py reads texdump/mw_<name>.png)
+import os, dxt
+from PIL import Image
+os.makedirs('texdump', exist_ok=True)
+for t in tex:
+    Image.fromarray(dxt.decode(t['data'], t['w'], t['h'], t['fmt'])).save(f"texdump/mw_{t['name']}.png")

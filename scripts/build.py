@@ -1,4 +1,4 @@
-"""Builds the Ford Fusion Titanium 2018 for NFSU2 (FOCUS slot) from the approved MW2005 port (V1prime-z10).
+"""v4. Builds the Ford Fusion Titanium 2018 for NFSU2 (FOCUS slot) from the approved MW2005 port (V1prime-z10).
 
 Layout follows the Escort RS mod that already works in this game (nfsu360 compiler layout):
   FOCUS_KIT00_BODY_A, FOCUS_KITW01..04_BODY_A, FOCUS_BASE_A, FOCUS_KIT00_FRONT_WHEEL_A
@@ -82,55 +82,123 @@ def tex_for(mwtex, mwmat):
     return bh(name), mat
 
 
-# ---------------------------------------------------------------- shared pieces
-win = merge([weld(g) for g in P['MUSTANGGT_KIT00_FRONT_WINDOW_A']['groups']])
-win = dec(win, 1500, 'windows')
-windows = mesh(win, T_WINDOW, M['WINDSHIELD'])
-hood = weld(P['MUSTANGGT_KIT00_HOOD_C']['groups'][0])
+# ---------------------------------------------------------------- v4 helpers
+import twins, comps
+CAP = 21500   # tris per solid (64.5k indices, under the 16-bit 65,535; Senna mod loads with 20,486)
 
 
-PAINT_BUDGET = 14000   # v2: every solid <= 16k tris / 48k indices (v1 crashed the game at car select)
-_paint_cache = {}
+def compact(g, keep):
+    t = g['tri'][keep]
+    used = np.unique(t)
+    remap = np.full(len(g['pos']), -1, np.int64); remap[used] = np.arange(len(used))
+    return dict(pos=g['pos'][used], nrm=g['nrm'][used], uv=g['uv'][used], col=g['col'][used], tri=remap[t])
 
 
-def body_meshes(kit):
-    if kit not in _paint_cache:
-        _paint_cache[kit] = dec(merge([weld(P[f'MUSTANGGT_{kit}_BODY_C']['groups'][0]), hood]), PAINT_BUDGET, 'paint_' + kit)
-    paint = _paint_cache[kit]
-    return [mesh(paint, T_PAINT, M['CARSKIN']), windows]
+def outwardness(g, clamp=(-1.0, 1.0), zc=0.7):
+    p = g['pos']; t = g['tri']; c = p[t].mean(1)
+    fn = np.cross(p[t[:, 1]] - p[t[:, 0]], p[t[:, 2]] - p[t[:, 0]])
+    ax = np.zeros_like(c); ax[:, 0] = np.clip(c[:, 0], *clamp); ax[:, 2] = zc
+    return ((c - ax) * fn).sum(1)
 
 
-# BASE: LOD C of the base (grille, chassis, trims, plates, emblems) + interior + driver + lamps (LOD B)
+def drop_inward_twins(g, name):
+    tw, fn, c = twins.twins(g['pos'], g['tri'])
+    o = outwardness(g)
+    keep = ~(tw & (o < 0))
+    LOG.setdefault('inward_twins_removed', {})[name] = int((~keep).sum())
+    return compact(g, keep)
+
+
+def outward_only(g, name, clamp=(-0.9, 0.5), zc=0.75):
+    keep = outwardness(g, clamp, zc) > 0
+    LOG.setdefault('inner_faces_removed', {})[name] = int((~keep).sum())
+    return compact(g, keep)
+
+
+def double_sided(g):
+    n = len(g['pos'])
+    return dict(pos=np.r_[g['pos'], g['pos']], nrm=np.r_[g['nrm'], -g['nrm']], uv=np.r_[g['uv'], g['uv']],
+                col=np.r_[g['col'], g['col']], tri=np.r_[g['tri'], g['tri'][:, ::-1] + n])
+
+
+def ntris(ms):
+    return sum(len(m['tri']) for m in ms)
+
+
+# ---------------------------------------------------------------- paint: LOD B (smooth), single-sided
+paint = drop_inward_twins(weld(P['MUSTANGGT_KIT00_BODY_B']['groups'][0]), 'paint_B')
+lab = comps.components(paint['pos'], paint['tri'])
+is_trunk = np.zeros(len(paint['tri']), bool)
+for i in range(lab.max() + 1):
+    s = lab == i
+    p = paint['pos'][np.unique(paint['tri'][s])]
+    mn, mx = p.min(0), p.max(0)
+    if mx[0] < -1.7 and max(abs(mn[1]), abs(mx[1])) < 0.63 and mn[2] > 0.33:
+        is_trunk |= s
+trunk_paint = compact(paint, is_trunk)
+body_paint = compact(paint, ~is_trunk)
+hood = outward_only(weld(P['MUSTANGGT_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
+
+# ---------------------------------------------------------------- lamps (LOD C). Lenses double-sided;
+# brake lens uses the BRAKELIGHT material (BRAKELIGHTGLASS is only the glow shown when braking)
+head_parts, brake_parts = [], []
+for part in ['KIT00_RIGHT_HEADLIGHT_C', 'KIT00_RIGHT_HEADLIGHT_GLASS_C']:
+    for g in groups_of(part):
+        t, m = tex_for(g['tex'], g['mat'])
+        if m == M['HEADLIGHTGLASS']:
+            g = double_sided(g)
+        head_parts.append(mesh(g, t, m))
+for part in ['KIT00_RIGHT_BRAKELIGHT_C', 'KIT00_RIGHT_BRAKELIGHT_GLASS_C']:
+    for g in groups_of(part):
+        if g['mat'] == 'HEADLIGHTGLASS':
+            brake_parts.append(mesh(double_sided(g), bh('FOCUS_BRAKELIGHT_GLASS'), M['BRAKELIGHT']))
+        else:
+            brake_parts.append(mesh(g, bh('FOCUS_KIT00_BRAKELIGHT'), M['DULLPLASTIC']))
+# draw order inside a solid: opaque first, lenses (DXT3) last
+head_opaque = [m for m in head_parts if m['mat'] != M['HEADLIGHTGLASS']]
+head_glass = [m for m in head_parts if m['mat'] == M['HEADLIGHTGLASS']]
+brake_opaque = [m for m in brake_parts if m['tex'] != bh('FOCUS_BRAKELIGHT_GLASS')]
+brake_glass = [m for m in brake_parts if m['tex'] == bh('FOCUS_BRAKELIGHT_GLASS')]
+
+body_list = [mesh(body_paint, T_PAINT, M['CARSKIN'])] + head_opaque + head_glass
+trunk_list = [mesh(trunk_paint, T_PAINT, M['CARSKIN'])]
+
+# ---------------------------------------------------------------- BASE
 base = []
 for g in groups_of('BASE_C'):
     if len(g['tri']) > 2000:
         g = dec(g, int(len(g['tri']) * 0.85), 'base_' + g['tex'][10:]) | {'tex': g['tex'], 'mat': g['mat']}
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(g, t, m))
+base.append(mesh(hood, T_PAINT, M['CARSKIN']))
+for g in groups_of('KIT00_DRIVER_A'):
+    base.append(mesh(dec(g, 1000, 'driver'), bh('FOCUS_DRIVER'), M['DRIVER']))
+base += brake_opaque
+# glass: both MW pieces (FRONT_WINDOW + REAR_WINDOW), outer faces only, then mild decimation
+glass = merge([weld(g) for part in ('KIT00_FRONT_WINDOW_A', 'KIT00_REAR_WINDOW_A') for g in P['MUSTANGGT_' + part]['groups']])
+glass = outward_only(glass, 'glass')
+GLASS_BUDGET = 3500
+glass = dec(glass, GLASS_BUDGET, 'glass')
 inter = groups_of('KIT00_INTERIOR_A')
+fixed = ntris(base) + len(glass['tri']) + ntris(brake_glass) + ntris([m for m in base if m['mat'] == M['HEADLIGHTGLASS']]) * 0
+INTERIOR_BUDGET = 21000 - fixed
 big = [g for g in inter if len(g['tri']) > 1000]
 small = [g for g in inter if len(g['tri']) <= 1000]
+avail = INTERIOR_BUDGET - sum(len(g['tri']) for g in small)
 tot = sum(len(g['tri']) for g in big)
-INTERIOR_BUDGET = 4500
 for g in big:
-    tgt = int(INTERIOR_BUDGET * len(g['tri']) / tot)
-    d = dec(g, tgt, 'interior_' + g['mat'])
+    d = dec(g, int(avail * len(g['tri']) / tot), 'interior_' + g['mat'])
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(d, t, m))
 for g in small:
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(g, t, m))
-for g in groups_of('KIT00_DRIVER_A'):
-    g = dec(g, 1000, 'driver')
-    base.append(mesh(g, bh('FOCUS_DRIVER'), M['DRIVER']))
-lamps_opaque, lamps_glass = [], []
-for part in ['KIT00_RIGHT_HEADLIGHT_C', 'KIT00_RIGHT_BRAKELIGHT_C', 'KIT00_RIGHT_HEADLIGHT_GLASS_C', 'KIT00_RIGHT_BRAKELIGHT_GLASS_C']:
-    for g in groups_of(part):
-        t, m = tex_for(g['tex'], g['mat'])
-        (lamps_glass if m in (M['HEADLIGHTGLASS'], M['BRAKELIGHTGLASS']) else lamps_opaque).append(mesh(g, t, m))
-# opaque first, translucent (DXT3 lenses) last
 base_glass = [b for b in base if b['mat'] == M['HEADLIGHTGLASS']]
-base = [b for b in base if b['mat'] != M['HEADLIGHTGLASS']] + lamps_opaque + base_glass + lamps_glass
+base = [b for b in base if b['mat'] != M['HEADLIGHTGLASS']] + [mesh(glass, T_WINDOW, M['WINDSHIELD'])] + base_glass + brake_glass
+LOG['base_parts'] = [(hex(m['tex']), hex(m['mat']), len(m['tri'])) for m in base]
+print(LOG['base_parts'])
+LOG['budget'] = dict(body=ntris(body_list), trunk=ntris(trunk_list), base=ntris(base))
+print(LOG['budget'])
 
 # wheel: LOD B of the 20-spoke 18" wheel
 wheel = []
@@ -197,12 +265,14 @@ def solid(name, meshes, markers=()):
     return s
 
 
-bodies = {'KIT00': 'KIT00', 'KITW01': 'KIT01', 'KITW02': 'KIT02', 'KITW03': 'KIT00', 'KITW04': 'KIT01'}
 solids = []
-for slot, kit in bodies.items():
-    solids.append(solid(f'FOCUS_{slot}_BODY_A', body_meshes(kit), exhaust_markers))
+for slot in ['KIT00', 'KITW01', 'KITW02', 'KITW03', 'KITW04']:   # the MW kits share the same paint mesh at LOD B
+    solids.append(solid(f'FOCUS_{slot}_BODY_A', body_list, exhaust_markers))
+solids.append(solid('FOCUS_KIT00_TRUNK_A', trunk_list))
 solids.append(solid('FOCUS_BASE_A', base, base_markers))
 solids.append(solid('FOCUS_KIT00_FRONT_WHEEL_A', wheel))
+for s in solids:
+    assert sum(len(g['tri']) for g in s['groups']) <= CAP, (s['name'], LOG.get('decimation'), LOG.get('budget'))
 for s in solids:
     print(s['name'], sum(len(g['tri']) for g in s['groups']), len(s['pos']))
 

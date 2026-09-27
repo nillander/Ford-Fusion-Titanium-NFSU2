@@ -1,9 +1,12 @@
 {
+ "inward_twins_removed": {
+  "paint_B": 585
+ },
+ "inner_faces_removed": {
+  "hood_B": 2720,
+  "glass": 9278
+ },
  "decimation": {
-  "windows": [
-   11993,
-   1500
-  ],
   "base_MISC": [
    4367,
    3711
@@ -12,30 +15,94 @@
    3033,
    2578
   ],
-  "interior_DULLPLASTIC": [
-   3395,
-   826
-  ],
-  "interior_INTERIOR": [
-   15081,
-   5008
-  ],
   "driver": [
    1415,
    1000
   ],
-  "paint_KIT00": [
-   14802,
-   14000
+  "glass": [
+   10715,
+   3499
   ],
-  "paint_KIT01": [
-   16214,
-   14000
+  "interior_DULLPLASTIC": [
+   3395,
+   1071
   ],
-  "paint_KIT02": [
-   16230,
-   13999
+  "interior_INTERIOR": [
+   15081,
+   5008
   ]
+ },
+ "base_parts": [
+  [
+   "0xb4bd7aca",
+   "0xfedee40",
+   3711
+  ],
+  [
+   "0x4bb53dca",
+   "0x2787edab",
+   467
+  ],
+  [
+   "0xb87c200a",
+   "0x4c95c6f8",
+   8
+  ],
+  [
+   "0xb4bd066f",
+   "0xfedee40",
+   2578
+  ],
+  [
+   "0x3c84d757",
+   "0xd6d6080a",
+   2728
+  ],
+  [
+   "0xc5a6a26a",
+   "0x5799e60b",
+   1000
+  ],
+  [
+   "0x18abe7e2",
+   "0xfedee40",
+   438
+  ],
+  [
+   "0x4bb53dca",
+   "0xfedee40",
+   1071
+  ],
+  [
+   "0x4bb53dca",
+   "0x2787edab",
+   5008
+  ],
+  [
+   "0xb4bd066f",
+   "0x2787edab",
+   8
+  ],
+  [
+   "0x834b8017",
+   "0x471a1dca",
+   3499
+  ],
+  [
+   "0xe2799301",
+   "0xa6348ee3",
+   78
+  ],
+  [
+   "0x17ea234",
+   "0x5bc3a3c",
+   656
+  ]
+ ],
+ "budget": {
+  "body": 20232,
+  "trunk": 6670,
+  "base": 21250
  },
  "markers": {
   "LEFT_BRAKELIGHT": [
@@ -86,39 +153,45 @@
  },
  "solids": {
   "FOCUS_KIT00_BODY_A": {
-   "tris": 15500,
-   "indices": 46500,
-   "verts": 18710,
-   "groups": 2
+   "tris": 20232,
+   "indices": 60696,
+   "verts": 21916,
+   "groups": 3
   },
   "FOCUS_KITW01_BODY_A": {
-   "tris": 15500,
-   "indices": 46500,
-   "verts": 18724,
-   "groups": 2
+   "tris": 20232,
+   "indices": 60696,
+   "verts": 21916,
+   "groups": 3
   },
   "FOCUS_KITW02_BODY_A": {
-   "tris": 15499,
-   "indices": 46497,
-   "verts": 18741,
-   "groups": 2
+   "tris": 20232,
+   "indices": 60696,
+   "verts": 21916,
+   "groups": 3
   },
   "FOCUS_KITW03_BODY_A": {
-   "tris": 15500,
-   "indices": 46500,
-   "verts": 18710,
-   "groups": 2
+   "tris": 20232,
+   "indices": 60696,
+   "verts": 21916,
+   "groups": 3
   },
   "FOCUS_KITW04_BODY_A": {
-   "tris": 15500,
-   "indices": 46500,
-   "verts": 18724,
-   "groups": 2
+   "tris": 20232,
+   "indices": 60696,
+   "verts": 21916,
+   "groups": 3
+  },
+  "FOCUS_KIT00_TRUNK_A": {
+   "tris": 6670,
+   "indices": 20010,
+   "verts": 6240,
+   "groups": 1
   },
   "FOCUS_BASE_A": {
-   "tris": 15435,
-   "indices": 46305,
-   "verts": 18967,
+   "tris": 21249,
+   "indices": 63747,
+   "verts": 23257,
    "groups": 13
   },
   "FOCUS_KIT00_FRONT_WHEEL_A": {
@@ -129,9 +202,9 @@
   }
  },
  "fixed_normals": {
-  "FOCUS_BASE_A": 19
+  "FOCUS_BASE_A": 26
  },
- "geometry_bytes": 4862976,
+ "geometry_bytes": 6034816,
  "textures": {
   "FOCUS_MISC": [
    "DXT1",
@@ -194,5 +267,5 @@
    128
   ]
  },
- "textures_bytes": 163158
+ "textures_bytes": 878592
 }

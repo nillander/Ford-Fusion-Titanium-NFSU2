@@ -4,7 +4,7 @@ from PIL import Image
 from hashes import bh
 geo, texf, out = sys.argv[1], sys.argv[2], sys.argv[3]
 body = sys.argv[4] if len(sys.argv) > 4 else 'FOCUS_KIT00_BODY_A'
-WHEELS = [(1.431, 0.78, 0.13), (1.431, -0.78, 0.13), (-1.311, 0.78, 0.13), (-1.311, -0.78, 0.13)]
+WHEELS = [(1.431, 0.78, 0.098), (1.431, -0.78, 0.098), (-1.311, 0.78, 0.098), (-1.311, -0.78, 0.098)]
 d, cl, h, S = ug2.parse(geo)
 info, tex = tpk2.parse(texf)
 T = {t['hash']: dxt.decode(t['data'], t['w'], t['h'], t['fmt']) for t in tex}
@@ -25,7 +25,7 @@ def meshes(s, xf=None):
         out.append(m)
     return out
 parts = {s['name']: s for s in S}
-M = meshes(parts[body]) + meshes(parts['FOCUS_BASE_A'])
+M = meshes(parts[body]) + meshes(parts['FOCUS_BASE_A']) + (meshes(parts['FOCUS_KIT00_TRUNK_A']) if 'FOCUS_KIT00_TRUNK_A' in parts else [])
 wh = parts['FOCUS_KIT00_FRONT_WHEEL_A']
 for x, y, z in WHEELS:
     def xf(p, n, x=x, y=y, z=z):

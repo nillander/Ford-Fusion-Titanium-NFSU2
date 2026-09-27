@@ -24,4 +24,14 @@ cid=h[p:p+(flag&15)];p+=flag&15;ps,p=num(h,p);props=h[p:p+ps];p+=ps
 assert h[p]==0xc;p+=1;usize,p=num(h,p)
 hdr=lzma_dec(d[32+packpos:32+packpos+psize],props,usize)
 print(hdr.hex())
-open('/tmp/hdr.bin','wb').write(hdr)
+open('hdr.bin','wb').write(hdr)
+# --- extract the two files of FOCUS.7z (one LZMA folder: GEOMETRY.BIN then TEXTURES.BIN) into escort/
+p = 2; assert hdr[p] == 6; p += 1
+packpos, p = num(hdr, p); n, p = num(hdr, p); p += 1; psize, p = num(hdr, p)
+i = hdr.index(bytes([0x5d, 0, 0, 0x30, 0])); props2 = hdr[i:i + 5]; p = i + 5; assert hdr[p] == 0xc; p += 1
+usize2, p = num(hdr, p)
+data = lzma_dec(d[32 + packpos:32 + packpos + psize], props2, usize2)
+j = hdr.index(bytes([8, 0xd, 2, 9])) + 4; s1, j = num(hdr, j)
+os.makedirs('escort', exist_ok=True)
+open('escort/GEOMETRY.BIN', 'wb').write(data[:s1]); open('escort/TEXTURES.BIN', 'wb').write(data[s1:])
+print('escort/GEOMETRY.BIN', s1, 'escort/TEXTURES.BIN', len(data) - s1)
