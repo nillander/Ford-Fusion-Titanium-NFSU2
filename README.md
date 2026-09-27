@@ -4,7 +4,7 @@ Substitui o **Ford Focus** (slot `FOCUS`). O modelo vem do port aprovado de Most
 (`fusion-mw2005`, V1prime-z10); os arquivos de lá não foram alterados. O doador de estrutura é o
 **Escort RS** (`source/Ford-Focus-ESCORT-RS`), o mod sedã que já funciona neste jogo.
 
-> **Estado:** a v3 foi a primeira a abrir no jogo. A v5 (instalada) corrige rodas, capô, lanternas e traseira e traz vidros novos sem frestas; aguarda teste. Detalhes em [TODO.md](TODO.md) e [CONTINUACAO.md](CONTINUACAO.md).
+> **Estado:** a v3 foi a primeira a abrir no jogo. A v6 (instalada) adiciona os adesivos, limpa o para-brisa e refaz a traseira (tampa LOD A, lanternas vermelhas); aguarda teste. Detalhes em [TODO.md](TODO.md) e [CONTINUACAO.md](CONTINUACAO.md).
 
 ![prévia](docs/previa-fusion-ug2.png)
 
@@ -70,8 +70,8 @@ O backup do estado anterior (Escort RS + GlobalB) está em `backup/antes-fusion-
 
 | Arquivo instalado | SHA-256 |
 | --- | --- |
-| `CARS/FOCUS/GEOMETRY.BIN` | `FC9E24E701CD06CAA924E6107522654D3AAEB76DB10EB9B3A33DA367B555E0F7` |
-| `CARS/FOCUS/TEXTURES.BIN` | `349F6BEC14892ABC0993B23C82A2E77024DB4591750DD00D6FCC83A7E4A969B4` |
+| `CARS/FOCUS/GEOMETRY.BIN` | `BF79EABD35242B4FA854FC7BC2F86606068A4BF3C6B12D2AD2EBAA02EC46B532` |
+| `CARS/FOCUS/TEXTURES.BIN` | `830FD72B7A4A1BAFC061FAABF5AC843722C62C81CB6AF5D4594C94839646457F` |
 | `GLOBAL/GlobalB.lzc` | `27F9944B5045FB59EDBBC7CE9253B9011DBC4465E518396CF24D04E5A428CF97` (original + rodas) |
 
 ## Reconstruir

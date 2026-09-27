@@ -1,4 +1,4 @@
-"""v4. Builds the Ford Fusion Titanium 2018 for NFSU2 (FOCUS slot) from the approved MW2005 port (V1prime-z10).
+"""v6. Builds the Ford Fusion Titanium 2018 for NFSU2 (FOCUS slot) from the approved MW2005 port (V1prime-z10).
 
 Layout follows the Escort RS mod that already works in this game (nfsu360 compiler layout):
   FOCUS_KIT00_BODY_A, FOCUS_KITW01..04_BODY_A, FOCUS_BASE_A, FOCUS_KIT00_FRONT_WHEEL_A
@@ -135,8 +135,24 @@ for i in range(lab.max() + 1):
     mn, mx = p.min(0), p.max(0)
     if mx[0] < -1.7 and max(abs(mn[1]), abs(mx[1])) < 0.63 and mn[2] > 0.33:
         is_trunk |= s
-trunk_paint = compact(paint, is_trunk)
 body_paint = compact(paint, ~is_trunk)
+
+
+def trunk_region(g):
+    lab = comps.components(g['pos'], g['tri'])
+    sel = np.zeros(len(g['tri']), bool)
+    for i in range(lab.max() + 1):
+        s_ = lab == i
+        p_ = g['pos'][np.unique(g['tri'][s_])]
+        mn, mx = p_.min(0), p_.max(0)
+        if mx[0] < -1.7 and max(abs(mn[1]), abs(mx[1])) < 0.63 and mn[2] > 0.33:
+            sel |= s_
+    return sel
+
+
+# v6: the trunk lid comes from LOD A (the TRUNK_A solid has room for it; LOD B showed waves in the game)
+wA = weld(P['MUSTANGGT_KIT00_BODY_A']['groups'][0])
+trunk_paint = drop_inward_twins(compact(wA, trunk_region(wA)), 'trunk_A')
 hood = outward_only(weld(P['MUSTANGGT_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
 
 # ---------------------------------------------------------------- lamps (LOD C). Lenses double-sided;
@@ -148,7 +164,7 @@ for part in ['KIT00_RIGHT_HEADLIGHT_C', 'KIT00_RIGHT_HEADLIGHT_GLASS_C']:
         if m == M['HEADLIGHTGLASS']:
             g = double_sided(g)
         head_parts.append(mesh(g, t, m))
-for part in ['KIT00_RIGHT_BRAKELIGHT_C', 'KIT00_RIGHT_BRAKELIGHT_GLASS_C']:
+for part in ['KIT00_RIGHT_BRAKELIGHT_B', 'KIT00_RIGHT_BRAKELIGHT_GLASS_B']:
     for g in groups_of(part):
         if g['mat'] == 'HEADLIGHTGLASS':
             brake_parts.append(mesh(double_sided(g), bh('FOCUS_BRAKELIGHT_GLASS'), M['BRAKELIGHT']))
@@ -160,14 +176,59 @@ head_glass = [m for m in head_parts if m['mat'] == M['HEADLIGHTGLASS']]
 brake_opaque = [m for m in brake_parts if m['tex'] != bh('FOCUS_BRAKELIGHT_GLASS')]
 brake_glass = [m for m in brake_parts if m['tex'] == bh('FOCUS_BRAKELIGHT_GLASS')]
 
+def split_y(ms, lim=0.6):
+    inner, outer = [], []
+    for m in ms:
+        c = m['pos'][m['tri']].mean(1)
+        k = np.abs(c[:, 1]) < lim
+        for sel, dst in ((k, inner), (~k, outer)):
+            if sel.any():
+                g = compact(m, sel); dst.append(mesh(g, m['tex'], m['mat']))
+    return inner, outer
+
+
+brake_opaque_in, brake_opaque = split_y(brake_opaque)
+brake_glass_in, brake_glass = split_y(brake_glass)
 body_list = [mesh(body_paint, T_PAINT, M['CARSKIN'])] + head_opaque + head_glass
-trunk_list = [mesh(trunk_paint, T_PAINT, M['CARSKIN'])]
+trunk_list = [mesh(trunk_paint, T_PAINT, M['CARSKIN'])] + brake_opaque_in + brake_glass_in
 
 # ---------------------------------------------------------------- BASE
+_G = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'vidros_v5.npz')) \
+    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'vidros_v5.npz')) else np.load('vidros_v5.npz')
+_panes = [{k: _G[f'{i}_{k}'] for k in ('pos', 'nrm', 'uv', 'col', 'tri')} for i in range(int(_G['n']))]
+_big = [p_ for p_ in _panes if abs(p_['pos'][:, 1].mean()) < 0.3]          # windscreen and rear screen
+GP = np.concatenate([p_['pos'] for p_ in _big]); GN = np.concatenate([p_['nrm'] for p_ in _big])
+
+
+def near_glass(c, tol=0.015, lat=0.08):
+    out = np.zeros(len(c), bool)
+    for i in range(0, len(c), 256):
+        q = c[i:i + 256]
+        d2 = ((q[:, None] - GP[None]) ** 2).sum(-1); j = d2.argmin(1)
+        v = q - GP[j]; dn = np.abs((v * GN[j]).sum(1))
+        out[i:i + 256] = (dn < tol) & (np.sqrt(d2[np.arange(len(q)), j]) < lat)
+    return out
+
+
 base = []
 for g in groups_of('BASE_C'):
+    if g['tex'] in ('MUSTANGGT_LOGO', 'MUSTANGGT_MISC'):
+        fr = near_glass(g['pos'][g['tri']].mean(1))
+        if fr.any():
+            LOG.setdefault('frit_removed', {})[g['tex']] = int(fr.sum())
+            g = compact(g, ~fr) | {'tex': g['tex'], 'mat': g['mat']}
     if len(g['tri']) > 2000:
         g = dec(g, int(len(g['tri']) * 0.85), 'base_' + g['tex'][10:]) | {'tex': g['tex'], 'mat': g['mat']}
+    if g['tex'] in ('MUSTANGGT_LOGO', 'MUSTANGGT_MISC'):
+        # v6: MW draws both faces; the black valances of the bumpers were modelled facing inwards and vanish
+        # in UG2 (back-face culling) -> lower front/rear areas made double-sided
+        c = g['pos'][g['tri']].mean(1)
+        low = (np.abs(c[:, 0]) > 1.85) & (c[:, 2] < 0.5)
+        if low.any():
+            ds = double_sided(compact(g, low))
+            LOG.setdefault('double_sided_valance', {})[g['tex']] = int(low.sum())
+            gg = merge([compact(g, ~low), ds])
+            g = gg | {'tex': g['tex'], 'mat': g['mat']}
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(g, t, m))
 base.append(mesh(hood, T_PAINT, M['CARSKIN']))
@@ -257,6 +318,19 @@ def solid(name, meshes, markers=()):
         nrm_all[bad] = acc[bad]
         LOG.setdefault('fixed_normals', {})[name] = int(bad.sum())
     nrm_all = nrm_all / np.linalg.norm(nrm_all, axis=1, keepdims=True)
+    # v6: a normal that disagrees with the faces using that vertex (> ~70 deg) makes a dark blotch in UG2;
+    # replace it with the area-weighted average of those faces (hard edges stay: vertices are already split)
+    pos_all = np.concatenate(pos); acc = np.zeros_like(pos_all)
+    for g in groups:
+        t = g['tri']; fnm = np.cross(pos_all[t[:, 1]] - pos_all[t[:, 0]], pos_all[t[:, 2]] - pos_all[t[:, 0]])
+        for k in range(3): np.add.at(acc, t[:, k], fnm)
+    ln2 = np.linalg.norm(acc, axis=1)
+    ok = ln2 > 1e-12
+    avg = np.zeros_like(acc); avg[ok] = acc[ok] / ln2[ok, None]
+    flip = ok & ((nrm_all * avg).sum(1) < 0.35)
+    if flip.any():
+        nrm_all[flip] = avg[flip]
+        LOG.setdefault('normals_fixed', {})[name] = int(flip.sum())
     nrm = [nrm_all]
     s = dict(name=name, tex=texs, light=lights, pos=np.concatenate(pos).astype(np.float32),
              nrm=np.concatenate(nrm).astype(np.float32), uv=np.concatenate(uv).astype(np.float32),
@@ -272,6 +346,36 @@ for slot in ['KIT00', 'KITW01', 'KITW02', 'KITW03', 'KITW04']:   # the MW kits s
 solids.append(solid('FOCUS_KIT00_TRUNK_A', trunk_list))
 solids.append(solid('FOCUS_BASE_A', base, base_markers))
 solids.append(solid('FOCUS_KIT00_FRONT_WHEEL_A', wheel))
+
+# ---------------------------------------------------------------- v6: decal placement solids
+import decals
+paint_all = merge([body_paint, trunk_paint, hood])
+PT = (paint_all['pos'], paint_all['tri'])
+glass_all = merge(_panes)
+GT = (glass_all['pos'], glass_all['tri'])
+_hood_npz = next(p_ for p_ in (os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'decal_capo_corolla.npz'), 'decal_capo_corolla.npz') if os.path.exists(p_))
+
+
+def side_of(part):
+    ys = np.concatenate([g['pos'][:, 1] for g in P[part]['groups']])
+    return 'LEFT' if ys.mean() > 0 else 'RIGHT'          # UG2: +y is the left side
+
+
+dec_parts = {}
+dec_parts['DECAL_FRONT_WINDOW_WIDE_MEDIUM_A'] = decals.mesh_from_groups(decals.from_mw(P, 'MUSTANGGT_DECAL_FRONT_WINDOW_WIDE_MEDIUM_A'), GT, off=0.004, levels=2)
+dec_parts['DECAL_REAR_WINDOW_WIDE_MEDIUM_A'] = decals.mesh_from_groups(decals.from_mw(P, 'MUSTANGGT_DECAL_REAR_WINDOW_WIDE_MEDIUM_A'), GT, off=0.004, levels=2)
+for mwside in ('LEFT', 'RIGHT'):
+    for what in ('DOOR', 'QUARTER'):
+        part = f'MUSTANGGT_KIT00_DECAL_{mwside}_{what}_RECT_MEDIUM_A'
+        dec_parts[f'DECAL_{side_of(part)}_{what}_RECT_MEDIUM_A'] = decals.mesh_from_groups(decals.from_mw(P, part), PT, off=0.005, levels=2)
+for key, nm in (('medium', 'DECAL_HOOD_RECT_MEDIUM_A'), ('small', 'DECAL_HOOD_RECT_SMALL_A')):
+    dec_parts[nm] = decals.mesh_from_groups(decals.hood_from_corolla(_hood_npz, key, hood['pos'], hood['tri']), (hood['pos'], hood['tri']), off=0.008)
+for nm, ms in list(dec_parts.items()):
+    solids.append(solid('FOCUS_' + nm, ms))
+    if 'DOOR' in nm or 'QUARTER' in nm:          # the wide-body kits use their own decal parts (same body here)
+        for w in range(1, 5):
+            solids.append(solid(f'FOCUS_WIDE{w}_' + nm, ms))
+LOG['decals'] = {nm: ntris(ms) for nm, ms in dec_parts.items()}
 for s in solids:
     assert sum(len(g['tri']) for g in s['groups']) <= CAP, (s['name'], LOG.get('decimation'), LOG.get('budget'))
 for s in solids:
@@ -289,6 +393,12 @@ place = 0
 for name, (src, sz, fmt) in TEX.items():
     img = Image.open(f'texdump/mw_{src}.png').convert('RGBA').resize((sz, sz), Image.LANCZOS)
     rgba = np.array(img)
+    if name == 'FOCUS_BRAKELIGHT_GLASS':      # v6: MW lens is dark red (lit by emission in MW); UG2 needs it bright
+        f = rgba[..., :3].astype(float)
+        red = f[..., 0] > f[..., 1:].max(-1) + 20
+        f[red, 0] = np.clip(f[red, 0] * 2.2 + 40, 0, 235); f[red, 1:] = np.clip(f[red, 1:] * 1.5, 0, 40)
+        rgba[..., :3] = f.astype(np.uint8)
+        rgba[..., 3] = np.maximum(rgba[..., 3], 215)
     if fmt == 'DXT1':
         rgba[..., 3] = 255
         data = dxtenc.encode_dxt1(rgba); tm = tmpl_dxt1

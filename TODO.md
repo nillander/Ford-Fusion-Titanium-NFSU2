@@ -1,11 +1,12 @@
 # TODO — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
 
-Estado em 26/09/2026 (noite): **v5 instalada, aguardando teste no jogo.** A v5 é a v4 com vidros novos
-(gerados do zero, sem frestas). A v4 ataca os itens 1–8 da lista abaixo. Leia também [CONTINUACAO.md](CONTINUACAO.md).
+Estado em 27/09/2026: **v6 instalada, aguardando teste no jogo.** A v6 ataca os itens A, B e C do teste da
+v5 (adesivos, para-brisa, traseira). A v5 trouxe os vidros novos (gerados do zero, sem frestas). A v4 ataca os itens 1–8 da lista abaixo. Leia também [CONTINUACAO.md](CONTINUACAO.md).
 
-- Instalado agora: GEOMETRY `FC9E24E7…E0F7` (v5), TEXTURES `349F6BEC…26B4` (o da v3, sem mudança),
+- Instalado agora: GEOMETRY `BF79EABD…B532` (v6), TEXTURES `830FD72B…457F` (v6: lente da lanterna mais clara),
   GlobalB `27F9944B…CF97` (o original do backup **só com as rodas mudadas**: X +1,431 / −1,311, Y ±0,78).
-- Backups (fora do git): v3 em `backup/v3-instalada-2026-09-26/`, GEOMETRY da v4 em `backup/v4-instalada/`.
+- Backups (fora do git): v3 em `backup/v3-instalada-2026-09-26/`, GEOMETRY da v4 em `backup/v4-instalada/`,
+  GEOMETRY + TEXTURES da v5 em `backup/v5-instalada/`.
 - Diagnóstico: `docs/diagnostico-v4/` (magenta = face vista por trás, que o jogo não desenha → buraco;
   verde = normal do vértice contrária à face → mancha escura).
 
@@ -39,11 +40,37 @@ nova (Delaunay, pontos a cada 6 cm; 3.174 triângulos no total). O resultado fic
 globais nos arquivos do jogo). Imagens: `docs/diagnostico-v4/v5-vidros-*.png`.
 A faixa preta com o triângulo no alto do para-brisa é a cerâmica do Fusion real (peça da base), não defeito.
 
+## v6 — o que mudou (itens A, B, C)
+
+- **A. Adesivos.** Criadas as peças de posicionamento que os carros originais têm (cada vaga é uma malha com
+  UV 0–1, textura global `DUMMY_DECAL1..8` = `910E6654..665B` e material `DECAL` = `02A05578`, nomes
+  confirmados no GlobalB): `FOCUS_DECAL_FRONT_WINDOW_WIDE_MEDIUM_A`, `…REAR_WINDOW_WIDE_MEDIUM_A`,
+  `…LEFT/RIGHT_DOOR_RECT_MEDIUM_A` (6 vagas), `…LEFT/RIGHT_QUARTER_RECT_MEDIUM_A`, `…HOOD_RECT_MEDIUM_A`
+  (4 vagas), `…HOOD_RECT_SMALL_A` (8 vagas) e as cópias `FOCUS_WIDE1..4_DECAL_…` de portas/laterais para as
+  carrocerias largas. Vidros, portas e laterais vêm das peças de adesivo do MW (as vagas extras do MW
+  `D0161A90`/`445A675D`, números de corrida, ficaram de fora), subdivididas e projetadas no ponto mais
+  próximo da pintura/vidro novos, 4–5 mm por fora e com os triângulos virados para fora. O MW não tem
+  adesivos de capô: o layout é o do Corolla (`docs/decal_capo_corolla.npz`), com um retângulo por vaga
+  deitado sobre o capô do Fusion. Script: `scripts/decals.py`.
+- **B. Para-brisa.** Tiradas da base as peças pretas (borda de cerâmica e triângulo do retrovisor) que ficavam
+  a menos de 15 mm do para-brisa/vidro traseiro e atravessavam o vidro novo (336 triângulos de `LOGO`, 3 de
+  `MISC`). As cunhas escuras que sobram na base do vidro são as palhetas do limpador.
+- **C. Traseira.** Tampa do porta-malas agora do **LOD A** (17.450 → 16.365 sem as faces internas; a
+  `TRUNK_A` tinha folga). Lanternas do **LOD B**; a parte central, que fica na tampa, foi para a `TRUNK_A`.
+  Lente com vermelho vivo (a textura do MW era 98,0,0 porque o MW acende a lente com emissão; agora 238,0,0).
+  As faixas pretas dos para-choques eram faces viradas para dentro (o MW desenha as duas faces, o UG2 não):
+  as peças `LOGO`/`MISC` baixas da frente e da traseira ficaram dupla face. Normais que apontavam contra a
+  própria face (manchas escuras) foram recalculadas em todas as peças (663 na carroceria, 1.079 no
+  porta-malas, 2.180 na base).
+
+Peças: carrocerias 20.232 · `TRUNK_A` 18.021 · `BASE_A` 21.145 · roda 8.614 · 32 peças de adesivo.
+Imagens: `docs/diagnostico-v4/v6-*.png`.
+
 ## Problemas vistos no teste da v5 (26/09/2026, 22:48) — para a próxima sessão
 
 Capturas: `docs/in-game-v5/` (cópia em `Need for Speed Underground 2/_fusion-screenshots/`).
 
-- [ ] **A. Adesivos não aparecem** no para-brisa, no vidro traseiro e nas portas.
+- [x] (v6) **A. Adesivos não aparecem** no para-brisa, no vidro traseiro e nas portas.
   Suspeita: o UG2 desenha os adesivos em peças próprias de posicionamento (`<CARRO>_DECAL_FRONT_WINDOW_…`,
   `_DECAL_REAR_WINDOW_…`, `_DECAL_LEFT/RIGHT_DOOR_RECT_…`, `_DECAL_LEFT/RIGHT_QUARTER_…`,
   `_DECAL_HOOD_RECT_…`), que o Corolla original e o mod do Mustang têm e o nosso GEOMETRY não tem
@@ -52,12 +79,12 @@ Capturas: `docs/in-game-v5/` (cópia em `Need for Speed Underground 2/_fusion-sc
   (por hash) das peças DECAL do Corolla/Mustang UG2, portar as do MW com os nomes `FOCUS_…` e conferir
   materiais/texturas que elas usam. Conferir também se os adesivos de lateral dependem da UV da pintura
   (`VINYLS.BIN` do Focus).
-- [ ] **B. Falha no para-brisa** (`v5-frente-perspectiva.png`): triângulo escuro no alto e faixa escura
+- [x] (v6) **B. Falha no para-brisa** (`v5-frente-perspectiva.png`): triângulo escuro no alto e faixa escura
   serrilhada na base do vidro. O triângulo é a peça `LOGO` da base C (x 0,36–0,64, z 1,06–1,20), que fica
   por fora do vidro — tirar da base ou empurrar para dentro do vidro. A faixa de baixo pode ser a borda nova
   do vidro (dobrada 3 cm para dentro) cruzando o painel/limpadores, ou a mesma peça `LOGO`: testar a borda
   com dobra menor só na base do para-brisa e renderizar essa região com a base inteira.
-- [ ] **C. Traseira deformada** (`v5-traseira.png`): lanternas escuras/cinza, sem o vermelho da lente, e
+- [x] (v6) **C. Traseira deformada** (`v5-traseira.png`): lanternas escuras/cinza, sem o vermelho da lente, e
   tampa do porta-malas e para-choque com ondulações no reflexo.
   - Lanternas: a lente com `BRAKELIGHT` + dupla face ainda não aparece vermelha. Testar a lente opaca
     (DXT1 vermelha, sem alfa), conferir a ordem de desenho e comparar com a lanterna do Corolla/Golf
@@ -78,6 +105,7 @@ A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e
 
 ## Lista
 
+- [ ] **Testar a v6 no jogo** (adesivos em vidros/portas/capô, para-brisa, lanternas, tampa e para-choque).
 - [x] Testar a v5 no jogo: abriu. Novos problemas em "Problemas vistos no teste da v5" (A, B, C).
 - [ ] **0. Teste B — GlobalB com performance.** Depois que a v4 for aprovada, aplicar
   `scripts/globalb_patch.py` sobre o GlobalB **atual** (já com as rodas) e testar. Se fechar, aplicar o patch

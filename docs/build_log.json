@@ -1,18 +1,23 @@
 {
  "inward_twins_removed": {
-  "paint_B": 585
+  "paint_B": 585,
+  "trunk_A": 1085
  },
  "inner_faces_removed": {
   "hood_B": 2720
  },
+ "frit_removed": {
+  "MUSTANGGT_MISC": 3,
+  "MUSTANGGT_LOGO": 336
+ },
  "decimation": {
   "base_MISC": [
-   4367,
-   3711
+   4364,
+   3709
   ],
   "base_LOGO": [
-   3033,
-   2578
+   2697,
+   2292
   ],
   "driver": [
    1415,
@@ -20,12 +25,16 @@
   ],
   "interior_DULLPLASTIC": [
    3395,
-   1130
+   1094
   ],
   "interior_INTERIOR": [
    15081,
-   5022
+   5008
   ]
+ },
+ "double_sided_valance": {
+  "MUSTANGGT_MISC": 307,
+  "MUSTANGGT_LOGO": 436
  },
  "glass": {
   "source": "docs/vidros_v5.npz",
@@ -37,7 +46,7 @@
   [
    "0xb4bd7aca",
    "0xfedee40",
-   3711
+   4016
   ],
   [
    "0x4bb53dca",
@@ -52,7 +61,7 @@
   [
    "0xb4bd066f",
    "0xfedee40",
-   2578
+   2728
   ],
   [
    "0x3c84d757",
@@ -67,17 +76,17 @@
   [
    "0x18abe7e2",
    "0xfedee40",
-   438
+   144
   ],
   [
    "0x4bb53dca",
    "0xfedee40",
-   1130
+   1094
   ],
   [
    "0x4bb53dca",
    "0x2787edab",
-   5022
+   5008
   ],
   [
    "0xb4bd066f",
@@ -97,13 +106,13 @@
   [
    "0x17ea234",
    "0x5bc3a3c",
-   656
+   692
   ]
  ],
  "budget": {
   "body": 20232,
-  "trunk": 6670,
-  "base": 20998
+  "trunk": 18021,
+  "base": 21145
  },
  "markers": {
   "LEFT_BRAKELIGHT": [
@@ -152,6 +161,16 @@
    1.207
   ]
  },
+ "normals_fixed": {
+  "FOCUS_KIT00_BODY_A": 663,
+  "FOCUS_KITW01_BODY_A": 663,
+  "FOCUS_KITW02_BODY_A": 663,
+  "FOCUS_KITW03_BODY_A": 663,
+  "FOCUS_KITW04_BODY_A": 663,
+  "FOCUS_KIT00_TRUNK_A": 1079,
+  "FOCUS_BASE_A": 2259,
+  "FOCUS_KIT00_FRONT_WHEEL_A": 40
+ },
  "solids": {
   "FOCUS_KIT00_BODY_A": {
    "tris": 20232,
@@ -184,15 +203,15 @@
    "groups": 3
   },
   "FOCUS_KIT00_TRUNK_A": {
-   "tris": 6670,
-   "indices": 20010,
-   "verts": 6240,
-   "groups": 1
+   "tris": 18021,
+   "indices": 54063,
+   "verts": 13143,
+   "groups": 3
   },
   "FOCUS_BASE_A": {
-   "tris": 20997,
-   "indices": 62991,
-   "verts": 22857,
+   "tris": 21144,
+   "indices": 63432,
+   "verts": 23398,
    "groups": 13
   },
   "FOCUS_KIT00_FRONT_WHEEL_A": {
@@ -200,12 +219,166 @@
    "indices": 25842,
    "verts": 5386,
    "groups": 2
+  },
+  "FOCUS_DECAL_FRONT_WINDOW_WIDE_MEDIUM_A": {
+   "tris": 208,
+   "indices": 624,
+   "verts": 140,
+   "groups": 1
+  },
+  "FOCUS_DECAL_REAR_WINDOW_WIDE_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 165,
+   "groups": 1
+  },
+  "FOCUS_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE1_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE2_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE3_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE4_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE1_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE2_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE3_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE4_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE1_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE2_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE3_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE4_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE1_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE2_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE3_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE4_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_DECAL_HOOD_RECT_MEDIUM_A": {
+   "tris": 800,
+   "indices": 2400,
+   "verts": 484,
+   "groups": 4
+  },
+  "FOCUS_DECAL_HOOD_RECT_SMALL_A": {
+   "tris": 1600,
+   "indices": 4800,
+   "verts": 968,
+   "groups": 8
   }
  },
  "fixed_normals": {
-  "FOCUS_BASE_A": 26
+  "FOCUS_BASE_A": 12
  },
- "geometry_bytes": 6018944,
+ "decals": {
+  "DECAL_FRONT_WINDOW_WIDE_MEDIUM_A": 208,
+  "DECAL_REAR_WINDOW_WIDE_MEDIUM_A": 256,
+  "DECAL_LEFT_DOOR_RECT_MEDIUM_A": 528,
+  "DECAL_LEFT_QUARTER_RECT_MEDIUM_A": 256,
+  "DECAL_RIGHT_DOOR_RECT_MEDIUM_A": 528,
+  "DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": 256,
+  "DECAL_HOOD_RECT_MEDIUM_A": 800,
+  "DECAL_HOOD_RECT_SMALL_A": 1600
+ },
+ "geometry_bytes": 6685824,
  "textures": {
   "FOCUS_MISC": [
    "DXT1",
