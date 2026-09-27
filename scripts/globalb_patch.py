@@ -2,7 +2,7 @@
 
 Usage: python globalb_patch.py <src> <dst> [2018|2012]
 Both ports share the 2018 chassis: Corolla torque scaled to 248 cv, Lancer tyres and
-suspension, mass 1.63 t, Fusion wheelbase.  2018 writes the MUSTANG record with torque
+suspension, mass 1.63 t, Fusion wheelbase.  2018 writes the MUSTANGGT record with torque
 split 0.5 (AWD).  2012 writes the FOCUS record with torque split 1.0 (FWD).
 Wheel Z, tyre radius and width stay as they are in the input file.
 """

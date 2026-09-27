@@ -4,12 +4,12 @@ Dois ports, a partir dos ZIPs do Most Wanted 2005. Os arquivos de lá não são 
 
 | Most Wanted | Underground 2 | Carro |
 | --- | --- | --- |
-| `MUSTANGGT` | `MUSTANG` | Fusion Titanium 2018 AWD |
+| `MUSTANGGT` | `MUSTANGGT` | Fusion Titanium 2018 AWD |
 | `COBALTSS` | `FOCUS` | Fusion 2012 FWD |
 
 O 2012 reaproveita o caminho do 2018 (corte, vidros, adesivos, vinil, chassi). O que muda é o slot e a tração, dianteira no 2012. O método está em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md).
 
-> **Estado:** a v9 do 2018 foi aprovada no jogo em 27/09/2026 (pintura LOD B + LOD A nas áreas que deformavam, sem o emblema do bico, 248 cv, tração integral, chassi do Lancer). Ela substitui o Mustang: origem `MUSTANGGT`, destino `MUSTANG`, em `CARS/MUSTANG`. O 2012, quando for gerado, ocupa o `FOCUS`. O histórico está em [TODO.md](TODO.md).
+> **Estado:** a v9 do 2018 foi aprovada no jogo em 27/09/2026 (pintura LOD B + LOD A nas áreas que deformavam, sem o emblema do bico, 248 cv, tração integral, chassi do Lancer). Ela substitui o Mustang GT: no Underground 2 o slot também se chama `MUSTANGGT`, em `CARS/MUSTANGGT`. O 2012, quando for gerado, ocupa o `FOCUS`. O histórico está em [TODO.md](TODO.md).
 
 ## No jogo
 
@@ -24,9 +24,9 @@ O 2012 reaproveita o caminho do 2018 (corte, vidros, adesivos, vinil, chassi). O
 
 | Arquivo | Conteúdo |
 | --- | --- |
-| `CARS/MUSTANG/GEOMETRY.BIN` | peças que o slot MUSTANG desenha: `KIT00_BODY_A`, `KITW01–04_BODY_A`, `KIT00_TRUNK_A`, `BASE_A`, `KIT00_FRONT_WHEEL_A` e os adesivos |
-| `CARS/MUSTANG/TEXTURES.BIN` | 15 texturas sem compressão (RAWW). Opacas em DXT1; lentes, sombras e neon em DXT3 |
-| `GLOBAL/GlobalB.lzc` | registro `MUSTANG` alterado (rodas, massa, inércia, motor, câmbio, tração, chassi). Editado no próprio arquivo do jogo |
+| `CARS/MUSTANGGT/GEOMETRY.BIN` | peças que o slot MUSTANGGT desenha: `KIT00_BODY_A`, `KITW01–04_BODY_A`, `KIT00_TRUNK_A`, `BASE_A`, `KIT00_FRONT_WHEEL_A` e os adesivos |
+| `CARS/MUSTANGGT/TEXTURES.BIN` | 15 texturas sem compressão (RAWW). Opacas em DXT1; lentes, sombras e neon em DXT3 |
+| `GLOBAL/GlobalB.lzc` | registro `MUSTANGGT` alterado (rodas, massa, inércia, motor, câmbio, tração, chassi). Editado no próprio arquivo do jogo |
 
 `VINYLS.BIN` e `PARTS_ANIMATIONS.bin` continuam os do jogo.
 
@@ -128,23 +128,23 @@ Valores finais em `docs/globalb_focus.json`.
 
 ## Instalação
 
-Feche o jogo e execute `instalar.bat` (na release ele fica ao lado de `CARS`; no repositório, `release/instalar.bat`). O script procura o Underground 2, copia `CARS/MUSTANG` e aplica no `GLOBAL/GlobalB.lzc` o mesmo ajuste de `scripts/globalb_patch.py` no registro `MUSTANG`: 248 cv, tração integral e chassi do Lancer. Na primeira execução o GlobalB anterior fica em `GLOBAL/GlobalB.lzc.antes-fusion`. Se o arquivo estiver compactado (JDLZ), salve-o descompactado no Nikki e rode de novo.
+Feche o jogo e execute `instalar.bat` (na release ele fica ao lado de `CARS`; no repositório, `release/instalar.bat`). O script procura o Underground 2, copia `CARS/MUSTANGGT` e aplica no `GLOBAL/GlobalB.lzc` o mesmo ajuste de `scripts/globalb_patch.py` no registro `MUSTANGGT`: 248 cv, tração integral e chassi do Lancer. Na primeira execução o GlobalB anterior fica em `GLOBAL/GlobalB.lzc.antes-fusion`. Se o arquivo estiver compactado (JDLZ), salve-o descompactado no Nikki e rode de novo.
 
 O backup do estado anterior desta cópia (Escort RS + GlobalB) está em `backup/antes-fusion-2026-09-25` (fora do git).
 
 | Arquivo instalado | SHA-256 |
 | --- | --- |
-| `CARS/MUSTANG/GEOMETRY.BIN` | `28EBF7A7D1FE3F824CC3DB25442447C402195D52B1FB2AC4DFD47E1C729858FB` |
-| `CARS/MUSTANG/TEXTURES.BIN` | `D103B621DE49264F09DF934EAE7BB24703B3F0A9072C1392575A834CFC2E6B11` |
+| `CARS/MUSTANGGT/GEOMETRY.BIN` | `8AADFE92E374B52A95728E86887C3547DB4526013DAEA451829D66E986F1E59D` |
+| `CARS/MUSTANGGT/TEXTURES.BIN` | `D1750123BFB8914F56CFC5FB2922C82E9959C998F3AE0662DB993DA5572350E6` |
 | `GLOBAL/GlobalB.lzc` | `689B5935A0E1D8C89F3CFB3959F1FF2E4742760AA31E56CB8AC249A7DB9B2462` (rodas + performance; o anterior, só com as rodas, está em `backup/v9-antes-performance/`) |
 
 ## Reconstruir
 
-Python 3 + numpy + Pillow. `mw/` é o ZIP da release do Most Wanted extraído. O molde de textura é o `CARS/MUSTANG/TEXTURES.BIN` do 2018.
+Python 3 + numpy + Pillow. `mw/` é o ZIP da release do Most Wanted extraído. O molde de textura é o `CARS/MUSTANGGT/TEXTURES.BIN` do 2018.
 
 ```
 python extract_mw.py 2018     # MUSTANGGT -> mw_parts.pkl e texdump/
-python build.py out 2018      # peças MUSTANG_*
+python build.py out 2018      # peças MUSTANGGT_*
 python extract_mw.py 2012     # COBALTSS, mesma pipeline do 2018
 python build.py out 2012      # peças FOCUS_*
 python globalb_patch.py GlobalB.lzc out/GlobalB.lzc 2018

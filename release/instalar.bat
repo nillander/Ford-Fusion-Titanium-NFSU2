@@ -9,19 +9,19 @@ if exist "%CANDIDATOS%" del /f /q "%CANDIDATOS%"
 if exist "%PERGUNTADAS%" del /f /q "%PERGUNTADAS%"
 
 set "RAIZ=%~dp0"
-if exist "%~dp0CARS\MUSTANG\GEOMETRY.BIN" goto TemCarro
-if exist "%~dp0..\CARS\MUSTANG\GEOMETRY.BIN" (
+if exist "%~dp0CARS\MUSTANGGT\GEOMETRY.BIN" goto TemCarro
+if exist "%~dp0..\CARS\MUSTANGGT\GEOMETRY.BIN" (
     set "RAIZ=%~dp0..\"
     goto TemCarro
 )
-echo Nao encontrei CARS\MUSTANG\GEOMETRY.BIN ao lado deste script:
+echo Nao encontrei CARS\MUSTANGGT\GEOMETRY.BIN ao lado deste script:
 echo %~dp0
 pause
 exit /b 1
 
 :TemCarro
-if not exist "!RAIZ!CARS\MUSTANG\TEXTURES.BIN" (
-    echo Nao encontrei CARS\MUSTANG\TEXTURES.BIN
+if not exist "!RAIZ!CARS\MUSTANGGT\TEXTURES.BIN" (
+    echo Nao encontrei CARS\MUSTANGGT\TEXTURES.BIN
     pause
     exit /b 1
 )
@@ -140,10 +140,10 @@ exit /b 1
 :Instalar
 echo.
 echo Feche o jogo se ele estiver aberto.
-echo Copiando CARS\MUSTANG para:
+echo Copiando CARS\MUSTANGGT para:
 echo !JOGO!
-if not exist "!JOGO!\CARS\MUSTANG" mkdir "!JOGO!\CARS\MUSTANG"
-robocopy "!RAIZ!CARS\MUSTANG" "!JOGO!\CARS\MUSTANG" GEOMETRY.BIN TEXTURES.BIN /R:1 /W:1
+if not exist "!JOGO!\CARS\MUSTANGGT" mkdir "!JOGO!\CARS\MUSTANGGT"
+robocopy "!RAIZ!CARS\MUSTANGGT" "!JOGO!\CARS\MUSTANGGT" GEOMETRY.BIN TEXTURES.BIN /R:1 /W:1
 if errorlevel 8 goto Falhou
 call :AplicarGlobalB
 if errorlevel 1 goto FalhouGlobalB
@@ -229,10 +229,10 @@ try {
     $name = [System.Text.Encoding]::ASCII.GetString($D, $off, 32).Split([char]0)[0]
     $recs[$name] = $off
   }
-  foreach ($need in @('MUSTANG','COROLLA','LANCEREVO8')) {
+  foreach ($need in @('MUSTANGGT','COROLLA','LANCEREVO8')) {
     if (-not $recs.ContainsKey($need)) { throw "Registro $need ausente no GlobalB." }
   }
-  $F = $recs['MUSTANG']; $C = $recs['COROLLA']; $L = $recs['LANCEREVO8']
+  $F = $recs['MUSTANGGT']; $C = $recs['COROLLA']; $L = $recs['LANCEREVO8']
   function Copy-Range([int]$srcOff, [int]$a, [int]$b) {
     [Buffer]::BlockCopy($D, $srcOff + $a, $D, $F + $a, $b - $a)
   }

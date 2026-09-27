@@ -1,6 +1,6 @@
 # TODO — Fusion no NFSU2
 
-A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang (`MUSTANGGT` → `MUSTANG`) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANG`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
+A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANGGT`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
 # Diário da v9 — Fusion Titanium 2018 no slot FOCUS
 

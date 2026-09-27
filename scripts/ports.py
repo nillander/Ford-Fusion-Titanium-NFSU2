@@ -9,7 +9,7 @@ PORTS = {
     '2018': {
         'id': '2018',
         'mw': 'MUSTANGGT',
-        'ug2': 'MUSTANG',
+        'ug2': 'MUSTANGGT',
         'zip': 'Fusion2018_AWD_MW2005.zip',
         'drive': 'AWD',
         'split': 0.5,
@@ -27,7 +27,7 @@ PORTS = {
 # DXT headers plus shadow and neon pixels. This file is the v9 that proved which
 # parts the Focus slot draws. Both ports borrow that structure; neither reads the
 # deleted Escort archive.
-TEMPLATE = 'CARS/MUSTANG/TEXTURES.BIN'
+TEMPLATE = 'CARS/MUSTANGGT/TEXTURES.BIN'
 
 
 def get(port_id='2018'):

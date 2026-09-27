@@ -1,7 +1,7 @@
 """Builds a Fusion for NFSU2 from an approved MW2005 release.
 
 Usage: python build.py <out-dir> [2018|2012]
-  2018  MUSTANGGT -> MUSTANG   (Fusion Titanium 2018 AWD)
+  2018  MUSTANGGT -> MUSTANGGT (Fusion Titanium 2018 AWD; mesmo nome de slot dos dois jogos)
   2012  COBALTSS  -> FOCUS     (Fusion 2012 FWD; same part split, clip, glass and decals as 2018)
 
 The destination names follow the nfsu360 layout proved on the Focus slot:
