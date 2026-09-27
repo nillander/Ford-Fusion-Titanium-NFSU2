@@ -165,7 +165,10 @@ A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e
 
 - [ ] **Testar a v6 no jogo** (adesivos em vidros/portas/capô, para-brisa, lanternas, tampa e para-choque).
 - [x] Testar a v5 no jogo: abriu. Novos problemas em "Problemas vistos no teste da v5" (A, B, C).
-- [ ] **0. Teste B — GlobalB com performance.** Depois que a v4 for aprovada, aplicar
+- [ ] **0. Teste B — GlobalB com performance: instalado em 27/09** (`FEC97DC3…7080`, gerado sobre o GlobalB
+  com as rodas; o anterior em `backup/v9-antes-performance/`). Motor do Corolla com todas as curvas de torque ×1,2,
+  AWD 0,5, chassi e massa 1,40 t do Lancer; Z/raio/largura das rodas mantidos os do Escort. Antes disso o menu
+  mostrava a potência do Focus porque o patch nunca tinha sido instalado. Plano original: depois que a v4 for aprovada, aplicar
   `scripts/globalb_patch.py` sobre o GlobalB **atual** (já com as rodas) e testar. Se fechar, aplicar o patch
   em partes (chassi do Lancer → motor/câmbio do Corolla → tração 0,5) até achar o bloco.
   Atenção: o patch grava Z = 0,13 e raio 0,3225; na v3/v4 o Z 0,098 e raio 0,308 do Escort ficaram bons

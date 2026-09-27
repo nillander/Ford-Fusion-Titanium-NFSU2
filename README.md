@@ -52,10 +52,13 @@ Todas com no máximo 46.500 índices e 19 mil vértices por peça (a v1, com at�
 
 ## Performance (`scripts/globalb_patch.py`)
 
-- **Motor e câmbio do Toyota Corolla** (curvas de torque, turbo, giro, relações; estoque e upgrades).
+- **Motor e câmbio do Toyota Corolla com +20 % de potência**: todas as curvas de torque (estoque, turbo e
+  upgrades) ×1,2; giro e relações do Corolla. Estimativa pela curva: ~133 hp a 6.560 rpm e 156 Nm
+  (Corolla ~111 hp / 130 Nm; Focus original ~125 hp / 182 Nm).
 - **Tração integral**: divisão de torque 0,5 (valor do Lancer Evo VIII), no estoque e nos 3 níveis.
 - **Dirigibilidade do Lancer Evo VIII**: pneus, suspensão, direção, freios e tabelas de upgrade;
-  massa 1,40 t.
+  massa 1,40 t (mais pesado que o Focus, 1,15 t, e o Corolla, 0,97 t).
+- Altura da roda (Z 0,0975), raio 0,3075 e largura 0,195 continuam os do Escort, aprovados no jogo.
 - **Carro longo**: dimensões 4,73 × 1,85 × 1,46 m e inércia recalculada a partir delas
   (guinada 3,01 contra 2,67 do Evo), além do entre-eixos de 2,74 m (o Focus tinha 2,54 m).
 
@@ -72,7 +75,7 @@ O backup do estado anterior (Escort RS + GlobalB) está em `backup/antes-fusion-
 | --- | --- |
 | `CARS/FOCUS/GEOMETRY.BIN` | `4E731163C867DE8E8787F7C0ED0F624130818FD95A2DA5B72080EDAEB472C2CB` |
 | `CARS/FOCUS/TEXTURES.BIN` | `830FD72B7A4A1BAFC061FAABF5AC843722C62C81CB6AF5D4594C94839646457F` |
-| `GLOBAL/GlobalB.lzc` | `27F9944B5045FB59EDBBC7CE9253B9011DBC4465E518396CF24D04E5A428CF97` (original + rodas) |
+| `GLOBAL/GlobalB.lzc` | `FEC97DC3AD3D2B8A4027E9A367C4684BAD1C323FBF05676A3001C83AA6FA7080` (rodas + performance; o anterior, só com as rodas, está em `backup/v9-antes-performance/`) |
 
 ## Reconstruir
 
