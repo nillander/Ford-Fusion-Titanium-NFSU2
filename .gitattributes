@@ -14,3 +14,4 @@ release/instalar.bat text eol=crlf
 /docs/in-game-final/final-frente.png filter=lfs diff=lfs merge=lfs -text
 /docs/in-game-final/final-garagem.png filter=lfs diff=lfs merge=lfs -text
 /docs/in-game-final/final-largada.png filter=lfs diff=lfs merge=lfs -text
+/CARS/MUSTANG/GEOMETRY.BIN filter=lfs diff=lfs merge=lfs -text

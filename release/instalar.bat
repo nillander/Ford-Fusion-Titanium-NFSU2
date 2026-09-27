@@ -9,23 +9,23 @@ if exist "%CANDIDATOS%" del /f /q "%CANDIDATOS%"
 if exist "%PERGUNTADAS%" del /f /q "%PERGUNTADAS%"
 
 set "RAIZ=%~dp0"
-if exist "%~dp0CARS\FOCUS\GEOMETRY.BIN" goto TemCarro
-if exist "%~dp0..\CARS\FOCUS\GEOMETRY.BIN" (
+if exist "%~dp0CARS\MUSTANG\GEOMETRY.BIN" goto TemCarro
+if exist "%~dp0..\CARS\MUSTANG\GEOMETRY.BIN" (
     set "RAIZ=%~dp0..\"
     goto TemCarro
 )
-echo Nao encontrei CARS\FOCUS\GEOMETRY.BIN ao lado deste script:
+echo Nao encontrei CARS\MUSTANG\GEOMETRY.BIN ao lado deste script:
 echo %~dp0
 pause
 exit /b 1
 
 :TemCarro
-if not exist "!RAIZ!CARS\FOCUS\TEXTURES.BIN" (
-    echo Nao encontrei CARS\FOCUS\TEXTURES.BIN
+if not exist "!RAIZ!CARS\MUSTANG\TEXTURES.BIN" (
+    echo Nao encontrei CARS\MUSTANG\TEXTURES.BIN
     pause
     exit /b 1
 )
-set "MENSAGEM=O Fusion 2018 substitui o Ford Focus."
+set "MENSAGEM=O Fusion 2018 substitui o Ford Mustang."
 
 echo Procurando Need for Speed: Underground 2...
 echo.
@@ -140,10 +140,10 @@ exit /b 1
 :Instalar
 echo.
 echo Feche o jogo se ele estiver aberto.
-echo Copiando CARS\FOCUS para:
+echo Copiando CARS\MUSTANG para:
 echo !JOGO!
-if not exist "!JOGO!\CARS\FOCUS" mkdir "!JOGO!\CARS\FOCUS"
-robocopy "!RAIZ!CARS\FOCUS" "!JOGO!\CARS\FOCUS" GEOMETRY.BIN TEXTURES.BIN /R:1 /W:1
+if not exist "!JOGO!\CARS\MUSTANG" mkdir "!JOGO!\CARS\MUSTANG"
+robocopy "!RAIZ!CARS\MUSTANG" "!JOGO!\CARS\MUSTANG" GEOMETRY.BIN TEXTURES.BIN /R:1 /W:1
 if errorlevel 8 goto Falhou
 call :AplicarGlobalB
 if errorlevel 1 goto FalhouGlobalB
@@ -229,10 +229,10 @@ try {
     $name = [System.Text.Encoding]::ASCII.GetString($D, $off, 32).Split([char]0)[0]
     $recs[$name] = $off
   }
-  foreach ($need in @('FOCUS','COROLLA','LANCEREVO8')) {
+  foreach ($need in @('MUSTANG','COROLLA','LANCEREVO8')) {
     if (-not $recs.ContainsKey($need)) { throw "Registro $need ausente no GlobalB." }
   }
-  $F = $recs['FOCUS']; $C = $recs['COROLLA']; $L = $recs['LANCEREVO8']
+  $F = $recs['MUSTANG']; $C = $recs['COROLLA']; $L = $recs['LANCEREVO8']
   function Copy-Range([int]$srcOff, [int]$a, [int]$b) {
     [Buffer]::BlockCopy($D, $srcOff + $a, $D, $F + $a, $b - $a)
   }

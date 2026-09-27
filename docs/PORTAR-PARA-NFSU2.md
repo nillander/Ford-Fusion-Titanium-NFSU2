@@ -9,7 +9,7 @@ O método fica neste repositório. O `fusion-mw2005` só fornece o ZIP da releas
 
 A tabela está em `scripts/ports.py`. Os dois ports usam o mesmo caminho do 2018: corte entre LOD A e LOD B, teto de 21.500 triângulos, vidros de `docs/vidros_v5.npz`, adesivos e UV de vinil. O 2012 só troca a origem (`COBALTSS`), o slot de destino (`FOCUS`) e a tração (dianteira). As luzes do 2012 já vêm nos dois lados do BIN do Most Wanted; o script inclui `LEFT_*` quando essa peça existe. O 2018, que só tem `RIGHT_*`, segue como antes.
 
-O BIN em `CARS/FOCUS` é a v9 do 2018, gravada quando aquele carro ainda usava o slot Focus. Ele permanece como molde de textura (`ports.TEMPLATE`): cabeçalhos DXT e as sombras/neon. Não é o Fusion 2012. O 2012 passa a ocupar esse slot quando o `build.py 2012` for rodado.
+O 2018 aprovado está em `CARS/MUSTANG`. Ele substitui o Mustang do jogo: a origem é o `MUSTANGGT` do Most Wanted e o destino é o `MUSTANG` do Underground 2. Esse `TEXTURES.BIN` também é o molde (`ports.TEMPLATE`) dos dois ports. O 2012, quando for gerado, ocupa o `FOCUS`.
 
 O diário da v9 está em [TODO.md](../TODO.md). As lições do Most Wanted continuam em `fusion-mw2005/docs/APRENDIZADOS.md`.
 
@@ -42,7 +42,7 @@ O Codex montou o hábito de partir de um doador. O Claude fechou a malha que o M
 A pasta de trabalho é este repositório:
 
 - `mw/` = ZIP da release do `fusion-mw2005`, extraído, com `CARS/MUSTANGGT` ou `CARS/COBALTSS`.
-- O molde de textura é `CARS/FOCUS/TEXTURES.BIN` (a v9). Os dois ports copiam dele o cabeçalho DXT e as texturas `SHADOWFE`, `SHADOWIG` e `NEON`, já com o prefixo do slot de destino. O Escort RS saiu do repositório; o crédito a ele continua no README.
+- O molde de textura é `CARS/MUSTANG/TEXTURES.BIN`. Os dois ports copiam dele o cabeçalho DXT e as texturas `SHADOWFE`, `SHADOWIG` e `NEON`, já com o prefixo do slot de destino. O Escort RS saiu do repositório; o crédito a ele continua no README.
 
 Os outros mods de `source/` saíram depois que o Fusion foi aprovado. O que cada um ensinou já está no diário; o arquivo não entra na reconstrução:
 
@@ -180,7 +180,7 @@ O ZIP da release leva o bat ao lado de `CARS/`, não a árvore inteira do reposi
 ## Checklist do próximo carro
 
 1. ZIP aprovado em `fusion-mw2005/release/`, o da tabela (`2018` ou `2012`). Nenhum arquivo de lá é editado.
-2. Rodar o `2018` antes do `2012`. O segundo reaproveita corte, vidro, adesivo, vinil e o molde `CARS/FOCUS/TEXTURES.BIN`.
+2. Rodar o `2018` antes do `2012`. O segundo reaproveita corte, vidro, adesivo, vinil e o molde `CARS/MUSTANG/TEXTURES.BIN`.
 3. `ug2write.py` regrava o doador e o arquivo volta igual chunk a chunk.
 4. Cada sólido novo ≤ 21.500 triângulos. Kits da IA preenchidos. Teto, portas e capô dentro das peças que o slot desenha.
 5. Opacos em DXT1. Lentes em DXT3, por último. `TEXTURES.BIN` em RAWW.
