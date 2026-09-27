@@ -39,6 +39,34 @@ nova (Delaunay, pontos a cada 6 cm; 3.174 triângulos no total). O resultado fic
 globais nos arquivos do jogo). Imagens: `docs/diagnostico-v4/v5-vidros-*.png`.
 A faixa preta com o triângulo no alto do para-brisa é a cerâmica do Fusion real (peça da base), não defeito.
 
+## Problemas vistos no teste da v5 (26/09/2026, 22:48) — para a próxima sessão
+
+Capturas: `docs/in-game-v5/` (cópia em `Need for Speed Underground 2/_fusion-screenshots/`).
+
+- [ ] **A. Adesivos não aparecem** no para-brisa, no vidro traseiro e nas portas.
+  Suspeita: o UG2 desenha os adesivos em peças próprias de posicionamento (`<CARRO>_DECAL_FRONT_WINDOW_…`,
+  `_DECAL_REAR_WINDOW_…`, `_DECAL_LEFT/RIGHT_DOOR_RECT_…`, `_DECAL_LEFT/RIGHT_QUARTER_…`,
+  `_DECAL_HOOD_RECT_…`), que o Corolla original e o mod do Mustang têm e o nosso GEOMETRY não tem
+  (nem o Escort). O MW do Fusion tem essas peças (`MUSTANGGT_KIT00_DECAL_LEFT_DOOR_RECT_MEDIUM_A`,
+  `MUSTANGGT_DECAL_FRONT_WINDOW_WIDE_MEDIUM_A` etc., 13–65 triângulos). Plano: listar os nomes completos
+  (por hash) das peças DECAL do Corolla/Mustang UG2, portar as do MW com os nomes `FOCUS_…` e conferir
+  materiais/texturas que elas usam. Conferir também se os adesivos de lateral dependem da UV da pintura
+  (`VINYLS.BIN` do Focus).
+- [ ] **B. Falha no para-brisa** (`v5-frente-perspectiva.png`): triângulo escuro no alto e faixa escura
+  serrilhada na base do vidro. O triângulo é a peça `LOGO` da base C (x 0,36–0,64, z 1,06–1,20), que fica
+  por fora do vidro — tirar da base ou empurrar para dentro do vidro. A faixa de baixo pode ser a borda nova
+  do vidro (dobrada 3 cm para dentro) cruzando o painel/limpadores, ou a mesma peça `LOGO`: testar a borda
+  com dobra menor só na base do para-brisa e renderizar essa região com a base inteira.
+- [ ] **C. Traseira deformada** (`v5-traseira.png`): lanternas escuras/cinza, sem o vermelho da lente, e
+  tampa do porta-malas e para-choque com ondulações no reflexo.
+  - Lanternas: a lente com `BRAKELIGHT` + dupla face ainda não aparece vermelha. Testar a lente opaca
+    (DXT1 vermelha, sem alfa), conferir a ordem de desenho e comparar com a lanterna do Corolla/Golf
+    originais (usam texturas globais `D947F346`/`02B52399` e o material `12C9453C`).
+  - Tampa/para-choque: o reflexo do UG2 (pintura com mapa de ambiente) mostra as facetas e as normais do
+    LOD B. Verificar normais da `KIT00_TRUNK_A` e da traseira da carroceria (recalcular normais suaves
+    por posição, respeitando só as quinas vivas) e se a divisão corpo/porta-malas criou normais diferentes
+    na emenda.
+
 ## Se a v4/v5 fechar o jogo
 
 A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e as rodas no GlobalB.
@@ -50,7 +78,7 @@ A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e
 
 ## Lista
 
-- [ ] **Testar a v5 no jogo** e conferir os itens 1–8 (fotos novas em `docs/in-game-v4/`).
+- [x] Testar a v5 no jogo: abriu. Novos problemas em "Problemas vistos no teste da v5" (A, B, C).
 - [ ] **0. Teste B — GlobalB com performance.** Depois que a v4 for aprovada, aplicar
   `scripts/globalb_patch.py` sobre o GlobalB **atual** (já com as rodas) e testar. Se fechar, aplicar o patch
   em partes (chassi do Lancer → motor/câmbio do Corolla → tração 0,5) até achar o bloco.

@@ -5,3 +5,5 @@
 /docs/in-game-v3/v3-lateral-direita.png filter=lfs diff=lfs merge=lfs -text
 /docs/in-game-v3/v3-lateral-esquerda.png filter=lfs diff=lfs merge=lfs -text
 /docs/in-game-v3/v3-traseira.png filter=lfs diff=lfs merge=lfs -text
+/docs/in-game-v5/v5-frente-perspectiva.png filter=lfs diff=lfs merge=lfs -text
+/docs/in-game-v5/v5-traseira.png filter=lfs diff=lfs merge=lfs -text
