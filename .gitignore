@@ -1,3 +1,6 @@
 backup/
 __pycache__/
 variantes/
+local/
+*.code-workspace
+*.lnk
