@@ -3,8 +3,7 @@
   "paint_B": 585
  },
  "inner_faces_removed": {
-  "hood_B": 2720,
-  "glass": 9278
+  "hood_B": 2720
  },
  "decimation": {
   "base_MISC": [
@@ -19,18 +18,20 @@
    1415,
    1000
   ],
-  "glass": [
-   10715,
-   3499
-  ],
   "interior_DULLPLASTIC": [
    3395,
-   1071
+   1130
   ],
   "interior_INTERIOR": [
    15081,
-   5008
+   5022
   ]
+ },
+ "glass": {
+  "source": "docs/vidros_v5.npz",
+  "windows": 12,
+  "tris": 3174,
+  "under_frame_m": 0.03
  },
  "base_parts": [
   [
@@ -71,12 +72,12 @@
   [
    "0x4bb53dca",
    "0xfedee40",
-   1071
+   1130
   ],
   [
    "0x4bb53dca",
    "0x2787edab",
-   5008
+   5022
   ],
   [
    "0xb4bd066f",
@@ -86,7 +87,7 @@
   [
    "0x834b8017",
    "0x471a1dca",
-   3499
+   3174
   ],
   [
    "0xe2799301",
@@ -102,7 +103,7 @@
  "budget": {
   "body": 20232,
   "trunk": 6670,
-  "base": 21250
+  "base": 20998
  },
  "markers": {
   "LEFT_BRAKELIGHT": [
@@ -189,9 +190,9 @@
    "groups": 1
   },
   "FOCUS_BASE_A": {
-   "tris": 21249,
-   "indices": 63747,
-   "verts": 23257,
+   "tris": 20997,
+   "indices": 62991,
+   "verts": 22857,
    "groups": 13
   },
   "FOCUS_KIT00_FRONT_WHEEL_A": {
@@ -204,7 +205,7 @@
  "fixed_normals": {
   "FOCUS_BASE_A": 26
  },
- "geometry_bytes": 6034816,
+ "geometry_bytes": 6018944,
  "textures": {
   "FOCUS_MISC": [
    "DXT1",

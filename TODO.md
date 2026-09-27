@@ -1,11 +1,11 @@
 # TODO — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
 
-Estado em 26/09/2026 (noite): **v4 instalada, aguardando teste no jogo.** A v4 ataca os itens 1–8 da
-lista abaixo. Leia também [CONTINUACAO.md](CONTINUACAO.md).
+Estado em 26/09/2026 (noite): **v5 instalada, aguardando teste no jogo.** A v5 é a v4 com vidros novos
+(gerados do zero, sem frestas). A v4 ataca os itens 1–8 da lista abaixo. Leia também [CONTINUACAO.md](CONTINUACAO.md).
 
-- Instalado agora: GEOMETRY `4DE8215E…02A6D` (v4), TEXTURES `349F6BEC…26B4` (o da v3, sem mudança),
+- Instalado agora: GEOMETRY `FC9E24E7…E0F7` (v5), TEXTURES `349F6BEC…26B4` (o da v3, sem mudança),
   GlobalB `27F9944B…CF97` (o original do backup **só com as rodas mudadas**: X +1,431 / −1,311, Y ±0,78).
-- Backup do que estava instalado (v3): `backup/v3-instalada-2026-09-26/` (fora do git).
+- Backups (fora do git): v3 em `backup/v3-instalada-2026-09-26/`, GEOMETRY da v4 em `backup/v4-instalada/`.
 - Diagnóstico: `docs/diagnostico-v4/` (magenta = face vista por trás, que o jogo não desenha → buraco;
   verde = normal do vértice contrária à face → mancha escura).
 
@@ -25,7 +25,21 @@ Peças da v4 (limite adotado: 21.500 triângulos = 64.500 índices por peça):
 porta-malas) · `BASE_A` 21.249 (base C, capô B, vidros, lanternas, interior, motorista) · roda 8.614.
 Os kits do MW são a mesma malha no LOD B, então as 5 carrocerias são iguais.
 
-## Se a v4 fechar o jogo
+## v5 — vidros novos
+
+Mesmo na v4 ficavam frestas entre o vidro e a moldura (o vidro do MW termina antes da carroceria).
+A v5 gera os vidros do zero pelo método dos carros originais do UG2 (uma lâmina simples de face única por
+janela, que entra por baixo da moldura), aproveitando do Fusion só o formato:
+`scripts/newglass.py` pega a camada externa do vidro do MW, separa as 12 janelas, ajusta uma superfície
+lisa (polinômio de grau 6 no plano de cada janela; erro máximo 1,3–3,5 mm), alarga o contorno 30 mm e
+dobra essa borda para dentro do carro (0,35 m/m) para ficar escondida sob a moldura, e faz uma malha
+nova (Delaunay, pontos a cada 6 cm; 3.174 triângulos no total). O resultado fica em `docs/vidros_v5.npz`
+(o `newglass.py` precisa de scipy e contourpy, que não estão no Python do computador; o `build.py` só lê o
+`.npz`). Textura continua a `WINDOW` (as texturas por janela dos carros originais não existem como
+globais nos arquivos do jogo). Imagens: `docs/diagnostico-v4/v5-vidros-*.png`.
+A faixa preta com o triângulo no alto do para-brisa é a cerâmica do Fusion real (peça da base), não defeito.
+
+## Se a v4/v5 fechar o jogo
 
 A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e as rodas no GlobalB.
 1. Voltar só o GlobalB do backup (`backup/v3-instalada-2026-09-26/GlobalB.lzc`). Se abrir → o problema
@@ -36,7 +50,7 @@ A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e
 
 ## Lista
 
-- [ ] **Testar a v4 no jogo** e conferir os itens 1–8 (fotos novas em `docs/in-game-v4/`).
+- [ ] **Testar a v5 no jogo** e conferir os itens 1–8 (fotos novas em `docs/in-game-v4/`).
 - [ ] **0. Teste B — GlobalB com performance.** Depois que a v4 for aprovada, aplicar
   `scripts/globalb_patch.py` sobre o GlobalB **atual** (já com as rodas) e testar. Se fechar, aplicar o patch
   em partes (chassi do Lancer → motor/câmbio do Corolla → tração 0,5) até achar o bloco.
@@ -45,13 +59,12 @@ A v4 muda duas coisas ao mesmo tempo em relação à v3 que abriu: a geometria e
 - [x] 1. Roda traseira muito para a frente → X −1,311 (v4).
 - [x] 2. Roda dianteira muito para trás → X +1,431 (v4).
 - [x] 3. Porta dianteira direita diferente → pintura LOD B sem decimação (v4).
-- [x] 4. Buraco no vidro traseiro → `REAR_WINDOW_A` incluída, só camada externa (v4).
+- [x] 4. Buraco no vidro traseiro → `REAR_WINDOW_A` incluída (v4); vidros refeitos sem frestas (v5).
 - [x] 5. Lanternas sem lente → material `BRAKELIGHT` + dupla face (v4).
 - [x] 6. Traseira deformada → LOD B + `TRUNK_A` (v4).
 - [x] 7. Capô com deformações e manchas pretas → capô B, só a face de cima (v4).
 - [x] 8. Para-brisa incompleto → idem item 4 (v4).
 - [ ] Porta-malas: na tela de som o jogo anima a `TRUNK_A` com o pivô do Focus; ver se fica estranho.
-- [ ] Um pedaço do interior (suporte do retrovisor) aparece como triângulo escuro no alto do para-brisa.
 
 ## Depois da lista
 
