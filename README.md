@@ -4,7 +4,7 @@ Substitui o **Ford Focus** (slot `FOCUS`). O modelo vem do port aprovado de Most
 (`fusion-mw2005`, V1prime-z10); os arquivos de lá não foram alterados. O doador de estrutura é o
 **Escort RS** (`source/Ford-Focus-ESCORT-RS`), o mod sedã que já funciona neste jogo.
 
-> **Estado:** finalizado e aprovado no jogo em 27/09/2026. A v9 desenha o carro completo no slot FOCUS (pintura LOD B + LOD A nas áreas que deformavam, sem o emblema do bico, UV de vinil no molde do Focus) com o GlobalB de performance (248 cv, tração integral, chassi do Lancer). O histórico das versões está em [TODO.md](TODO.md). O método para repetir o port com outro carro está em `fusion-mw2005/docs/PORTAR-PARA-NFSU2.md`.
+> **Estado:** finalizado e aprovado no jogo em 27/09/2026. A v9 desenha o carro completo no slot FOCUS (pintura LOD B + LOD A nas áreas que deformavam, sem o emblema do bico, UV de vinil no molde do Focus) com o GlobalB de performance (248 cv, tração integral, chassi do Lancer). O histórico das versões está em [TODO.md](TODO.md). O método para repetir o port com outro carro está em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md).
 
 ## No jogo
 
