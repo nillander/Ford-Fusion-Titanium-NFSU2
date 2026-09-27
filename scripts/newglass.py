@@ -17,10 +17,10 @@ DEG = 6
 TUCK = 0.35       # inward drop per metre beyond the original edge
 
 
-def load(pkl):
+def load(pkl, mw='MUSTANGGT'):
     P = pickle.load(open(pkl, 'rb'))
     pos, tri, nrm, uv, col = [], [], [], [], []; o = 0
-    for part in ['MUSTANGGT_KIT00_FRONT_WINDOW_A', 'MUSTANGGT_KIT00_REAR_WINDOW_A']:
+    for part in ['%s_KIT00_FRONT_WINDOW_A' % mw, '%s_KIT00_REAR_WINDOW_A' % mw]:
         for g in P[part]['groups']:
             pos.append(g['pos']); nrm.append(g['nrm']); uv.append(g['uv']); col.append(g['col']); tri.append(g['tri'] + o); o += len(g['pos'])
     pos, nrm, uv, col, tri = map(np.concatenate, (pos, nrm, uv, col, tri))

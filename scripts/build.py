@@ -1,40 +1,60 @@
-"""v6. Builds the Ford Fusion Titanium 2018 for NFSU2 (FOCUS slot) from the approved MW2005 port (V1prime-z10).
+"""Builds a Fusion for NFSU2 from an approved MW2005 release.
 
-Layout follows the Escort RS mod that already works in this game (nfsu360 compiler layout):
-  FOCUS_KIT00_BODY_A, FOCUS_KITW01..04_BODY_A, FOCUS_BASE_A, FOCUS_KIT00_FRONT_WHEEL_A
-Every solid stays under 65,535 indices (UG2 limit).  Opaque textures are DXT1; only lamp lenses
-use a DXT3 texture (MW lesson: DXT3 = no depth write).
+Usage: python build.py <out-dir> [2018|2012]
+  2018  MUSTANGGT -> MUSTANG   (Fusion Titanium 2018 AWD)
+  2012  COBALTSS  -> FOCUS     (Fusion 2012 FWD; same part split, clip, glass and decals as 2018)
+
+The destination names follow the nfsu360 layout proved on the Focus slot:
+  <SLOT>_KIT00_BODY_A, <SLOT>_KITW01..04_BODY_A, <SLOT>_BASE_A, <SLOT>_KIT00_FRONT_WHEEL_A
+Every solid stays under 65,535 indices. Opaque textures are DXT1; only lamp lenses use DXT3.
 """
 import pickle, json, struct, sys, os
 import numpy as np
 from PIL import Image
-import decimate, ug2write, tpkwrite, tpk2, dxt, dxtenc
+import decimate, ug2write, tpkwrite, tpk2, dxt, dxtenc, ports
 from hashes import bh
 
+PORT = ports.get(sys.argv[2] if len(sys.argv) > 2 else '2018')
+MW, UG2 = PORT['mw'], PORT['ug2']
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'out'
 os.makedirs(OUT, exist_ok=True)
 P = pickle.load(open('mw_parts.pkl', 'rb'))
-LOG = {}
+LOG = {'port': PORT['id'], 'mw': MW, 'ug2': UG2}
 
 # ---------------------------------------------------------------- materials
 M = {k: bh(k) for k in ['CARSKIN', 'WINDSHIELD', 'DULLPLASTIC', 'INTERIOR', 'LICENSEPLATE', 'HEADLIGHTGLASS',
                         'HEADLIGHTREFLECTOR', 'BRAKELIGHT', 'BRAKELIGHTGLASS', 'DRIVER', 'RUBBER', 'USER_RIMS']}
 T_PAINT = 0x3C84D757   # global paint texture used by every UG2 body (retail and mods)
 T_WINDOW = bh('WINDOW')
-TEX = {  # new car textures (name -> source, size, format)
-    'FOCUS_MISC': ('MUSTANGGT_MISC', 512, 'DXT1'),
-    'FOCUS_LOGO': ('MUSTANGGT_LOGO', 512, 'DXT1'),
-    'FOCUS_INTERIOR': ('MUSTANGGT_INTERIOR', 512, 'DXT1'),
-    'FOCUS_BADGING': ('MUSTANGGT_BADGING', 512, 'DXT1'),
-    'FOCUS_KIT00_HEADLIGHT': ('MUSTANGGT_KIT00_HEADLIG', 256, 'DXT1'),
-    'FOCUS_HEADLIGHT_GLASS': ('MUSTANGGT_KIT00_HEADLIG', 256, 'DXT3'),
-    'FOCUS_KIT00_BRAKELIGHT': ('MUSTANGGT_KIT00_BRAKELI', 256, 'DXT1'),
-    'FOCUS_BRAKELIGHT_GLASS': ('MUSTANGGT_KIT00_BRAKELI', 256, 'DXT3'),
-    'FOCUS_RIM': ('MUSTANGGT_RIM', 256, 'DXT1'),
-    'FOCUS_TIRE': ('MUSTANGGT_TIRE', 256, 'DXT1'),
-    'FOCUS_DRIVER': ('MUSTANGGT_DRIVER', 256, 'DXT1'),
+def sheet(suffix):
+    """PNG stem for a MW texture. The TPK truncates the name (HEADLIG vs HEADLIGH)."""
+    prefix = MW + '_'
+    hits = []
+    for filename in os.listdir('texdump'):
+        if not (filename.startswith('mw_') and filename.endswith('.png')):
+            continue
+        stem = filename[3:-4]
+        if stem.startswith(prefix) and stem[len(prefix):].startswith(suffix):
+            hits.append(stem)
+    if len(hits) != 1:
+        raise SystemExit('texture %s for %s: %s' % (suffix, MW, hits))
+    return hits[0]
+
+
+TEX = {  # destination name -> (mw sheet suffix, size, format)
+    UG2 + '_MISC': ('MISC', 512, 'DXT1'),
+    UG2 + '_LOGO': ('LOGO', 512, 'DXT1'),
+    UG2 + '_INTERIOR': ('INTERIOR', 512, 'DXT1'),
+    UG2 + '_BADGING': ('BADGING', 512, 'DXT1'),
+    UG2 + '_KIT00_HEADLIGHT': ('KIT00_HEADLIG', 256, 'DXT1'),
+    UG2 + '_HEADLIGHT_GLASS': ('KIT00_HEADLIG', 256, 'DXT3'),
+    UG2 + '_KIT00_BRAKELIGHT': ('KIT00_BRAKELI', 256, 'DXT1'),
+    UG2 + '_BRAKELIGHT_GLASS': ('KIT00_BRAKELI', 256, 'DXT3'),
+    UG2 + '_RIM': ('RIM', 256, 'DXT1'),
+    UG2 + '_TIRE': ('TIRE', 256, 'DXT1'),
+    UG2 + '_DRIVER': ('DRIVER', 256, 'DXT1'),
 }
-KEEP_ESCORT = [0x6F62BC7B, bh('FOCUS_SHADOWFE'), bh('FOCUS_SHADOWIG'), bh('FOCUS_NEON')]
+KEEP_SUFFIXES = ('SHADOWFE', 'SHADOWIG', 'NEON')
 
 
 def weld(g):
@@ -69,17 +89,17 @@ def dec(g, target, name):
 
 
 def groups_of(part):
-    return [weld(g) | {'tex': g['tex'], 'mat': g['mat']} for g in P['MUSTANGGT_' + part]['groups']]
+    return [weld(g) | {'tex': g['tex'], 'mat': g['mat']} for g in P[MW + '_' + part]['groups']]
 
 
 def tex_for(mwtex, mwmat):
-    if mwtex == 'MUSTANGGT_KIT00_HEADLIG':
-        return (bh('FOCUS_HEADLIGHT_GLASS'), M['HEADLIGHTGLASS']) if mwmat == 'HEADLIGHTGLASS' else (bh('FOCUS_KIT00_HEADLIGHT'), M['HEADLIGHTREFLECTOR'])
-    if mwtex == 'MUSTANGGT_KIT00_BRAKELI':
-        return (bh('FOCUS_BRAKELIGHT_GLASS'), M['BRAKELIGHTGLASS']) if mwmat == 'HEADLIGHTGLASS' else (bh('FOCUS_KIT00_BRAKELIGHT'), M['BRAKELIGHT'])
-    name = 'FOCUS_' + mwtex[len('MUSTANGGT_'):]
+    body = mwtex[len(MW) + 1:] if mwtex.startswith(MW + '_') else mwtex
+    if body.startswith('KIT00_HEADLIG'):
+        return (bh(UG2 + '_HEADLIGHT_GLASS'), M['HEADLIGHTGLASS']) if mwmat == 'HEADLIGHTGLASS' else (bh(UG2 + '_KIT00_HEADLIGHT'), M['HEADLIGHTREFLECTOR'])
+    if body.startswith('KIT00_BRAKELI'):
+        return (bh(UG2 + '_BRAKELIGHT_GLASS'), M['BRAKELIGHTGLASS']) if mwmat == 'HEADLIGHTGLASS' else (bh(UG2 + '_KIT00_BRAKELIGHT'), M['BRAKELIGHT'])
     mat = M.get(mwmat, M['DULLPLASTIC'])
-    return bh(name), mat
+    return bh(UG2 + '_' + body), mat
 
 
 # ---------------------------------------------------------------- v4 helpers
@@ -126,7 +146,7 @@ def ntris(ms):
 
 
 # ---------------------------------------------------------------- paint: LOD B (smooth), single-sided
-paint = drop_inward_twins(weld(P['MUSTANGGT_KIT00_BODY_B']['groups'][0]), 'paint_B')
+paint = drop_inward_twins(weld(P[MW + '_KIT00_BODY_B']['groups'][0]), 'paint_B')
 lab = comps.components(paint['pos'], paint['tri'])
 is_trunk = np.zeros(len(paint['tri']), bool)
 for i in range(lab.max() + 1):
@@ -151,7 +171,7 @@ def trunk_region(g):
 
 
 # v6: the trunk lid comes from LOD A (the TRUNK_A solid has room for it; LOD B showed waves in the game)
-wA = weld(P['MUSTANGGT_KIT00_BODY_A']['groups'][0])
+wA = weld(P[MW + '_KIT00_BODY_A']['groups'][0])
 _tA = trunk_region(wA)
 trunk_paint = drop_inward_twins(compact(wA, _tA), 'trunk_A')
 # v8: ALL paint from LOD A, no decimation, split over the retail part slots that are drawn with every kit
@@ -209,30 +229,35 @@ noseA = merge([A_parts['nose'], A_parts['roof_front']])      # these go into BAS
 BODY_B_TARGET = 14900
 bB = dec(bB, BODY_B_TARGET, 'paint_B_flat')
 body_paint = merge([bB, rearA])
-hood = outward_only(weld(P['MUSTANGGT_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
+hood = outward_only(weld(P[MW + '_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
 A_parts['body_B'] = bB
 LOG['paint_lods'] = {k + '_A': int(len(v['tri'])) for k, v in A_parts.items()}
 
 # ---------------------------------------------------------------- lamps (LOD C). Lenses double-sided;
 # brake lens uses the BRAKELIGHT material (BRAKELIGHTGLASS is only the glow shown when braking)
 head_parts, brake_parts = [], []
-for part in ['KIT00_RIGHT_HEADLIGHT_C', 'KIT00_RIGHT_HEADLIGHT_GLASS_C']:
-    for g in groups_of(part):
-        t, m = tex_for(g['tex'], g['mat'])
-        if m == M['HEADLIGHTGLASS']:
-            g = double_sided(g)
-        head_parts.append(mesh(g, t, m))
-for part in ['KIT00_RIGHT_BRAKELIGHT_B', 'KIT00_RIGHT_BRAKELIGHT_GLASS_B']:
-    for g in groups_of(part):
-        if g['mat'] == 'HEADLIGHTGLASS':
-            brake_parts.append(mesh(double_sided(g), bh('FOCUS_BRAKELIGHT_GLASS'), bh('MOLDINGS')))   # v7: retail lens material
-        else:
-            brake_parts.append(mesh(g, bh('FOCUS_KIT00_BRAKELIGHT'), M['DULLPLASTIC']))
+lamp_sides = ['RIGHT']
+if MW + '_KIT00_LEFT_HEADLIGHT_C' in P:
+    lamp_sides.append('LEFT')
+for side in lamp_sides:
+    for part in ['KIT00_%s_HEADLIGHT_C' % side, 'KIT00_%s_HEADLIGHT_GLASS_C' % side]:
+        for g in groups_of(part):
+            t, m = tex_for(g['tex'], g['mat'])
+            if m == M['HEADLIGHTGLASS']:
+                g = double_sided(g)
+            head_parts.append(mesh(g, t, m))
+for side in lamp_sides:
+    for part in ['KIT00_%s_BRAKELIGHT_B' % side, 'KIT00_%s_BRAKELIGHT_GLASS_B' % side]:
+        for g in groups_of(part):
+            if g['mat'] == 'HEADLIGHTGLASS':
+                brake_parts.append(mesh(double_sided(g), bh(UG2 + '_BRAKELIGHT_GLASS'), bh('MOLDINGS')))   # v7: retail lens material
+            else:
+                brake_parts.append(mesh(g, bh(UG2 + '_KIT00_BRAKELIGHT'), M['DULLPLASTIC']))
 # draw order inside a solid: opaque first, lenses (DXT3) last
 head_opaque = [m for m in head_parts if m['mat'] != M['HEADLIGHTGLASS']]
 head_glass = [m for m in head_parts if m['mat'] == M['HEADLIGHTGLASS']]
-brake_opaque = [m for m in brake_parts if m['tex'] != bh('FOCUS_BRAKELIGHT_GLASS')]
-brake_glass = [m for m in brake_parts if m['tex'] == bh('FOCUS_BRAKELIGHT_GLASS')]
+brake_opaque = [m for m in brake_parts if m['tex'] != bh(UG2 + '_BRAKELIGHT_GLASS')]
+brake_glass = [m for m in brake_parts if m['tex'] == bh(UG2 + '_BRAKELIGHT_GLASS')]
 
 def split_y(ms, lim=0.6):
     inner, outer = [], []
@@ -276,23 +301,23 @@ _baseC = []
 for g in groups_of('BASE_C'):
     c = g['pos'][g['tri']].mean(1)
     k = ~_rear_low(c)
-    if g['tex'] == 'MUSTANGGT_MISC':      # v7: Ford oval on the nose removed (the nose paint is now smooth LOD A)
+    if g['tex'] == MW + '_MISC':      # v7: Ford oval on the nose removed (the nose paint is now smooth LOD A)
         emb = (c[:, 0] > 2.24) & (np.abs(c[:, 1]) < 0.075) & (c[:, 2] > 0.58) & (c[:, 2] < 0.64)
         LOG['emblem_removed'] = int(emb.sum()); k &= ~emb
     if k.any(): _baseC.append(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']})
 for g in groups_of('BASE_B'):             # v7: exhaust tips and diffuser from LOD B (C was too coarse)
     c = g['pos'][g['tri']].mean(1); k = _rear_low(c)
-    if k.any() and g['tex'] in ('MUSTANGGT_MISC', 'MUSTANGGT_LOGO'):
+    if k.any() and g['tex'] in (MW + '_MISC', MW + '_LOGO'):
         _baseC.append(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']}); LOG.setdefault('rear_low_from_B', {})[g['tex']] = int(k.sum())
 for g in _baseC:
-    if g['tex'] in ('MUSTANGGT_LOGO', 'MUSTANGGT_MISC'):
+    if g['tex'] in (MW + '_LOGO', MW + '_MISC'):
         fr = near_glass(g['pos'][g['tri']].mean(1))
         if fr.any():
             LOG.setdefault('frit_removed', {})[g['tex']] = int(fr.sum())
             g = compact(g, ~fr) | {'tex': g['tex'], 'mat': g['mat']}
     if len(g['tri']) > 2000:
         g = dec(g, int(len(g['tri']) * 0.9), 'base_' + g['tex'][10:]) | {'tex': g['tex'], 'mat': g['mat']}
-    if g['tex'] in ('MUSTANGGT_LOGO', 'MUSTANGGT_MISC'):
+    if g['tex'] in (MW + '_LOGO', MW + '_MISC'):
         # v6: MW draws both faces; the black valances of the bumpers were modelled facing inwards and vanish
         # in UG2 (back-face culling) -> lower front/rear areas made double-sided
         c = g['pos'][g['tri']].mean(1)
@@ -305,7 +330,7 @@ for g in _baseC:
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(g, t, m))
 for g in groups_of('KIT00_DRIVER_A'):
-    base.append(mesh(dec(g, 700, 'driver'), bh('FOCUS_DRIVER'), M['DRIVER']))
+    base.append(mesh(dec(g, 700, 'driver'), bh(UG2 + '_DRIVER'), M['DRIVER']))
 base += brake_opaque
 base.append(VP(hood))
 base.append(VP(noseA))
@@ -384,13 +409,13 @@ print(LOG['budget'])
 # wheel: LOD B of the 20-spoke 18" wheel
 wheel = []
 for g in groups_of('KIT00_FRONT_TIRE_B'):
-    if g['tex'] == 'MUSTANGGT_RIM':
-        wheel.append(mesh(g, bh('FOCUS_RIM'), M['USER_RIMS']))
+    if g['tex'] == MW + '_RIM':
+        wheel.append(mesh(g, bh(UG2 + '_RIM'), M['USER_RIMS']))
     else:
-        wheel.append(mesh(g, bh('FOCUS_TIRE'), M['RUBBER']))
+        wheel.append(mesh(g, bh(UG2 + '_TIRE'), M['RUBBER']))
 
 # ---------------------------------------------------------------- markers (MW positions, UG2 left = +y)
-mw_markers = P['MUSTANGGT_BASE_A']['markers']
+mw_markers = P[MW + '_BASE_A']['markers']
 names = {bh(n): n for n in ['LEFT_REVERSE', 'RIGHT_REVERSE', 'LEFT_BRAKELIGHT', 'RIGHT_BRAKELIGHT', 'LEFT_EXHAUST',
                               'RIGHT_EXHAUST', 'CENTRE_BRAKELIGHT', 'LEFT_HEADLIGHT', 'RIGHT_HEADLIGHT', 'SPOILER', 'ROOF_SCOOP']}
 swap = {'LEFT': 'RIGHT', 'RIGHT': 'LEFT'}
@@ -461,11 +486,11 @@ def solid(name, meshes, markers=()):
 
 solids = []
 for slot in ['KIT00', 'KITW01', 'KITW02', 'KITW03', 'KITW04']:   # the MW kits share the same paint mesh at LOD B
-    solids.append(solid(f'FOCUS_{slot}_BODY_A', body_list, exhaust_markers))
-solids.append(solid('FOCUS_KIT00_TRUNK_A', trunk_list))
+    solids.append(solid(f'{UG2}_{slot}_BODY_A', body_list, exhaust_markers))
+solids.append(solid(UG2 + '_KIT00_TRUNK_A', trunk_list))
 
-solids.append(solid('FOCUS_BASE_A', base, base_markers))
-solids.append(solid('FOCUS_KIT00_FRONT_WHEEL_A', wheel))
+solids.append(solid(UG2 + '_BASE_A', base, base_markers))
+solids.append(solid(UG2 + '_KIT00_FRONT_WHEEL_A', wheel))
 
 # ---------------------------------------------------------------- v6: decal placement solids
 import decals
@@ -482,19 +507,19 @@ def side_of(part):
 
 
 dec_parts = {}
-dec_parts['DECAL_FRONT_WINDOW_WIDE_MEDIUM_A'] = decals.mesh_from_groups(decals.from_mw(P, 'MUSTANGGT_DECAL_FRONT_WINDOW_WIDE_MEDIUM_A'), GT, off=0.004, levels=2)
-dec_parts['DECAL_REAR_WINDOW_WIDE_MEDIUM_A'] = decals.mesh_from_groups(decals.from_mw(P, 'MUSTANGGT_DECAL_REAR_WINDOW_WIDE_MEDIUM_A'), GT, off=0.004, levels=2)
+dec_parts['DECAL_FRONT_WINDOW_WIDE_MEDIUM_A'] = decals.mesh_from_groups(decals.from_mw(P, MW + '_DECAL_FRONT_WINDOW_WIDE_MEDIUM_A'), GT, off=0.004, levels=2)
+dec_parts['DECAL_REAR_WINDOW_WIDE_MEDIUM_A'] = decals.mesh_from_groups(decals.from_mw(P, MW + '_DECAL_REAR_WINDOW_WIDE_MEDIUM_A'), GT, off=0.004, levels=2)
 for mwside in ('LEFT', 'RIGHT'):
     for what in ('DOOR', 'QUARTER'):
-        part = f'MUSTANGGT_KIT00_DECAL_{mwside}_{what}_RECT_MEDIUM_A'
+        part = f'{MW}_KIT00_DECAL_{mwside}_{what}_RECT_MEDIUM_A'
         dec_parts[f'DECAL_{side_of(part)}_{what}_RECT_MEDIUM_A'] = decals.mesh_from_groups(decals.from_mw(P, part), PT, off=0.005, levels=2)
 for key, nm in (('medium', 'DECAL_HOOD_RECT_MEDIUM_A'), ('small', 'DECAL_HOOD_RECT_SMALL_A')):
     dec_parts[nm] = decals.mesh_from_groups(decals.hood_from_corolla(_hood_npz, key, hood['pos'], hood['tri']), (hood['pos'], hood['tri']), off=0.008)
 for nm, ms in list(dec_parts.items()):
-    solids.append(solid('FOCUS_' + nm, ms))
+    solids.append(solid(UG2 + '_' + nm, ms))
     if 'DOOR' in nm or 'QUARTER' in nm:          # the wide-body kits use their own decal parts (same body here)
         for w in range(1, 5):
-            solids.append(solid(f'FOCUS_WIDE{w}_' + nm, ms))
+            solids.append(solid(f'{UG2}_WIDE{w}_' + nm, ms))
 LOG['decals'] = {nm: ntris(ms) for nm, ms in dec_parts.items()}
 for s in solids:
     assert sum(len(g['tri']) for g in s['groups']) <= CAP, (s['name'], LOG.get('decimation'), LOG.get('budget'))
@@ -505,15 +530,22 @@ size = ug2write.write(solids, f'{OUT}/GEOMETRY.BIN')
 LOG['geometry_bytes'] = size
 
 # ---------------------------------------------------------------- textures
-info_e, tex_e = tpk2.parse('escort/TEXTURES.BIN')
-tmpl_dxt1 = next(t for t in tex_e if t['name'] == 'FOCUS_MISC')
-tmpl_dxt3 = next(t for t in tex_e if t['name'] == 'FOCUS_BADGING')
+info_e, tex_e = tpk2.parse(ports.TEMPLATE)
+
+
+def _fmt(texture):
+    return texture['fmt'].decode() if isinstance(texture['fmt'], bytes) else texture['fmt']
+
+
+tmpl_dxt1 = next(t for t in tex_e if _fmt(t) == 'DXT1')
+tmpl_dxt3 = next(t for t in tex_e if _fmt(t) == 'DXT3')
 out_tex = []
 place = 0
-for name, (src, sz, fmt) in TEX.items():
+for name, (suffix, sz, fmt) in TEX.items():
+    src = sheet(suffix)
     img = Image.open(f'texdump/mw_{src}.png').convert('RGBA').resize((sz, sz), Image.LANCZOS)
     rgba = np.array(img)
-    if name == 'FOCUS_BRAKELIGHT_GLASS':      # v6: MW lens is dark red (lit by emission in MW); UG2 needs it bright
+    if name == UG2 + '_BRAKELIGHT_GLASS':      # v6: MW lens is dark red (lit by emission in MW); UG2 needs it bright
         f = rgba[..., :3].astype(float)
         red = f[..., 0] > f[..., 1:].max(-1) + 20
         f[red, 0] = np.clip(f[red, 0] * 2.2 + 40, 0, 235); f[red, 1:] = np.clip(f[red, 1:] * 1.5, 0, 40)
@@ -527,12 +559,16 @@ for name, (src, sz, fmt) in TEX.items():
     info = tpkwrite.build_info(tm['info'], name, bh(name), sz, sz, len(data), place)
     place += len(data)
     out_tex.append(dict(hash=bh(name), info=info, dds=tm['dds'], data=data, name=name, fmt=fmt, size=sz))
+kept = set()
 for t in tex_e:
-    if t['hash'] in KEEP_ESCORT:
-        info = bytearray(t['info'])
-        struct.pack_into('<I', info, 48, place); struct.pack_into('<I', info, 52, place + t['size'])
-        place += t['size']
-        out_tex.append(dict(hash=t['hash'], info=bytes(info), dds=t['dds'], data=t['data'], tail=t['tail'], name=t['name'], fmt=t['fmt'].decode(), size=t['w']))
+    suffix = next((item for item in KEEP_SUFFIXES if t['name'].endswith(item)), None)
+    if suffix is None or suffix in kept:
+        continue
+    kept.add(suffix)
+    name = UG2 + '_' + suffix
+    info = tpkwrite.build_info(t['info'], name, bh(name), t['w'], t['h'], t['size'], place)
+    place += t['size']
+    out_tex.append(dict(hash=bh(name), info=info, dds=t['dds'], data=t['data'], tail=t['tail'], name=name, fmt=_fmt(t), size=t['w']))
 LOG['textures'] = {t['name']: [t['fmt'], t['size']] for t in out_tex}
 LOG['textures_bytes'] = tpkwrite.write_raw(out_tex, f'{OUT}/TEXTURES.BIN')  # v3: RAWW (mwtc layout) instead of JDLZ
 json.dump(LOG, open(f'{OUT}/build_log.json', 'w'), indent=1)

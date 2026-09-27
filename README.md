@@ -1,10 +1,15 @@
-# Ford Fusion Titanium 2018 AWD — Need for Speed Underground 2
+# Ford Fusion — Need for Speed Underground 2
 
-Substitui o **Ford Focus** (slot `FOCUS`). O modelo vem do port aprovado de Most Wanted 2005
-(`fusion-mw2005`, V1prime-z10); os arquivos de lá não foram alterados. O doador de estrutura é o
-**Escort RS** (`source/Ford-Focus-ESCORT-RS`), o mod sedã que já funciona neste jogo.
+Dois ports, a partir dos ZIPs do Most Wanted 2005. Os arquivos de lá não são alterados. A estrutura que o Underground 2 aceita foi medida no **Escort RS**.
 
-> **Estado:** finalizado e aprovado no jogo em 27/09/2026. A v9 desenha o carro completo no slot FOCUS (pintura LOD B + LOD A nas áreas que deformavam, sem o emblema do bico, UV de vinil no molde do Focus) com o GlobalB de performance (248 cv, tração integral, chassi do Lancer). O histórico das versões está em [TODO.md](TODO.md). O método para repetir o port com outro carro está em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md).
+| Most Wanted | Underground 2 | Carro |
+| --- | --- | --- |
+| `MUSTANGGT` | `MUSTANG` | Fusion Titanium 2018 AWD |
+| `COBALTSS` | `FOCUS` | Fusion 2012 FWD |
+
+O 2012 reaproveita o caminho do 2018 (corte, vidros, adesivos, vinil, chassi). O que muda é o slot e a tração, dianteira no 2012. O método está em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md).
+
+> **Estado:** a v9 do 2018 foi aprovada no jogo em 27/09/2026, ainda no slot `FOCUS` (pintura LOD B + LOD A nas áreas que deformavam, sem o emblema do bico, UV de vinil no molde do Focus, 248 cv, tração integral, chassi do Lancer). Esse BIN fica em `CARS/FOCUS` como molde. Daqui pra frente o 2018 vai para `MUSTANG` e o 2012 para `FOCUS`. O histórico está em [TODO.md](TODO.md).
 
 ## No jogo
 
@@ -135,13 +140,14 @@ O backup do estado anterior desta cópia (Escort RS + GlobalB) está em `backup/
 
 ## Reconstruir
 
-Python 3 + numpy + Pillow. A partir de uma pasta com `mw/` (ZIP da release do MW) e `escort/`
-(conteúdo de `FOCUS.7z`, extraível com `scripts/sevenz.py`):
+Python 3 + numpy + Pillow. `mw/` é o ZIP da release do Most Wanted extraído. O molde de textura é o `CARS/FOCUS/TEXTURES.BIN` desta v9.
 
 ```
-python extract_mw.py          # lê o GEOMETRY/TEXTURES do MW -> mw_parts.pkl e texdump/
-python build.py out           # GEOMETRY.BIN + TEXTURES.BIN
-python globalb_patch.py GlobalB.lzc out/GlobalB.lzc
+python extract_mw.py 2018     # MUSTANGGT -> mw_parts.pkl e texdump/
+python build.py out 2018      # peças MUSTANG_*
+python extract_mw.py 2012     # COBALTSS, mesma pipeline do 2018
+python build.py out 2012      # peças FOCUS_*
+python globalb_patch.py GlobalB.lzc out/GlobalB.lzc 2018
 python preview.py out/GEOMETRY.BIN out/TEXTURES.BIN previa.png
 ```
 

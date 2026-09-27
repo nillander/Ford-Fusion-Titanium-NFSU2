@@ -1,4 +1,8 @@
-# TODO — Fusion Titanium 2018 AWD no NFSU2 (slot FOCUS)
+# TODO — Fusion no NFSU2
+
+A partir da tabela em `scripts/ports.py`, o 2018 vai para o slot `MUSTANG` e o 2012 para o slot `FOCUS`. O diário abaixo é a v9, feita quando o 2018 ainda ocupava o `FOCUS`. Essa medição é o que o port do 2012 reaproveita.
+
+# Diário da v9 — Fusion Titanium 2018 no slot FOCUS
 
 Estado em 27/09/2026: **finalizado e aprovado no jogo.** Capturas em `docs/in-game-final/`. O resultado publicado está no [README.md](README.md).
 

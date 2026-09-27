@@ -1,18 +1,18 @@
-"""Patches the FOCUS CarTypeInfo (chunk 0x34600, 2192-byte records) in GlobalB.lzc.
+"""Patches one CarTypeInfo record (chunk 0x34600, 2192-byte records) in GlobalB.lzc.
 
-Engine and gearbox: Toyota COROLLA with every torque curve (stock, turbo and upgrades) scaled by the
-same factor, chosen so the stock peak power is 248 cv (2.0 EcoBoost of the Fusion Titanium 2018).
-The 9 stock torque points (kN*m) are taken as evenly spaced from 0 to the max rpm.  Drivetrain: AWD
-(torque split 0.5, as LANCEREVO8).  Chassis, tyres, suspension, steering, brakes: LANCEREVO8.  Mass
-1.63 t.  Wheel X/Y, body dimensions and inertia: Fusion geometry (long car -> larger yaw inertia,
-2.74 m wheelbase).  Wheel Z, tyre radius and width stay as they are in the input (the Escort values
-were approved in the game).
+Usage: python globalb_patch.py <src> <dst> [2018|2012]
+Both ports share the 2018 chassis: Corolla torque scaled to 248 cv, Lancer tyres and
+suspension, mass 1.63 t, Fusion wheelbase.  2018 writes the MUSTANG record with torque
+split 0.5 (AWD).  2012 writes the FOCUS record with torque split 1.0 (FWD).
+Wheel Z, tyre radius and width stay as they are in the input file.
 """
 import math, struct, sys, json
 import ug2
+import ports
 
 REC = 2192
 src, dst = sys.argv[1], sys.argv[2]
+PORT = ports.get(sys.argv[3] if len(sys.argv) > 3 else '2018')
 D = bytearray(open(src, 'rb').read())
 if D[:4] == b'JDLZ':
     raise SystemExit('GlobalB is compressed; decompress first')
@@ -26,7 +26,7 @@ recs = {}
 for off in range(base + 8, base + size, REC):
     name = bytes(D[off:off + 32]).split(b'\0')[0].decode()
     recs[name] = off
-F, C, L = recs['FOCUS'], recs['COROLLA'], recs['LANCEREVO8']
+F, C, L = recs[PORT['ug2']], recs['COROLLA'], recs['LANCEREVO8']
 before = bytes(D[F:F + REC])
 
 
@@ -70,9 +70,12 @@ TORQUE_ARRAYS = [(784, 820),    # stock torque curve, 9 points
 for a, b in TORQUE_ARRAYS:
     for o in range(a, b, 4):
         setf(o, struct.unpack_from('<f', D, C + o)[0] * POWER)
-# --- AWD: torque split 0.5 at stock and at the three upgrade levels (Lancer value)
+# 2018 copies the Lancer split (0.5, AWD). 2012 forces 1.0 (FWD) on the same chassis.
 for o in (720, 1136, 1200, 1264):
-    copy(L, o, o + 4)
+    if PORT['drive'] == 'FWD':
+        setf(o, PORT['split'])
+    else:
+        copy(L, o, o + 4)
 
 # --- Fusion geometry
 FX, RX, WY = 1.431, -1.311, 0.78
@@ -89,7 +92,7 @@ setf(560, ix); setf(580, iy); setf(600, iz)
 open(dst, 'wb').write(D)
 after = bytes(D[F:F + REC])
 changed = [o for o in range(0, REC, 4) if before[o:o + 4] != after[o:o + 4]]
-report = dict(record_offset=F, changed_fields=len(changed), mass=mass, inertia=[ix, iy, iz],
+report = dict(port=PORT['id'], slot=PORT['ug2'], drive=PORT['drive'], record_offset=F, changed_fields=len(changed), mass=mass, inertia=[ix, iy, iz],
               wheels=wheels, wheel_z=struct.unpack_from('<f', D, F + 296)[0],
               tyre_radius_width=struct.unpack_from('<2f', D, F + 304),
               torque_scale=POWER, peak_cv=peak_kw(F) / 0.73549875, torque_stock=struct.unpack_from('<9f', D, F + 784),

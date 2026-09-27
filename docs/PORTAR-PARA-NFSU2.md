@@ -1,10 +1,17 @@
-# Portar um carro do NFS Most Wanted 2005 para o Underground 2
+# Portar o Fusion do Most Wanted 2005 para o Underground 2
 
-Receita do Ford Fusion Titanium 2018 AWD, aprovado no Underground 2 em 27/09/2026 no slot `FOCUS`. Serve para o próximo carro que já esteja aprovado no Most Wanted (`C:\Users\nillander\NoDocuments\fusion-mw2005`) e precise ir para o NFSU2.
+O método fica neste repositório. O `fusion-mw2005` só fornece o ZIP da release; nada de lá é editado.
 
-Este arquivo é o método. O diário deste port, com causa e correção de cada versão, está em [TODO.md](../TODO.md). As lições do Most Wanted, que continuam valendo na malha, estão em `fusion-mw2005/docs/APRENDIZADOS.md`.
+| Port | Most Wanted | Underground 2 | Carro |
+| --- | --- | --- | --- |
+| `2018` | `MUSTANGGT` | `MUSTANG` | Fusion Titanium 2018 AWD |
+| `2012` | `COBALTSS` | `FOCUS` | Fusion 2012 FWD |
 
-Os arquivos do `fusion-mw2005` não são alterados pelo port. O Underground 2 lê outro formato. O trabalho novo fica neste repositório.
+A tabela está em `scripts/ports.py`. Os dois ports usam o mesmo caminho do 2018: corte entre LOD A e LOD B, teto de 21.500 triângulos, vidros de `docs/vidros_v5.npz`, adesivos e UV de vinil. O 2012 só troca a origem (`COBALTSS`), o slot de destino (`FOCUS`) e a tração (dianteira). As luzes do 2012 já vêm nos dois lados do BIN do Most Wanted; o script inclui `LEFT_*` quando essa peça existe. O 2018, que só tem `RIGHT_*`, segue como antes.
+
+O BIN em `CARS/FOCUS` é a v9 do 2018, gravada quando aquele carro ainda usava o slot Focus. Ele permanece como molde de textura (`ports.TEMPLATE`): cabeçalhos DXT e as sombras/neon. Não é o Fusion 2012. O 2012 passa a ocupar esse slot quando o `build.py 2012` for rodado.
+
+O diário da v9 está em [TODO.md](../TODO.md). As lições do Most Wanted continuam em `fusion-mw2005/docs/APRENDIZADOS.md`.
 
 ## O que cada IA fez
 
@@ -20,9 +27,9 @@ O Codex montou o hábito de partir de um doador. O Claude fechou a malha que o M
 
 ## Regras que não mudam
 
-1. **Não editar** `fusion-mw2005`. A entrada é o ZIP da release (no Fusion, `release/Fusion2018_AWD_MW2005.zip`, carro `CARS/MUSTANGGT`).
-2. **Não reusar o `GEOMETRY.BIN` do MW.** O Underground 2 fecha ou ignora peças nesse layout. O escritor tem de ser o do nfsu360, validado regravando o carro doador chunk a chunk.
-3. **Escolher o slot por um mod que já abre**, de silhueta parecida. Sedã longo foi para o Focus usando o Escort RS (`source/Ford-Focus-ESCORT-RS`). O nome do slot no disco (`FOCUS`) pode continuar o do jogo; o que manda é quais sólidos esse slot desenha.
+1. **Não editar** `fusion-mw2005`. A entrada é o ZIP em `release/`: `Fusion2018_AWD_MW2005.zip` (`CARS/MUSTANGGT`) ou `Fusion2012_FWD_MW2005.zip` (`CARS/COBALTSS`).
+2. **Não reusar o `GEOMETRY.BIN` do MW.** O Underground 2 fecha ou ignora peças nesse layout. O escritor é o `ug2write.py`, no layout nfsu360.
+3. **O slot de destino está na tabela acima.** A v9 mediu o que o slot `FOCUS` desenha (`BODY`, `KITW`, `BASE`, `TRUNK`, `FRONT_WHEEL` e adesivos). O 2012 herda essa lista. O 2018 grava os mesmos nomes com prefixo `MUSTANG`. `ROOF` e `DOOR_*` continuam de fora: a v8 ficou sem teto, sem portas e sem capô porque a pintura tinha parado nessas peças.
 4. **Descobrir a lista de peças no doador, não no nome.** No Focus do Escort o jogo desenha `BODY` (e `KITW`), `BASE`, `TRUNK`, `FRONT_WHEEL` e os adesivos. `ROOF` e `DOOR_*` são ignorados: a v8 do Fusion apareceu sem teto, sem portas e sem capô porque a pintura tinha sido parar nessas peças.
 5. **Uma variável por teste.** Se o jogo fechar na seleção, separar geometria, textura e `GlobalB`. A v1 e a v2 do Fusion fechavam com peças menores e com sólidos em ordem de hash; as duas usavam o mesmo compressor JDLZ. A v3, com a mesma geometria e textura sem compressão (RAWW), abriu.
 6. **Não truncar malha** para caber no limite. Cortar triângulos no meio abre buraco. Repartir em peças que o slot desenha, ou usar o LOD autoral mais leve nas áreas planas.
@@ -34,8 +41,8 @@ O Codex montou o hábito de partir de um doador. O Claude fechou a malha que o M
 
 A pasta de trabalho é este repositório:
 
-- `mw/` = ZIP da release do `fusion-mw2005`, extraído. Dele saem `GEOMETRY.BIN` e `TEXTURES.BIN` do carro aprovado.
-- `escort/` (ou o nome do doador) = arquivos do mod UG2 que já funciona naquele slot. O `FOCUS.7z` do Escort tem header LZMA puro; `scripts/sevenz.py` extrai sem 7-Zip. A pasta que permanece no repositório é `source/Ford-Focus-ESCORT-RS`.
+- `mw/` = ZIP da release do `fusion-mw2005`, extraído, com `CARS/MUSTANGGT` ou `CARS/COBALTSS`.
+- O molde de textura é `CARS/FOCUS/TEXTURES.BIN` (a v9). Os dois ports copiam dele o cabeçalho DXT e as texturas `SHADOWFE`, `SHADOWIG` e `NEON`, já com o prefixo do slot de destino. O Escort RS saiu do repositório; o crédito a ele continua no README.
 
 Os outros mods de `source/` saíram depois que o Fusion foi aprovado. O que cada um ensinou já está no diário; o arquivo não entra na reconstrução:
 
@@ -47,10 +54,16 @@ Os outros mods de `source/` saíram depois que o Fusion foi aprovado. O que cada
 | Mustang Shelby GT | Um mod UG2 tem as peças `DECAL_*` que o Escort não tem | Os adesivos saíram das peças do MW e do molde de capô do Corolla. A v9 aprovada já mostra o carro |
 
 ```
-python extract_mw.py    # mw/CARS/<SLOT>/ -> mw_parts.pkl e texdump/
-python build.py out     # out/GEOMETRY.BIN e out/TEXTURES.BIN
-python preview.py out/GEOMETRY.BIN out/TEXTURES.BIN previa.png
+python extract_mw.py 2018          # mw/CARS/MUSTANGGT -> mw_parts.pkl e texdump/
+python build.py out 2018           # out/ com peças MUSTANG_*
+python globalb_patch.py GlobalB.lzc out/GlobalB.lzc 2018
+
+python extract_mw.py 2012          # mw/CARS/COBALTSS; mesma pipeline
+python build.py out 2012           # out/ com peças FOCUS_*
+python globalb_patch.py GlobalB.lzc out/GlobalB.lzc 2012
 ```
+
+`extract_mw.py` e `build.py` sem argumento rodam o port `2018`. O `preview.py` lê o BIN gerado.
 
 `extract_mw.py` lê o BIN do MW (`scripts/mwgeo.py`, `scripts/tpk2.py`). `build.py` grava o BIN do UG2 (`scripts/ug2write.py`, `scripts/tpkwrite.py`). O `preview.py` lê de volta o que foi gravado: se o preview mente, o escritor mente.
 
@@ -127,7 +140,7 @@ Marcadores que acompanharam o MW: faróis (2,15; ±0,577; 0,515), lanternas (−
 
 ![Lanternas lidas da malha do Most Wanted, antes do enxerto](diagnostico-v4/mw-lanternas.png)
 
-Performance não está na malha. No Most Wanted ela mora no `ATTRIBUTES.BIN` / `ATTRIBUTES.MWPS`. No Underground 2 mora no registro `CarTypeInfo` do `GlobalB.lzc`: chunk `0x34600`, 2.192 bytes por carro. `scripts/globalb_patch.py` copia blocos de outros carros do mesmo arquivo e escala o torque. No Fusion: motor e câmbio do Corolla com todas as curvas ×2,212 (248 cv, 288 Nm), divisão de torque 0,5 do Lancer (integral, no estoque e nos três upgrades), pneus, suspensão, direção e freios do Lancer, massa 1,63 t, dimensões 4,73 × 1,85 × 1,46 m e inércia recalculada. O Focus original tem entre-eixos 2,54 m e massa 1,15 t; copiar o registro inteiro do Focus deixa o carro longo com física de carro curto.
+Performance não está na malha. No Most Wanted ela mora no `ATTRIBUTES.BIN` / `ATTRIBUTES.MWPS`. No Underground 2 mora no registro `CarTypeInfo` do `GlobalB.lzc`: chunk `0x34600`, 2.192 bytes por carro. `scripts/globalb_patch.py` copia blocos de outros carros do mesmo arquivo e escala o torque. Os dois ports usam o mesmo chassi da v9: motor e câmbio do Corolla com todas as curvas ×2,212 (248 cv, 288 Nm), pneus, suspensão, direção e freios do Lancer, massa 1,63 t, dimensões 4,73 × 1,85 × 1,46 m e inércia recalculada. O 2018 grava isso no registro `MUSTANG`, com divisão de torque 0,5 (integral). O 2012 grava no registro `FOCUS`, com divisão 1,0 (dianteira). O entre-eixos do Focus original é 2,54 m e a massa 1,15 t; copiar o registro inteiro do carro de estoque deixa o sedã longo com física de carro curto.
 
 O `GlobalB.lzc` desta cópia está descomprimido (o Nikki salvou assim). O original do jogo é JDLZ. O patch recusa arquivo compactado. Offsets e o que cada faixa de bytes significa estão no fim de [TODO.md](../TODO.md).
 
@@ -166,8 +179,8 @@ O ZIP da release leva o bat ao lado de `CARS/`, não a árvore inteira do reposi
 
 ## Checklist do próximo carro
 
-1. ZIP aprovado em `fusion-mw2005/release/`. Nenhum arquivo de lá é editado.
-2. Mod UG2 do mesmo tipo de carro, já visto no jogo. Anotar os nomes de sólido que ele realmente desenha.
+1. ZIP aprovado em `fusion-mw2005/release/`, o da tabela (`2018` ou `2012`). Nenhum arquivo de lá é editado.
+2. Rodar o `2018` antes do `2012`. O segundo reaproveita corte, vidro, adesivo, vinil e o molde `CARS/FOCUS/TEXTURES.BIN`.
 3. `ug2write.py` regrava o doador e o arquivo volta igual chunk a chunk.
 4. Cada sólido novo ≤ 21.500 triângulos. Kits da IA preenchidos. Teto, portas e capô dentro das peças que o slot desenha.
 5. Opacos em DXT1. Lentes em DXT3, por último. `TEXTURES.BIN` em RAWW.
