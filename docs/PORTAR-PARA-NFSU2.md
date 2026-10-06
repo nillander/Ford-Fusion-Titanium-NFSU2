@@ -140,7 +140,7 @@ Marcadores que acompanharam o MW: faróis (2,15; ±0,577; 0,515), lanternas (−
 
 ![Lanternas lidas da malha do Most Wanted, antes do enxerto](diagnostico-v4/mw-lanternas.png)
 
-Performance não está na malha. No Most Wanted ela mora no `ATTRIBUTES.BIN` / `ATTRIBUTES.MWPS`. No Underground 2 mora no registro `CarTypeInfo` do `GlobalB.lzc`: chunk `0x34600`, 2.192 bytes por carro. `scripts/globalb_patch.py` copia blocos de outros carros do mesmo arquivo e escala o torque. Os dois ports usam o mesmo chassi da v9: motor e câmbio do Corolla com todas as curvas ×2,212 (248 cv, 288 Nm), pneus, suspensão, direção e freios do Lancer, massa 1,63 t, dimensões 4,73 × 1,85 × 1,46 m e inércia recalculada. O 2018 grava isso no registro `MUSTANGGT`, com divisão de torque 0,5 (integral). O 2012 grava no registro `FOCUS`, com divisão 1,0 (dianteira). O entre-eixos do Focus original é 2,54 m e a massa 1,15 t; copiar o registro inteiro do carro de estoque deixa o sedã longo com física de carro curto.
+Performance não está na malha. No Most Wanted ela mora no `ATTRIBUTES.BIN` / `ATTRIBUTES.MWPS`. No Underground 2 mora no registro `CarTypeInfo` do `GlobalB.lzc`: chunk `0x34600`, 2.192 bytes por carro. `scripts/globalb_patch.py` copia blocos de outros carros do mesmo arquivo e escala o torque. Os dois ports usam o mesmo chassi da v9: motor e câmbio do Corolla com todas as curvas ×2,212 (248 cv, 288 Nm), pneus, suspensão, direção e freios do Lancer, massa 1,63 t, dimensões 4,73 × 1,85 × 1,46 m e inércia recalculada. O 2018 grava isso no registro `MUSTANGGT`, com divisão de torque 0,5 (integral). O 2012 grava no registro `FOCUS`, com divisão 0,0 (dianteira: o campo é a parte do eixo traseiro, e todo FWD do jogo grava 0,0). O entre-eixos do Focus original é 2,54 m e a massa 1,15 t; copiar o registro inteiro do carro de estoque deixa o sedã longo com física de carro curto.
 
 O `GlobalB.lzc` desta cópia está descomprimido (o Nikki salvou assim). O original do jogo é JDLZ. O patch recusa arquivo compactado. Offsets e o que cada faixa de bytes significa estão no fim de [TODO.md](../TODO.md).
 
@@ -164,6 +164,35 @@ Render de bancada: fundo magenta, face de costas descartada, normal de vértice.
 `release/instalar.bat` segue o `fusion-mw2005/release/instalar.bat`: procura o jogo, pede confirmação, copia `CARS/<SLOT>`. No Underground 2 o executável é `SPEED2.EXE` e, além da cópia, o bat aplica o mesmo patch de `globalb_patch.py` no `GLOBAL/GlobalB.lzc`. Na primeira vez o arquivo anterior vira `GlobalB.lzc.antes-fusion`.
 
 O ZIP da release leva o bat ao lado de `CARS/`, não a árvore inteira do repositório.
+
+### 8. O orçamento do 2012 (v10)
+
+O 2012 do MW é o 2018 com outra frente, outras lanternas e outra traseira. Vidros, capô, interior, rodas e arcos são os mesmos (arcos conferidos vértice a vértice: X +1,41/−1,31 nos dois). O que muda é o peso: faróis LOD C com 9,7 mil triângulos (2018: 1,4 mil), lanternas LOD B com 23 mil com as lentes (2018: 2,5 mil), traseira e grade mais densas. Com a divisão do 2018 as três peças passavam de 32, 24 e 35 mil triângulos.
+
+Os ajustes ficam em `scripts/ports.py` e só valem para o port que os declara; o 2018 continua com a divisão aprovada da v9:
+
+| Chave | 2018 | 2012 | O que faz |
+| --- | --- | --- | --- |
+| `lamps` | C/C/B/B | D/C/D/D | LOD de farol, lente do farol, lanterna e lente da lanterna |
+| `lens` | `double` | `outward` | `outward` vira para fora as faces da lente que olham para dentro, sem duplicar |
+| `valance` | `all` | `inward` | na base baixa, só ganham verso as faces que olham para dentro |
+| `rear_in` | `body` | `trunk` | onde fica o para-choque traseiro LOD A |
+| `rear_x` | −1,90 | −1,95 | início da caixa traseira em LOD A |
+| `trunk_lod` | A | B | LOD da tampa (no 2012 o B tem 9,3 mil triângulos, mais que o A do 2018 decimado) |
+| `outer_brake_in` | `base` | `trunk` | lanternas externas |
+| `nose_in` | `base` | `body` | bico e frente do teto LOD A |
+| `body_b_target` | 14.900 | 15.600 | triângulos da pintura plana LOD B depois da decimação |
+
+`BUILD_DRY=1 python build.py out 2012` imprime o orçamento sem gravar. O efeito colateral aceito é a tela de som: no 2012 o para-choque traseiro e as lanternas externas abrem junto com a tampa.
+
+Valem para os dois ports desde a v10:
+
+- **Lente pela peça.** A v2.7 do MW passou a lente da lanterna do 2018 para um shader difuso; o teste pelo material (`HEADLIGHTGLASS`) a tratava como carcaça opaca. A lente agora é tudo o que está em `*_GLASS_*`, menos o grupo com material `BRAKELIGHT` (refletor opaco do 2012).
+- **Folha pela UV.** A carcaça e a lente usam a folha que a UV delas aponta (`KIT00_HEADLIG` ou `KIT00_BRAKELI`), com uma cópia DXT3 por folha e papel. No 2012 a lente do farol fica na folha da lanterna e ganha `<SLOT>_HEADLIGHT_LENS`, sem o vermelho forte nem o alfa mínimo da lente da lanterna.
+- **Pintura na base.** O 2012 tem peças `SKIN1` dentro da base do MW. Elas recebem a pintura global e a UV de vinil, como a carroceria.
+- **Assoalho fora.** Triângulos do interior abaixo de z = 0,30 saem antes da decimação; o resto do orçamento vai para bancos e painel.
+- **Rodas e vinil por slot.** O patch grava Z, raio e largura aprovados nos dois registros. O molde de vinil do Mustang (`MUSTANGGT_DEBUG`, P8 com paleta) segue a convenção do Focus; os discos ficam em u 125,5/411,5 px e v 47,8/364 px e a linha do teto em v 206 px (`scripts/vinyluv.py`).
+- **Cabeçalho do TPK.** `tpkwrite.write_raw` copia os dois chunks de cabeçalho de `ports.TEMPLATE`; eles são iguais nos dois ZIPs do MW e na v9 instalada.
 
 ## O que não copiar do Most Wanted
 

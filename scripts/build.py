@@ -41,19 +41,41 @@ def sheet(suffix):
     return hits[0]
 
 
-TEX = {  # destination name -> (mw sheet suffix, size, format)
+TEX = {  # destination name -> (mw sheet suffix, size, format[, processing])
     UG2 + '_MISC': ('MISC', 512, 'DXT1'),
     UG2 + '_LOGO': ('LOGO', 512, 'DXT1'),
     UG2 + '_INTERIOR': ('INTERIOR', 512, 'DXT1'),
     UG2 + '_BADGING': ('BADGING', 512, 'DXT1'),
     UG2 + '_KIT00_HEADLIGHT': ('KIT00_HEADLIG', 256, 'DXT1'),
-    UG2 + '_HEADLIGHT_GLASS': ('KIT00_HEADLIG', 256, 'DXT3'),
     UG2 + '_KIT00_BRAKELIGHT': ('KIT00_BRAKELI', 256, 'DXT1'),
-    UG2 + '_BRAKELIGHT_GLASS': ('KIT00_BRAKELI', 256, 'DXT3'),
     UG2 + '_RIM': ('RIM', 256, 'DXT1'),
     UG2 + '_TIRE': ('TIRE', 256, 'DXT1'),
     UG2 + '_DRIVER': ('DRIVER', 256, 'DXT1'),
 }
+# Lamp sheets. The 2018 keeps each lamp on its own sheet; the 2012 draws the tail-light housings on the
+# headlight sheet and both lenses on the tail-light sheet. A lens is a DXT3 copy of the sheet its UVs point at,
+# one copy per (sheet, role): the tail-light copy gets the bright red of v6, the headlight copy stays clear.
+LAMP_SHEETS = ('KIT00_HEADLIG', 'KIT00_BRAKELI')
+LENS_NAMES = {('KIT00_HEADLIG', 'head'): '_HEADLIGHT_GLASS', ('KIT00_BRAKELI', 'brake'): '_BRAKELIGHT_GLASS',
+              ('KIT00_BRAKELI', 'head'): '_HEADLIGHT_LENS', ('KIT00_HEADLIG', 'brake'): '_BRAKELIGHT_LENS'}
+
+
+def lamp_sheet(mwtex):
+    body = mwtex[len(MW) + 1:] if mwtex.startswith(MW + '_') else mwtex
+    return next((k for k in LAMP_SHEETS if body.startswith(k)), None)
+
+
+def opaque_tex(mwtex):
+    return UG2 + {'KIT00_HEADLIG': '_KIT00_HEADLIGHT', 'KIT00_BRAKELI': '_KIT00_BRAKELIGHT'}[lamp_sheet(mwtex)]
+
+
+def lens_tex(mwtex, role):
+    key = lamp_sheet(mwtex)
+    name = UG2 + LENS_NAMES[(key, role)]
+    TEX.setdefault(name, (key, 256, 'DXT3', 'boost' if role == 'brake' else None))
+    return name
+
+
 KEEP_SUFFIXES = ('SHADOWFE', 'SHADOWIG', 'NEON')
 
 
@@ -93,11 +115,11 @@ def groups_of(part):
 
 
 def tex_for(mwtex, mwmat):
+    if lamp_sheet(mwtex):
+        if mwmat == 'HEADLIGHTGLASS':
+            return bh(lens_tex(mwtex, 'head')), M['HEADLIGHTGLASS']
+        return bh(opaque_tex(mwtex)), M['HEADLIGHTREFLECTOR']
     body = mwtex[len(MW) + 1:] if mwtex.startswith(MW + '_') else mwtex
-    if body.startswith('KIT00_HEADLIG'):
-        return (bh(UG2 + '_HEADLIGHT_GLASS'), M['HEADLIGHTGLASS']) if mwmat == 'HEADLIGHTGLASS' else (bh(UG2 + '_KIT00_HEADLIGHT'), M['HEADLIGHTREFLECTOR'])
-    if body.startswith('KIT00_BRAKELI'):
-        return (bh(UG2 + '_BRAKELIGHT_GLASS'), M['BRAKELIGHTGLASS']) if mwmat == 'HEADLIGHTGLASS' else (bh(UG2 + '_KIT00_BRAKELIGHT'), M['BRAKELIGHT'])
     mat = M.get(mwmat, M['DULLPLASTIC'])
     return bh(UG2 + '_' + body), mat
 
@@ -173,7 +195,11 @@ def trunk_region(g):
 # v6: the trunk lid comes from LOD A (the TRUNK_A solid has room for it; LOD B showed waves in the game)
 wA = weld(P[MW + '_KIT00_BODY_A']['groups'][0])
 _tA = trunk_region(wA)
-trunk_paint = drop_inward_twins(compact(wA, _tA), 'trunk_A')
+# The 2012 rear end is heavier at every LOD; its port takes the lid from the LOD in ports.py ('trunk_lod').
+# The lid is its own mesh component (a gap separates it from the body), so the LOD change leaves no step.
+TRUNK_LOD = PORT.get('trunk_lod', 'A')
+_wT = wA if TRUNK_LOD == 'A' else weld(P[MW + '_KIT00_BODY_' + TRUNK_LOD]['groups'][0])
+trunk_paint = drop_inward_twins(compact(_wT, trunk_region(_wT)), 'trunk_' + TRUNK_LOD)
 # v8: ALL paint from LOD A, no decimation, split over the retail part slots that are drawn with every kit
 # (doors and roof are separate parts in the retail cars; the KITW bodies do not cover the doors).
 # Cuts are exact (same mesh on both sides), so the pieces meet without steps.
@@ -216,7 +242,7 @@ LOG['nose_recess_filled_vertices'] = n_
 # v9: the FOCUS slot only draws BODY / BASE / TRUNK / WHEEL (+ decals): ROOF_A and DOOR_*_A are ignored
 # (v8 showed no roof, doors or hood). Paint = LOD B + LOD A where the game showed deformations
 # (rear bumper, nose, front edge of the roof); exact cuts so the LODs meet without steps.
-REAR_X, NOSE_X, NOSE_Y = -1.9, 2.0, 0.45
+REAR_X, NOSE_X, NOSE_Y = PORT.get('rear_x', -1.9), 2.0, 0.45
 BOXES = {'rear': dict(xmax=REAR_X), 'nose': dict(xmin=NOSE_X, ymin=-NOSE_Y, ymax=NOSE_Y, zmin=0.52, zmax=0.75),
          'roof_front': dict(xmin=0.15, xmax=0.6, ymin=-0.5, ymax=0.5, zmin=1.05)}
 bB = body_paint; A_parts = {}
@@ -226,38 +252,59 @@ for nm, box in BOXES.items():
     A_parts[nm] = ins
 rearA = A_parts['rear']
 noseA = merge([A_parts['nose'], A_parts['roof_front']])      # these go into BASE
-BODY_B_TARGET = 14900
+BODY_B_TARGET = PORT.get('body_b_target', 14900)
 bB = dec(bB, BODY_B_TARGET, 'paint_B_flat')
-body_paint = merge([bB, rearA])
+# 'rear_in': where the LOD A rear bumper goes. 'trunk' frees the body for the 2012 headlights; the only
+# side effect is the audio screen, which already swings TRUNK_A around the slot's own pivot.
+REAR_IN = PORT.get('rear_in', 'body')
+if REAR_IN == 'trunk':
+    body_paint = bB
+    trunk_paint = merge([trunk_paint, rearA])
+else:
+    body_paint = merge([bB, rearA])
 hood = outward_only(weld(P[MW + '_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
 A_parts['body_B'] = bB
 LOG['paint_lods'] = {k + '_A': int(len(v['tri'])) for k, v in A_parts.items()}
 
-# ---------------------------------------------------------------- lamps (LOD C). Lenses double-sided;
-# brake lens uses the BRAKELIGHT material (BRAKELIGHTGLASS is only the glow shown when braking)
-head_parts, brake_parts = [], []
-lamp_sides = ['RIGHT']
-if MW + '_KIT00_LEFT_HEADLIGHT_C' in P:
-    lamp_sides.append('LEFT')
+# ---------------------------------------------------------------- lamps. Lenses double-sided, drawn last.
+# A lens is told apart by its part (*_GLASS_*), not by the MW material: since MW v2.7 the 2018 tail-light lens
+# uses a diffuse shader there. Inside a glass part, a group with the MW BRAKELIGHT material is an opaque
+# reflector (the 2012 pair above the exhausts; MW lesson 17) and stays opaque.
+# Tail-light lens: retail MOLDINGS material (BRAKELIGHTGLASS is only the glow shown when braking).
+LOD = PORT.get('lamps', dict(head='C', head_glass='C', brake='B', brake_glass='B'))
+# 'lens': 'double' draws both faces (v4); 'outward' turns the faces that point into the car around and keeps one
+# layer, which looks the same from outside at half the triangles.
+LENS = PORT.get('lens', 'double')
+
+
+def face_out(g):
+    o = outwardness(g)
+    inward = o < 0
+    if not inward.any():
+        return g
+    keep = compact(g, ~inward)
+    flip = compact(g, inward)
+    flip = dict(flip, nrm=-flip['nrm'], tri=flip['tri'][:, ::-1])
+    LOG.setdefault('lens_faces_turned', 0); LOG['lens_faces_turned'] += int(inward.sum())
+    return merge([keep, flip])
+
+head_opaque, head_glass, brake_opaque, brake_glass = [], [], [], []
+lamp_sides = [sd for sd in ('RIGHT', 'LEFT') if '%s_KIT00_%s_HEADLIGHT_%s' % (MW, sd, LOD['head']) in P]
 for side in lamp_sides:
-    for part in ['KIT00_%s_HEADLIGHT_C' % side, 'KIT00_%s_HEADLIGHT_GLASS_C' % side]:
-        for g in groups_of(part):
-            t, m = tex_for(g['tex'], g['mat'])
-            if m == M['HEADLIGHTGLASS']:
-                g = double_sided(g)
-            head_parts.append(mesh(g, t, m))
-for side in lamp_sides:
-    for part in ['KIT00_%s_BRAKELIGHT_B' % side, 'KIT00_%s_BRAKELIGHT_GLASS_B' % side]:
-        for g in groups_of(part):
-            if g['mat'] == 'HEADLIGHTGLASS':
-                brake_parts.append(mesh(double_sided(g), bh(UG2 + '_BRAKELIGHT_GLASS'), bh('MOLDINGS')))   # v7: retail lens material
+    for part, role, lod in (('HEADLIGHT', 'head', LOD['head']), ('HEADLIGHT_GLASS', 'head', LOD['head_glass']),
+                            ('BRAKELIGHT', 'brake', LOD['brake']), ('BRAKELIGHT_GLASS', 'brake', LOD['brake_glass'])):
+        name = 'KIT00_%s_%s_%s' % (side, part, lod)
+        if MW + '_' + name not in P:
+            continue
+        for g in groups_of(name):
+            if part.endswith('GLASS') and g['mat'] != 'BRAKELIGHT':
+                lg = double_sided(g) if LENS == 'double' else face_out(g)
+                m = mesh(lg, bh(lens_tex(g['tex'], role)), M['HEADLIGHTGLASS'] if role == 'head' else bh('MOLDINGS'))
+                (head_glass if role == 'head' else brake_glass).append(m)
             else:
-                brake_parts.append(mesh(g, bh(UG2 + '_KIT00_BRAKELIGHT'), M['DULLPLASTIC']))
-# draw order inside a solid: opaque first, lenses (DXT3) last
-head_opaque = [m for m in head_parts if m['mat'] != M['HEADLIGHTGLASS']]
-head_glass = [m for m in head_parts if m['mat'] == M['HEADLIGHTGLASS']]
-brake_opaque = [m for m in brake_parts if m['tex'] != bh(UG2 + '_BRAKELIGHT_GLASS')]
-brake_glass = [m for m in brake_parts if m['tex'] == bh(UG2 + '_BRAKELIGHT_GLASS')]
+                m = mesh(g, bh(opaque_tex(g['tex'])), M['HEADLIGHTREFLECTOR'] if role == 'head' else M['DULLPLASTIC'])
+                (head_opaque if role == 'head' else brake_opaque).append(m)
+LOG['lamps'] = dict(lod=LOD, sides=lamp_sides, head=ntris(head_opaque) + ntris(head_glass), brake=ntris(brake_opaque) + ntris(brake_glass))
 
 def split_y(ms, lim=0.6):
     inner, outer = [], []
@@ -272,10 +319,16 @@ def split_y(ms, lim=0.6):
 
 brake_opaque_in, brake_opaque = split_y(brake_opaque)
 brake_glass_in, brake_glass = split_y(brake_glass)
-VP = lambda m: mesh(vinyluv.apply(m), T_PAINT, M['CARSKIN'])       # paint with vinyl UVs
+VP = lambda m: mesh(vinyluv.apply(m, UG2), T_PAINT, M['CARSKIN'])       # paint with vinyl UVs
 body_list = [VP(body_paint)] + head_opaque + head_glass
+NOSE_IN = PORT.get('nose_in', 'base')          # LOD A nose and roof front: BASE (v9) or BODY
+if NOSE_IN == 'body':
+    body_list = [VP(body_paint), VP(noseA)] + head_opaque + head_glass
 
 trunk_list = [VP(trunk_paint)] + brake_opaque_in + brake_glass_in
+if PORT.get('outer_brake_in', 'base') == 'trunk':      # outer tail lights next to the rear bumper
+    trunk_list = [VP(trunk_paint)] + brake_opaque_in + brake_opaque + brake_glass_in + brake_glass
+    brake_opaque, brake_glass = [], []
 
 # ---------------------------------------------------------------- BASE
 _G = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'vidros_v5.npz')) \
@@ -316,31 +369,43 @@ for g in _baseC:
             LOG.setdefault('frit_removed', {})[g['tex']] = int(fr.sum())
             g = compact(g, ~fr) | {'tex': g['tex'], 'mat': g['mat']}
     if len(g['tri']) > 2000:
-        g = dec(g, int(len(g['tri']) * 0.9), 'base_' + g['tex'][10:]) | {'tex': g['tex'], 'mat': g['mat']}
+        g = dec(g, int(len(g['tri']) * PORT.get('base_dec', 0.9)), 'base_' + g['tex'][len(MW) + 1:]) | {'tex': g['tex'], 'mat': g['mat']}
     if g['tex'] in (MW + '_LOGO', MW + '_MISC'):
         # v6: MW draws both faces; the black valances of the bumpers were modelled facing inwards and vanish
         # in UG2 (back-face culling) -> lower front/rear areas made double-sided
         c = g['pos'][g['tri']].mean(1)
         low = (np.abs(c[:, 0]) > 1.85) & (c[:, 2] < 0.5)
+        if PORT.get('valance', 'all') == 'inward':      # only the faces that look into the car get a back face
+            low &= outwardness(g, clamp=(-1.0, 1.0), zc=0.7) < 0
         if low.any():
             ds = double_sided(compact(g, low))
             LOG.setdefault('double_sided_valance', {})[g['tex']] = int(low.sum())
             gg = merge([compact(g, ~low), ds])
             g = gg | {'tex': g['tex'], 'mat': g['mat']}
+    if g['tex'] == MW + '_SKIN1':          # 2012: painted bumper pieces live in the MW base; same paint as the body
+        base.append(VP(g)); LOG.setdefault('base_paint', 0); LOG['base_paint'] += int(len(g['tri'])); continue
     t, m = tex_for(g['tex'], g['mat'])
     base.append(mesh(g, t, m))
 for g in groups_of('KIT00_DRIVER_A'):
     base.append(mesh(dec(g, 700, 'driver'), bh(UG2 + '_DRIVER'), M['DRIVER']))
 base += brake_opaque
 base.append(VP(hood))
-base.append(VP(noseA))
+if NOSE_IN == 'base':
+    base.append(VP(noseA))
 # glass (v5): new sheets generated by scripts/newglass.py (needs scipy + contourpy): one clean single-sided
 # surface per window fitted to the MW glass shape, outline widened 30 mm and bent inwards under the frame
 _G = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'vidros_v5.npz')) \
     if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'vidros_v5.npz')) else np.load('vidros_v5.npz')
 glass = merge([{k: _G[f'{i}_{k}'] for k in ('pos', 'nrm', 'uv', 'col', 'tri')} for i in range(int(_G['n']))])
 LOG['glass'] = dict(source='docs/vidros_v5.npz', windows=int(_G['n']), tris=int(len(glass['tri'])), under_frame_m=0.03)
-inter = groups_of('KIT00_INTERIOR_A')
+# The floor and pedals (z < 0.30) cannot be seen through the windows; leaving them out keeps the interior
+# budget for the seats and dashboard (the MW base and lamps grew since v9 and squeezed the interior).
+FLOOR_Z = 0.30
+inter = []
+for g in groups_of('KIT00_INTERIOR_A'):
+    k = g['pos'][g['tri']].mean(1)[:, 2] >= FLOOR_Z
+    LOG.setdefault('interior_floor_removed', 0); LOG['interior_floor_removed'] += int((~k).sum())
+    if k.any(): inter.append(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']})
 fixed = ntris(base) + len(glass['tri']) + ntris(brake_glass)
 INTERIOR_BUDGET = 21300 - fixed
 big = [g for g in inter if len(g['tri']) > 1000]
@@ -521,6 +586,10 @@ for nm, ms in list(dec_parts.items()):
         for w in range(1, 5):
             solids.append(solid(f'{UG2}_WIDE{w}_' + nm, ms))
 LOG['decals'] = {nm: ntris(ms) for nm, ms in dec_parts.items()}
+LOG['trunk_lid'] = int(len(trunk_paint['tri'])); LOG['hood'] = int(len(hood['tri']))
+if os.environ.get('BUILD_DRY'):          # budget probe: print the pieces and stop before writing
+    print(json.dumps({k: LOG.get(k) for k in ('budget', 'paint_lods', 'trunk_lid', 'hood', 'lamps', 'decimation', 'base_paint')}, indent=1))
+    raise SystemExit(0)
 for s in solids:
     assert sum(len(g['tri']) for g in s['groups']) <= CAP, (s['name'], LOG.get('decimation'), LOG.get('budget'))
 for s in solids:
@@ -541,11 +610,12 @@ tmpl_dxt1 = next(t for t in tex_e if _fmt(t) == 'DXT1')
 tmpl_dxt3 = next(t for t in tex_e if _fmt(t) == 'DXT3')
 out_tex = []
 place = 0
-for name, (suffix, sz, fmt) in TEX.items():
+for name, spec in TEX.items():
+    suffix, sz, fmt = spec[:3]
     src = sheet(suffix)
     img = Image.open(f'texdump/mw_{src}.png').convert('RGBA').resize((sz, sz), Image.LANCZOS)
     rgba = np.array(img)
-    if name == UG2 + '_BRAKELIGHT_GLASS':      # v6: MW lens is dark red (lit by emission in MW); UG2 needs it bright
+    if len(spec) > 3 and spec[3] == 'boost':   # v6: MW lens is dark red (lit by emission in MW); UG2 needs it bright
         f = rgba[..., :3].astype(float)
         red = f[..., 0] > f[..., 1:].max(-1) + 20
         f[red, 0] = np.clip(f[red, 0] * 2.2 + 40, 0, 235); f[red, 1:] = np.clip(f[red, 1:] * 1.5, 0, 40)

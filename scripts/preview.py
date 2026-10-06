@@ -3,7 +3,6 @@ import sys, numpy as np, ug2, tpk2, dxt, render
 from PIL import Image
 from hashes import bh
 geo, texf, out = sys.argv[1], sys.argv[2], sys.argv[3]
-body = sys.argv[4] if len(sys.argv) > 4 else 'FOCUS_KIT00_BODY_A'
 WHEELS = [(1.431, 0.78, 0.098), (1.431, -0.78, 0.098), (-1.311, 0.78, 0.098), (-1.311, -0.78, 0.098)]
 d, cl, h, S = ug2.parse(geo)
 info, tex = tpk2.parse(texf)
@@ -24,9 +23,17 @@ def meshes(s, xf=None):
         else: m['color'] = COL.get(th, (255, 0, 255))
         out.append(m)
     return out
-parts = {s['name']: s for s in S}
-M = meshes(parts[body]) + meshes(parts['FOCUS_BASE_A']) + sum((meshes(parts[n]) for n in ('FOCUS_KIT00_TRUNK_A', 'FOCUS_KIT00_ROOF_A', 'FOCUS_KIT00_DOOR_LEFT_A', 'FOCUS_KIT00_DOOR_RIGHT_A') if n in parts), [])
-wh = parts['FOCUS_KIT00_FRONT_WHEEL_A']
+SLOT = next(s['name'][:-len('_BASE_A')] for s in S if s['name'].endswith('_BASE_A'))       # FOCUS or MUSTANGGT
+parts = {}
+for s in S:                       # the header keeps 27 characters of the name; look the solids up by hash
+    parts[s['name']] = s
+for full in [SLOT + n for n in ('_KIT00_BODY_A', '_BASE_A', '_KIT00_TRUNK_A', '_KIT00_ROOF_A', '_KIT00_DOOR_LEFT_A',
+                                '_KIT00_DOOR_RIGHT_A', '_KIT00_FRONT_WHEEL_A')] + sys.argv[4:5]:
+    hit = next((s for s in S if s['hash'] == bh(full)), None)
+    if hit: parts[full] = hit
+body = sys.argv[4] if len(sys.argv) > 4 else SLOT + '_KIT00_BODY_A'
+M = meshes(parts[body]) + meshes(parts[SLOT + '_BASE_A']) + sum((meshes(parts[SLOT + n]) for n in ('_KIT00_TRUNK_A', '_KIT00_ROOF_A', '_KIT00_DOOR_LEFT_A', '_KIT00_DOOR_RIGHT_A') if SLOT + n in parts), [])
+wh = parts[SLOT + '_KIT00_FRONT_WHEEL_A']
 for x, y, z in WHEELS:
     def xf(p, n, x=x, y=y, z=z):
         p = p.copy(); n = n.copy()

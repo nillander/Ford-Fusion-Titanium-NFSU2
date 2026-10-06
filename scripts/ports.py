@@ -20,7 +20,18 @@ PORTS = {
         'ug2': 'FOCUS',
         'zip': 'Fusion2012_FWD_MW2005.zip',
         'drive': 'FWD',
-        'split': 1.0,
+        'split': 0.0,          # offset 720 is the share sent to the rear axle: retail FWD cars store 0.0
+        # Budget knobs (see build.py). The 2012 front lamps and rear end are about 2.5x heavier than the 2018
+        # ones at every LOD; these settings keep each solid under 21,500 triangles.
+        'lamps': dict(head='D', head_glass='C', brake='D', brake_glass='D'),
+        'lens': 'outward',
+        'valance': 'inward',
+        'rear_in': 'trunk',
+        'rear_x': -1.95,
+        'body_b_target': 15600,
+        'trunk_lod': 'B',
+        'outer_brake_in': 'trunk',
+        'nose_in': 'body',
     },
 }
 

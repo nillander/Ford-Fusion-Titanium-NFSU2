@@ -3,8 +3,10 @@
 Usage: python globalb_patch.py <src> <dst> [2018|2012]
 Both ports share the 2018 chassis: Corolla torque scaled to 248 cv, Lancer tyres and
 suspension, mass 1.63 t, Fusion wheelbase.  2018 writes the MUSTANGGT record with torque
-split 0.5 (AWD).  2012 writes the FOCUS record with torque split 1.0 (FWD).
-Wheel Z, tyre radius and width stay as they are in the input file.
+split 0.5 (AWD).  2012 writes the FOCUS record with torque split 0.0 (FWD: offset 720 is the rear share;
+every retail FWD car stores 0.0, the RWD ones 1.0).
+Wheel Z, tyre radius and width are the ones approved in the game for this mesh (Escort values, v4-v9); the
+Mustang record arrives with its own (Z 0.17, radius 0.343), which would lift the wheels into the arches.
 """
 import math, struct, sys, json
 import ug2
@@ -70,7 +72,7 @@ TORQUE_ARRAYS = [(784, 820),    # stock torque curve, 9 points
 for a, b in TORQUE_ARRAYS:
     for o in range(a, b, 4):
         setf(o, struct.unpack_from('<f', D, C + o)[0] * POWER)
-# 2018 copies the Lancer split (0.5, AWD). 2012 forces 1.0 (FWD) on the same chassis.
+# 2018 copies the Lancer split (0.5, AWD). 2012 forces 0.0 (FWD) on the same chassis.
 for o in (720, 1136, 1200, 1264):
     if PORT['drive'] == 'FWD':
         setf(o, PORT['split'])
@@ -80,8 +82,10 @@ for o in (720, 1136, 1200, 1264):
 # --- Fusion geometry
 FX, RX, WY = 1.431, -1.311, 0.78
 wheels = [(FX, WY), (FX, -WY), (RX, -WY), (RX, WY)]   # same order/signs as the stock records
+WZ, RADIUS, WIDTH = 0.09754, 0.3075, 0.195
 for i, (x, y) in enumerate(wheels):
-    struct.pack_into('<2f', D, F + 288 + 48 * i, x, y)
+    struct.pack_into('<3f', D, F + 288 + 48 * i, x, y, WZ)
+    struct.pack_into('<2f', D, F + 288 + 48 * i + 16, RADIUS, WIDTH)
 mass = MASS
 length, width, height = 4.73, 1.85, 1.46
 struct.pack_into('<4f', D, F + 544, mass, length, width, height)

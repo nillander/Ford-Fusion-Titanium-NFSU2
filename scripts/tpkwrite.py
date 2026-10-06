@@ -62,11 +62,13 @@ def write(textures, path):
     return len(out)
 
 
-def write_raw(textures, path, mw_template='mw/CARS/MUSTANGGT/TEXTURES.BIN'):
+def write_raw(textures, path, template=None):
     """Uncompressed (RAWW) TPK in the mwtc layout.  The old Cursor port used the MW TPK as-is in
-    this slot and the game loaded it, so this layout is known to be accepted by UG2."""
-    import ug2
-    tm = open(mw_template, 'rb').read()
+    this slot and the game loaded it, so this layout is known to be accepted by UG2.
+    The two header chunks (0x33310001, 0x33320001) are copied from the template; they are the same bytes
+    in both MW releases and in the installed v9, so any of them works (default: ports.TEMPLATE)."""
+    import ug2, ports
+    tm = open(template or ports.TEMPLATE, 'rb').read()
     info = c1 = None
     for a, b, p, s in ug2.chunks(tm, 0, len(tm), 0, []):
         if b == 0x33310001: info = tm[p + 8:p + 8 + s]

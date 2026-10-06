@@ -269,6 +269,10 @@ try {
   for ($i = 0; $i -lt 4; $i++) {
     [Buffer]::BlockCopy([BitConverter]::GetBytes([single]$wheels[$i][0]), 0, $D, $F + 288 + 48 * $i, 4)
     [Buffer]::BlockCopy([BitConverter]::GetBytes([single]$wheels[$i][1]), 0, $D, $F + 288 + 48 * $i + 4, 4)
+    # Z, raio e largura aprovados no jogo (o registro do Mustang vem com Z 0,17 e raio 0,343)
+    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]0.09754), 0, $D, $F + 288 + 48 * $i + 8, 4)
+    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]0.3075), 0, $D, $F + 288 + 48 * $i + 16, 4)
+    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]0.195), 0, $D, $F + 288 + 48 * $i + 20, 4)
   }
   $mass = 1.63; $length = 4.73; $width = 1.85; $height = 1.46
   $ix = $mass / 12 * ($width * $width + $height * $height)

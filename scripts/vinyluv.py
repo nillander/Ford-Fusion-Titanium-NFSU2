@@ -1,29 +1,43 @@
-"""Vinyl UVs in the layout of the FOCUS vinyl template (CARS/FOCUS/VINYLS.BIN, texture FOCUS_DEBUG):
+"""Vinyl UVs in the layout of the slot's vinyl template (CARS/<SLOT>/VINYLS.BIN, texture <SLOT>_DEBUG):
 left side at the top (upside down), top view in the middle, right side at the bottom, front view bottom-left,
-rear view bottom-right. Longitudinal scale/offset from the template's wheel discs (u 0.251 / 0.803) and the
-Fusion axles (x -1.311 / +1.431); the convention (which way is front/up) was measured on the retail COROLLA."""
+rear view bottom-right. Longitudinal scale/offset from the template's wheel discs and the Fusion axles
+(x -1.311 / +1.431); the convention (which way is front/up) was measured on the retail COROLLA.
+
+FOCUS was measured for v8 (docs/diagnostico-v8/FOCUS_DEBUG-molde.png). MUSTANGGT uses the same convention;
+its discs, centre line and front/rear columns were measured on MUSTANGGT_DEBUG of the installed game
+(the P8 texture decoded with its palette): discs at u 125.5/411.5 px, v 47.8 (left) and 364 (right),
+top centre line at v 206 px, FRONT column at u 235 px, REAR column at u 415 px."""
 import numpy as np
-A_U = (0.803 - 0.251) / (1.431 + 1.311)     # u per metre along x
-B_U = 0.803 - A_U * 1.431
-S_V = A_U * 1.163                           # vertical scale (Corolla ratio v/u = 1.163)
+
+REAR_X, FRONT_X = -1.311, 1.431
 WZ = 0.098                                  # wheel centre height in model space
+TEMPLATES = {
+    'FOCUS': dict(u_rear=0.251, u_front=0.803, v_left=11 / 512, v_right=372 / 512, v_top=192 / 512,
+                  u_frontview=0.395, u_rearview=0.77),
+    'MUSTANGGT': dict(u_rear=125.5 / 512, u_front=411.5 / 512, v_left=47.8 / 512, v_right=364 / 512, v_top=206 / 512,
+                      u_frontview=235 / 512, u_rearview=415 / 512),
+}
 
 
-def uv_region(pos, region):
+def uv_region(pos, region, t):
+    a_u = (t['u_front'] - t['u_rear']) / (FRONT_X - REAR_X)     # u per metre along x
+    b_u = t['u_front'] - a_u * FRONT_X
+    s_v = a_u * 1.163                                            # vertical scale (Corolla ratio v/u = 1.163)
     x, y, z = pos[:, 0], pos[:, 1], pos[:, 2]
     if region == 'left':
-        return np.c_[A_U * x + B_U, 11 / 512 + S_V * (z - WZ)]
+        return np.c_[a_u * x + b_u, t['v_left'] + s_v * (z - WZ)]
     if region == 'right':
-        return np.c_[A_U * x + B_U, 372 / 512 - S_V * (z - WZ)]
+        return np.c_[a_u * x + b_u, t['v_right'] - s_v * (z - WZ)]
     if region == 'top':
-        return np.c_[A_U * x + B_U, 192 / 512 - S_V * y]
+        return np.c_[a_u * x + b_u, t['v_top'] - s_v * y]
     if region == 'front':
-        return np.c_[0.395 + 0.19 * y, 0.96 - 0.24 * (z + 0.04)]
-    return np.c_[0.77 - 0.19 * y, 0.96 - 0.24 * (z + 0.04)]          # rear
+        return np.c_[t['u_frontview'] + 0.19 * y, 0.96 - 0.24 * (z + 0.04)]
+    return np.c_[t['u_rearview'] - 0.19 * y, 0.96 - 0.24 * (z + 0.04)]          # rear
 
 
-def apply(m):
+def apply(m, slot='FOCUS'):
     """returns a copy of mesh m (pos,nrm,uv,col,tri) with vinyl UVs; vertices are split between regions"""
+    t_ = TEMPLATES[slot]
     p = m['pos']; t = m['tri']
     fn = np.cross(p[t[:, 1]] - p[t[:, 0]], p[t[:, 2]] - p[t[:, 0]])
     fn /= np.linalg.norm(fn, axis=1, keepdims=True) + 1e-12
@@ -43,5 +57,5 @@ def apply(m):
     uv = np.zeros((len(src), 2))
     for r in ('left', 'right', 'top', 'front', 'rear'):
         s = rg == r
-        if s.any(): uv[s] = uv_region(p[src[s]], r)
+        if s.any(): uv[s] = uv_region(p[src[s]], r, t_)
     return dict(pos=p[src], nrm=m['nrm'][src], uv=np.clip(uv, 0.0, 1.0), col=m['col'][src], tri=T)
