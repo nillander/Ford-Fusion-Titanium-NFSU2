@@ -2,6 +2,17 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANGGT`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# v10 — os dois Fusion reexportados da release v2.7 do MW (06/10/2026)
+
+Instalados para teste: 2018 em `CARS/MUSTANGGT`, 2012 em `CARS/FOCUS`, `GlobalB.lzc` com os dois registros (SHA no README). Backup do estado anterior em `backup/antes-v10-2026-10-06/`. Orçamento e regras novas em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md), seção 8.
+
+- [ ] **Testar o 2018 no slot do Mustang**: seleção, garagem, cidade. Conferir se a tampa do porta-malas aparece (o mod de Mustang instalado antes não tinha `TRUNK_A`), lanternas vermelhas, rodas nos arcos e um vinil.
+- [ ] **Testar o 2012 no slot do Focus**: faróis LOD D, lanternas, refletores pequenos sobre o escape, grade e para-choque, tração dianteira no menu de desempenho.
+- [ ] Se o 2018 abrir sem a tampa: medir o que o slot `MUSTANGGT` desenha e mover a tampa para uma peça desenhada.
+- [ ] `release/instalar.bat` instala só o 2018; falta a opção do 2012.
+
+Peças: 2018 carroceria 21.228 · `TRUNK_A` 18.021 · `BASE_A` 21.236. 2012 carroceria 21.402 · `TRUNK_A` 21.020 · `BASE_A` 21.254. Logs em `docs/build_log.json` e `docs/build_log_2012.json`.
+
 # Diário da v9 — Fusion Titanium 2018 no slot FOCUS
 
 Estado em 27/09/2026: **finalizado e aprovado no jogo.** Capturas em `docs/in-game-final/`. O resultado publicado está no [README.md](README.md).

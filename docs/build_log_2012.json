@@ -1,0 +1,505 @@
+{
+ "port": "2012",
+ "mw": "COBALTSS",
+ "ug2": "FOCUS",
+ "inward_twins_removed": {
+  "paint_B": 1183,
+  "trunk_B": 442,
+  "paint_A": 1699
+ },
+ "nose_recess_filled_vertices": 117,
+ "decimation": {
+  "paint_B_flat": [
+   21049,
+   15600
+  ],
+  "base_MISC": [
+   3384,
+   3044
+  ],
+  "base_LOGO": [
+   4715,
+   4243
+  ],
+  "driver": [
+   1415,
+   699
+  ],
+  "interior_DULLPLASTIC": [
+   3079,
+   611
+  ],
+  "interior_INTERIOR": [
+   12625,
+   3696
+  ],
+  "interior_grid_INTERIOR": [
+   3696,
+   2463,
+   "cluster 0.007 m"
+  ]
+ },
+ "inner_faces_removed": {
+  "hood_B": 2810
+ },
+ "paint_lods": {
+  "rear_A": 6262,
+  "nose_A": 691,
+  "roof_front_A": 499,
+  "body_B_A": 15600
+ },
+ "lens_faces_turned": 106,
+ "lamps": {
+  "lod": {
+   "head": "D",
+   "head_glass": "C",
+   "brake": "D",
+   "brake_glass": "D"
+  },
+  "sides": [
+   "RIGHT",
+   "LEFT"
+  ],
+  "head": 4612,
+  "brake": 5878
+ },
+ "emblem_removed": 46,
+ "rear_low_from_B": {
+  "COBALTSS_MISC": 195,
+  "COBALTSS_LOGO": 510
+ },
+ "frit_removed": {
+  "COBALTSS_MISC": 3,
+  "COBALTSS_LOGO": 336
+ },
+ "double_sided_valance": {
+  "COBALTSS_MISC": 79,
+  "COBALTSS_LOGO": 137
+ },
+ "base_paint": 682,
+ "glass": {
+  "source": "docs/vidros_v5.npz",
+  "windows": 12,
+  "tris": 3174,
+  "under_frame_m": 0.03
+ },
+ "interior_floor_removed": 2772,
+ "base_parts": [
+  [
+   "0xb4bd7aca",
+   "0xfedee40",
+   3095
+  ],
+  [
+   "0x4bb53dca",
+   "0x2787edab",
+   464
+  ],
+  [
+   "0xb87c200a",
+   "0x4c95c6f8",
+   40
+  ],
+  [
+   "0xb4bd066f",
+   "0xfedee40",
+   5029
+  ],
+  [
+   "0xb4bd066f",
+   "0xfedee40",
+   1386
+  ],
+  [
+   "0x3c84d757",
+   "0xd6d6080a",
+   682
+  ],
+  [
+   "0xb4bd7aca",
+   "0xfedee40",
+   274
+  ],
+  [
+   "0xb4bd066f",
+   "0xfedee40",
+   647
+  ],
+  [
+   "0xc5a6a26a",
+   "0x5799e60b",
+   699
+  ],
+  [
+   "0x3c84d757",
+   "0xd6d6080a",
+   2638
+  ],
+  [
+   "0x4bb53dca",
+   "0xfedee40",
+   611
+  ],
+  [
+   "0x4bb53dca",
+   "0x2787edab",
+   2463
+  ],
+  [
+   "0xb4bd066f",
+   "0x2787edab",
+   8
+  ],
+  [
+   "0x834b8017",
+   "0x471a1dca",
+   3174
+  ],
+  [
+   "0xe2799301",
+   "0xa6348ee3",
+   44
+  ]
+ ],
+ "budget": {
+  "body": 21402,
+  "trunk": 21020,
+  "base": 21254
+ },
+ "markers": {
+  "LEFT_BRAKELIGHT": [
+   -2.245,
+   0.49,
+   0.714
+  ],
+  "RIGHT_BRAKELIGHT": [
+   -2.245,
+   -0.49,
+   0.714
+  ],
+  "RIGHT_EXHAUST": [
+   -2.32,
+   -0.635,
+   0.135
+  ],
+  "LEFT_EXHAUST": [
+   -2.32,
+   0.635,
+   0.135
+  ],
+  "CENTRE_BRAKELIGHT": [
+   -1.17,
+   0.0,
+   1.172
+  ],
+  "RIGHT_HEADLIGHT": [
+   1.99,
+   -0.692,
+   0.567
+  ],
+  "LEFT_HEADLIGHT": [
+   1.99,
+   0.692,
+   0.567
+  ],
+  "SPOILER": [
+   -2.15,
+   0.0,
+   0.868
+  ],
+  "ROOF_SCOOP": [
+   0.3,
+   0.0,
+   1.207
+  ]
+ },
+ "fixed_normals": {
+  "FOCUS_KIT00_BODY_A": 1,
+  "FOCUS_KITW01_BODY_A": 1,
+  "FOCUS_KITW02_BODY_A": 1,
+  "FOCUS_KITW03_BODY_A": 1,
+  "FOCUS_KITW04_BODY_A": 1,
+  "FOCUS_KIT00_TRUNK_A": 6,
+  "FOCUS_BASE_A": 9
+ },
+ "normals_fixed": {
+  "FOCUS_KIT00_BODY_A": 2432,
+  "FOCUS_KITW01_BODY_A": 2432,
+  "FOCUS_KITW02_BODY_A": 2432,
+  "FOCUS_KITW03_BODY_A": 2432,
+  "FOCUS_KITW04_BODY_A": 2432,
+  "FOCUS_KIT00_TRUNK_A": 2001,
+  "FOCUS_BASE_A": 1838,
+  "FOCUS_KIT00_FRONT_WHEEL_A": 40
+ },
+ "solids": {
+  "FOCUS_KIT00_BODY_A": {
+   "tris": 21402,
+   "indices": 64206,
+   "verts": 25639,
+   "groups": 6
+  },
+  "FOCUS_KITW01_BODY_A": {
+   "tris": 21402,
+   "indices": 64206,
+   "verts": 25639,
+   "groups": 6
+  },
+  "FOCUS_KITW02_BODY_A": {
+   "tris": 21402,
+   "indices": 64206,
+   "verts": 25639,
+   "groups": 6
+  },
+  "FOCUS_KITW03_BODY_A": {
+   "tris": 21402,
+   "indices": 64206,
+   "verts": 25639,
+   "groups": 6
+  },
+  "FOCUS_KITW04_BODY_A": {
+   "tris": 21402,
+   "indices": 64206,
+   "verts": 25639,
+   "groups": 6
+  },
+  "FOCUS_KIT00_TRUNK_A": {
+   "tris": 21020,
+   "indices": 63060,
+   "verts": 20000,
+   "groups": 11
+  },
+  "FOCUS_BASE_A": {
+   "tris": 21254,
+   "indices": 63762,
+   "verts": 21017,
+   "groups": 15
+  },
+  "FOCUS_KIT00_FRONT_WHEEL_A": {
+   "tris": 8614,
+   "indices": 25842,
+   "verts": 5386,
+   "groups": 2
+  },
+  "FOCUS_DECAL_FRONT_WINDOW_WIDE_MEDIUM_A": {
+   "tris": 208,
+   "indices": 624,
+   "verts": 140,
+   "groups": 1
+  },
+  "FOCUS_DECAL_REAR_WINDOW_WIDE_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 165,
+   "groups": 1
+  },
+  "FOCUS_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE1_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE2_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE3_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE4_DECAL_LEFT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE1_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE2_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE3_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE4_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE1_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE2_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE3_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_WIDE4_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": {
+   "tris": 528,
+   "indices": 1584,
+   "verts": 360,
+   "groups": 6
+  },
+  "FOCUS_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE1_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE2_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE3_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_WIDE4_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": {
+   "tris": 256,
+   "indices": 768,
+   "verts": 153,
+   "groups": 1
+  },
+  "FOCUS_DECAL_HOOD_RECT_MEDIUM_A": {
+   "tris": 800,
+   "indices": 2400,
+   "verts": 484,
+   "groups": 4
+  },
+  "FOCUS_DECAL_HOOD_RECT_SMALL_A": {
+   "tris": 1600,
+   "indices": 4800,
+   "verts": 968,
+   "groups": 8
+  }
+ },
+ "decals": {
+  "DECAL_FRONT_WINDOW_WIDE_MEDIUM_A": 208,
+  "DECAL_REAR_WINDOW_WIDE_MEDIUM_A": 256,
+  "DECAL_LEFT_DOOR_RECT_MEDIUM_A": 528,
+  "DECAL_LEFT_QUARTER_RECT_MEDIUM_A": 256,
+  "DECAL_RIGHT_DOOR_RECT_MEDIUM_A": 528,
+  "DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": 256,
+  "DECAL_HOOD_RECT_MEDIUM_A": 800,
+  "DECAL_HOOD_RECT_SMALL_A": 1600
+ },
+ "trunk_lid": 15142,
+ "hood": 2638,
+ "geometry_bytes": 7572608,
+ "textures": {
+  "FOCUS_MISC": [
+   "DXT1",
+   512
+  ],
+  "FOCUS_LOGO": [
+   "DXT1",
+   512
+  ],
+  "FOCUS_INTERIOR": [
+   "DXT1",
+   512
+  ],
+  "FOCUS_BADGING": [
+   "DXT1",
+   512
+  ],
+  "FOCUS_KIT00_HEADLIGHT": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_KIT00_BRAKELIGHT": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_RIM": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_TIRE": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_DRIVER": [
+   "DXT1",
+   256
+  ],
+  "FOCUS_HEADLIGHT_LENS": [
+   "DXT3",
+   256
+  ],
+  "FOCUS_BRAKELIGHT_GLASS": [
+   "DXT3",
+   256
+  ],
+  "FOCUS_HEADLIGHT_GLASS": [
+   "DXT3",
+   256
+  ],
+  "FOCUS_NEON": [
+   "DXT3",
+   128
+  ],
+  "FOCUS_SHADOWFE": [
+   "DXT3",
+   128
+  ],
+  "FOCUS_SHADOWIG": [
+   "DXT3",
+   128
+  ]
+ },
+ "textures_bytes": 922240
+}
