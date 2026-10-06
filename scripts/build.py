@@ -511,6 +511,14 @@ for i in range(0, len(mw_markers), 80):
 
 # ---------------------------------------------------------------- assemble solids
 def solid(name, meshes, markers=()):
+    # v10.3: one group per (texture, material), as in the v9 that drew everything in the game. The 2012 body and
+    # trunk had the left and right lamps (and the nose) as separate groups with the same key, and the game drew
+    # only part of them.
+    keyed = {}
+    for m in meshes:
+        if len(m['tri']):
+            keyed.setdefault((m['tex'], m['mat']), []).append(m)
+    meshes = [v[0] if len(v) == 1 else mesh(merge(v), k[0], k[1]) for k, v in keyed.items()]
     texs, lights = [], []
     pos, nrm, uv, col, groups = [], [], [], [], []
     o = 0
@@ -566,6 +574,11 @@ solids.append(solid(UG2 + '_KIT00_TRUNK_A', trunk_list))
 
 solids.append(solid(UG2 + '_BASE_A', base, base_markers))
 solids.append(solid(UG2 + '_KIT00_FRONT_WHEEL_A', wheel))
+# 'lod_alias' (MUSTANGGT): the retail slots list B/C LODs for body, trunk and wheel. The FOCUS slot (set up by the
+# Escort installer) draws _A only; the Mustang slot drew none of these three. Same mesh under the other LOD names.
+for letter in PORT.get('lod_alias', ()):
+    for src in [s_ for s_ in solids if s_['name'] in (UG2 + '_KIT00_BODY_A', UG2 + '_KIT00_TRUNK_A', UG2 + '_KIT00_FRONT_WHEEL_A')]:
+        solids.append(dict(src, name=src['name'][:-1] + letter))
 
 # ---------------------------------------------------------------- v6: decal placement solids
 import decals

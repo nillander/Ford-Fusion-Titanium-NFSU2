@@ -2,6 +2,14 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANGGT`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# v10.3 — teste de estrutura das peças (06/10/2026)
+
+Teste da v10.2: no 2012 faróis, faróis de milha e lanternas não existem (vê-se o interior pelos buracos), na garagem, na corrida rápida, na loja e no mundo aberto. O 2018 no Mustang, sem vinil, continua sem a pintura das laterais e sem rodas.
+
+- 2012: as luzes eram os únicos grupos repetidos dentro da carroceria e do porta-malas (lado direito e esquerdo com a mesma textura e o mesmo material, em grupos separados). Na v9, que o jogo desenhou inteira, cada peça tinha um grupo por textura e material. Agora os grupos iguais são unidos: carroceria e porta-malas ficam com 3 grupos, como na v9.
+- 2018: os carros originais têm LOD B e C de carroceria, porta-malas e roda; o slot do Focus (configurado pelo Escort) só usa o A. O Mustang desenha a base (só A nos nossos arquivos) mas não a carroceria, o porta-malas e as rodas. Teste: as mesmas malhas também com os nomes `_B` e `_C` (`lod_alias` em `ports.py`).
+- [ ] Resultado dos dois testes.
+
 # v10.2 — faróis do 2012 e faces repetidas (06/10/2026)
 
 Teste da v10.1 (carros salvos em "Selec. Carro Personalizado"): o 2012 abriu inteiro, mas com faróis e faróis de milha como buracos pretos; o 2018 no Mustang mostrou capô, frente do teto, vidros, grade, placa e faróis, sem a pintura das laterais e sem rodas.

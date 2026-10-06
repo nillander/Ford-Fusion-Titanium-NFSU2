@@ -249,43 +249,43 @@
    "tris": 20957,
    "indices": 62871,
    "verts": 25423,
-   "groups": 6
+   "groups": 3
   },
   "FOCUS_KITW01_BODY_A": {
    "tris": 20957,
    "indices": 62871,
    "verts": 25423,
-   "groups": 6
+   "groups": 3
   },
   "FOCUS_KITW02_BODY_A": {
    "tris": 20957,
    "indices": 62871,
    "verts": 25423,
-   "groups": 6
+   "groups": 3
   },
   "FOCUS_KITW03_BODY_A": {
    "tris": 20957,
    "indices": 62871,
    "verts": 25423,
-   "groups": 6
+   "groups": 3
   },
   "FOCUS_KITW04_BODY_A": {
    "tris": 20957,
    "indices": 62871,
    "verts": 25423,
-   "groups": 6
+   "groups": 3
   },
   "FOCUS_KIT00_TRUNK_A": {
    "tris": 20158,
    "indices": 60474,
    "verts": 19241,
-   "groups": 11
+   "groups": 3
   },
   "FOCUS_BASE_A": {
    "tris": 21299,
    "indices": 63897,
    "verts": 20805,
-   "groups": 15
+   "groups": 10
   },
   "FOCUS_KIT00_FRONT_WHEEL_A": {
    "tris": 8614,
@@ -450,7 +450,7 @@
  },
  "trunk_lid": 13219,
  "hood": 2638,
- "geometry_bytes": 7480320,
+ "geometry_bytes": 7478912,
  "tex_cells": [
   [
    "FOCUS_KIT00_HEADLIGHT",

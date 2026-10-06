@@ -280,7 +280,7 @@
    "tris": 21232,
    "indices": 63696,
    "verts": 21827,
-   "groups": 17
+   "groups": 12
   },
   "MUSTANGGT_KIT00_FRONT_WHEEL_A": {
    "tris": 8614,
@@ -448,7 +448,7 @@
  },
  "trunk_lid": 16365,
  "hood": 2623,
- "geometry_bytes": 7657728,
+ "geometry_bytes": 11670016,
  "textures": {
   "MUSTANGGT_MISC": [
    "DXT1",
