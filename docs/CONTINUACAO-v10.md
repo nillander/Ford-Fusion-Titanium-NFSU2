@@ -11,6 +11,8 @@ Leia antes de mexer: [PORTAR-PARA-NFSU2.md](PORTAR-PARA-NFSU2.md) (seções 8 e 
 | `CARS/FOCUS/GEOMETRY.BIN` / `TEXTURES.BIN` | ver README | Fusion 2012 v10.3 (grupos unidos) |
 | `GLOBAL/GlobalB.lzc` | `E5A03095…DFC3B42` | **variante de teste**: registros `FOCUS` (2012 FWD) e `MUSTANGGT` (2018 AWD) de `globalb_patch.py` + **só** carroceria e carrocerias largas do Mustang no layout do Focus (`globalb_parts.py … FOCUS MUSTANGGT 5,6`) |
 
+Variantes do `GlobalB` desta sessão (fora do git) em `backup/v10-globalb/`: `GlobalB.final.lzc` (v10–v10.3, `0A026C97…`), `GlobalB.parts.lzc` (v10.4, trava), `GlobalB.body.lzc` (teste atual), `GlobalB.orig.lzc` (original do jogo descompactado, para consultar as tabelas de fábrica).
+
 Backups (fora do git): `backup/antes-v10-2026-10-06/` (v9 no Focus, mod de Mustang de 2019, GlobalB `689B5935…`), `backup/antes-v10.4/GLOBAL/GlobalB.lzc` (`0A026C97…`, antes de qualquer mudança no banco de peças).
 
 ## Onde paramos
