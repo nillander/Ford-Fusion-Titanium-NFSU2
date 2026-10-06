@@ -45,9 +45,9 @@ O 2012 tem faróis e lanternas nos dois lados e cerca de 2,5 vezes mais triângu
 
 | Peça UG2 (2012) | Conteúdo | Triângulos |
 | --- | --- | --- |
-| `KIT00_BODY_A` e `KITW01–04` | pintura LOD B, bico e frente do teto em LOD A, faróis LOD D com lente LOD C | 21.392 |
-| `KIT00_TRUNK_A` | tampa LOD B, para-choque traseiro LOD B e as lanternas LOD D | 20.636 |
-| `BASE_A` | base, peças pintadas da base, capô, vidros, interior e motorista | 21.256 |
+| `KIT00_BODY_A` e `KITW01–04` | pintura LOD B, bico e frente do teto em LOD A, faróis LOD D com lente LOD C | 20.957 |
+| `KIT00_TRUNK_A` | tampa LOD B, para-choque traseiro LOD B e as lanternas LOD D | 20.158 |
+| `BASE_A` | base, peças pintadas da base, capô, vidros, interior e motorista | 21.299 |
 | `KIT00_FRONT_WHEEL_A` | a mesma roda do 2018 | 8.614 |
 
 Cada peça fica em até 21.500 triângulos (64.500 índices). A v1, com até 62.886 índices concentrados, fechou o jogo.
@@ -135,7 +135,13 @@ As faixas coloridas são as peças `DECAL`, não a pintura. Elas sentam no para-
    faltaram texturas nos dois (no 2018 só sobraram capô e para-brisa, que usam textura global). Agora cada pacote
    leva o nome, o caminho e o hash que os carros originais usam: `CARTEXTURES`,
    `Global\Pipeline\CarTemplateTextures_<SLOT>.tpk` e o hash desse caminho.
-10. **Rodas fixadas nos dois slots.** O registro do Mustang chega com Z 0,17 e raio 0,343. O patch grava X, Y,
+10. **Faces repetidas fora (v10.2).** As cascas do MW repetem cada face no mesmo lugar, virada ao contrário (lição
+    da v2.6/v2.8 do MW: o capô). Com os mods que desenham as duas faces, a cópia escura briga com a visível. O build
+    tira essa cópia também da base, das carcaças das luzes e do interior (no interior fica a face voltada para a
+    cabine), e o orçamento que sobra vai para o interior.
+11. **Farol do 2012.** O MW ilumina o fundo preto do farol com o shader de lâmpada; no UG2 ele fica preto e o farol
+    parece um buraco. A cópia UG2 da folha do farol troca essa célula preta por uma cópia escurecida da célula cromada.
+12. **Rodas fixadas nos dois slots.** O registro do Mustang chega com Z 0,17 e raio 0,343. O patch grava X, Y,
    Z, raio e largura aprovados na v9, em vez de herdar os do slot.
 
 ## Performance (`scripts/globalb_patch.py`)
@@ -162,10 +168,10 @@ O backup do estado anterior desta cópia (Escort RS + GlobalB) está em `backup/
 
 | Arquivo instalado | SHA-256 |
 | --- | --- |
-| `CARS/MUSTANGGT/GEOMETRY.BIN` | `44D8DA37D152510BB4DF8209D072351AA35D0E98C025AE71C0659101C1305D05` |
+| `CARS/MUSTANGGT/GEOMETRY.BIN` | `A000CFAC70AE73F5A237A6F0618AD734A96CBDFD371D20A5CBBBDA8A1FD9A51D` |
 | `CARS/MUSTANGGT/TEXTURES.BIN` | `D57805B128BFF00420C32E7EE06C04E2398834954D9E3F56831E086C72E91170` |
-| `CARS/FOCUS/GEOMETRY.BIN` | `A58CF92A698ACAF6859DA379FFA29D9B8787F2499BDF85C0D791E46FDD22C94F` |
-| `CARS/FOCUS/TEXTURES.BIN` | `0FA4FE86D41210D3FE39EBAC311111CEDAE770F32C8FF0FDF817A601E5567770` |
+| `CARS/FOCUS/GEOMETRY.BIN` | `C4D943A9E337B28AAC17DAB6D514A20AB01A7A5238AC455B25951D7D3C3EC9EB` |
+| `CARS/FOCUS/TEXTURES.BIN` | `5D3911E60F49089B30AD88CFAAA00A97046FF8FF1A70A77C81DE6C34B68A539D` |
 | `GLOBAL/GlobalB.lzc` | `0A026C97DBDD588E6E9B263D8EAAFC9DD7B2324C2600B129CE81762809B5A5DB` (`FOCUS` 2012 FWD + `MUSTANGGT` 2018 AWD) |
 
 ## Reconstruir

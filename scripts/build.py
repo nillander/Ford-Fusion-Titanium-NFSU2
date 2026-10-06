@@ -143,12 +143,19 @@ def outwardness(g, clamp=(-1.0, 1.0), zc=0.7):
     return ((c - ax) * fn).sum(1)
 
 
-def drop_inward_twins(g, name):
+def drop_inward_twins(g, name, keep_inward=False):
+    """MW shells carry a copy of each face in the same place, turned the other way (the underside of the hood,
+    the inner layer of the glass, the back of the lamp housings). The plain game culls it; with the mods that
+    draw both faces the dark copy fights the visible one (MW v2.6/v2.8). Keep one face: the one looking out of
+    the car, or into the cabin for the interior (keep_inward)."""
     tw, fn, c = twins.twins(g['pos'], g['tri'])
     o = outwardness(g)
-    keep = ~(tw & (o < 0))
-    LOG.setdefault('inward_twins_removed', {})[name] = int((~keep).sum())
-    return compact(g, keep)
+    drop = tw & ((o > 0) if keep_inward else (o < 0))
+    LOG.setdefault('inward_twins_removed', {})[name] = int(drop.sum())
+    out = compact(g, ~drop)
+    for k in ('tex', 'mat'):
+        if k in g: out[k] = g[k]
+    return out
 
 
 def outward_only(g, name, clamp=(-0.9, 0.5), zc=0.75):
@@ -303,6 +310,7 @@ for side in lamp_sides:
                 m = mesh(lg, bh(lens_tex(g['tex'], role)), M['HEADLIGHTGLASS'] if role == 'head' else bh('MOLDINGS'))
                 (head_glass if role == 'head' else brake_glass).append(m)
             else:
+                g = drop_inward_twins(g, name + '_' + g['mat'])
                 m = mesh(g, bh(opaque_tex(g['tex'])), M['HEADLIGHTREFLECTOR'] if role == 'head' else M['DULLPLASTIC'])
                 (head_opaque if role == 'head' else brake_opaque).append(m)
 LOG['lamps'] = dict(lod=LOD, sides=lamp_sides, head=ntris(head_opaque) + ntris(head_glass), brake=ntris(brake_opaque) + ntris(brake_glass))
@@ -364,6 +372,7 @@ for g in groups_of('BASE_B'):             # v7: exhaust tips and diffuser from L
     if k.any() and g['tex'] in (MW + '_MISC', MW + '_LOGO'):
         _baseC.append(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']}); LOG.setdefault('rear_low_from_B', {})[g['tex']] = int(k.sum())
 for g in _baseC:
+    g = drop_inward_twins(g, 'base_' + g['tex'][len(MW) + 1:] + '_' + str(g['mat']))
     if g['tex'] in (MW + '_LOGO', MW + '_MISC'):
         fr = near_glass(g['pos'][g['tri']].mean(1))
         if fr.any():
@@ -406,7 +415,7 @@ inter = []
 for g in groups_of('KIT00_INTERIOR_A'):
     k = g['pos'][g['tri']].mean(1)[:, 2] >= FLOOR_Z
     LOG.setdefault('interior_floor_removed', 0); LOG['interior_floor_removed'] += int((~k).sum())
-    if k.any(): inter.append(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']})
+    if k.any(): inter.append(drop_inward_twins(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']}, 'interior_' + g['mat'], keep_inward=True))
 fixed = ntris(base) + len(glass['tri']) + ntris(brake_glass)
 INTERIOR_BUDGET = 21300 - fixed
 big = [g for g in inter if len(g['tri']) > 1000]
@@ -614,8 +623,17 @@ place = 0
 for name, spec in TEX.items():
     suffix, sz, fmt = spec[:3]
     src = sheet(suffix)
-    img = Image.open(f'texdump/mw_{src}.png').convert('RGBA').resize((sz, sz), Image.LANCZOS)
-    rgba = np.array(img)
+    img = Image.open(f'texdump/mw_{src}.png').convert('RGBA')
+    full = np.array(img)
+    # 'tex_cells' (2012): MW lights the black inside of the headlight with its reflective lamp shader; UG2 draws it
+    # black, so the lamps read as holes. Fill that 1/8 cell of the sheet with a darker copy of the chrome cell.
+    for dst, srcc, k in PORT.get('tex_cells', {}).get(name[len(UG2) + 1:], ()):
+        cw, ch = full.shape[1] // 8, full.shape[0] // 8
+        cell = full[srcc[1] * ch:(srcc[1] + 1) * ch, srcc[0] * cw:(srcc[0] + 1) * cw].astype(float)
+        cell[..., :3] *= k
+        full[dst[1] * ch:(dst[1] + 1) * ch, dst[0] * cw:(dst[0] + 1) * cw] = cell.astype(np.uint8)
+        LOG.setdefault('tex_cells', []).append([name, dst, srcc, k])
+    rgba = np.array(Image.fromarray(full).resize((sz, sz), Image.LANCZOS))
     if len(spec) > 3 and spec[3] == 'boost':   # v6: MW lens is dark red (lit by emission in MW); UG2 needs it bright
         f = rgba[..., :3].astype(float)
         red = f[..., 0] > f[..., 1:].max(-1) + 20

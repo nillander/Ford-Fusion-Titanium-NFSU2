@@ -32,6 +32,7 @@ PORTS = {
         'trunk_lod': 'B',
         'outer_brake_in': 'trunk',
         'nose_in': 'body',
+        'tex_cells': {'KIT00_HEADLIGHT': [((4, 4), (5, 4), 0.65)]},
     },
 }
 

@@ -5,7 +5,20 @@
  "inward_twins_removed": {
   "paint_B": 1183,
   "trunk_B": 442,
-  "paint_A": 1699
+  "paint_A": 1699,
+  "KIT00_RIGHT_HEADLIGHT_D_HEADLIGHT": 227,
+  "KIT00_RIGHT_BRAKELIGHT_D_BRAKELIGHT": 266,
+  "KIT00_RIGHT_BRAKELIGHT_GLASS_D_BRAKELIGHT": 0,
+  "KIT00_LEFT_HEADLIGHT_D_HEADLIGHT": 208,
+  "KIT00_LEFT_BRAKELIGHT_D_BRAKELIGHT": 212,
+  "base_MISC_DULLPLASTIC": 4,
+  "base_KIT00_HEADLIGH_HEADLIGHTGLASS": 3,
+  "base_INTERIOR_INTERIOR": 22,
+  "base_BADGING_LICENSEPLATE": 0,
+  "base_LOGO_DULLPLASTIC": 1,
+  "base_SKIN1_CARSKIN": 240,
+  "interior_INTERIOR": 1513,
+  "interior_DULLPLASTIC": 41
  },
  "nose_recess_filled_vertices": 117,
  "decimation": {
@@ -14,34 +27,29 @@
    15200
   ],
   "base_MISC": [
-   3384,
-   2538
+   2946,
+   2208
   ],
   "base_LOGO": [
-   4715,
-   3536
+   4454,
+   3340
   ],
   "driver": [
    1415,
    699
   ],
   "interior_DULLPLASTIC": [
-   3079,
-   538
-  ],
-  "interior_grid_DULLPLASTIC": [
-   538,
-   374,
-   "cluster 0.023 m"
+   3038,
+   617
   ],
   "interior_INTERIOR": [
-   12625,
-   3696
+   11112,
+   2694
   ],
   "interior_grid_INTERIOR": [
-   3696,
-   1521,
-   "cluster 0.044 m"
+   2694,
+   2258,
+   "cluster 0.005 m"
   ]
  },
  "inner_faces_removed": {
@@ -64,8 +72,8 @@
    "RIGHT",
    "LEFT"
   ],
-  "head": 5002,
-  "brake": 7417
+  "head": 4567,
+  "brake": 6939
  },
  "emblem_removed": 46,
  "rear_low_from_B": {
@@ -74,13 +82,13 @@
  },
  "frit_removed": {
   "COBALTSS_MISC": 3,
-  "COBALTSS_LOGO": 336
+  "COBALTSS_LOGO": 327
  },
  "double_sided_valance": {
-  "COBALTSS_MISC": 195,
-  "COBALTSS_LOGO": 510
+  "COBALTSS_MISC": 191,
+  "COBALTSS_LOGO": 509
  },
- "base_paint": 682,
+ "base_paint": 442,
  "glass": {
   "source": "docs/vidros_v5.npz",
   "windows": 12,
@@ -92,12 +100,12 @@
   [
    "0xb4bd7aca",
    "0xfedee40",
-   2689
+   2373
   ],
   [
    "0x4bb53dca",
    "0x2787edab",
-   464
+   442
   ],
   [
    "0xb87c200a",
@@ -107,7 +115,7 @@
   [
    "0xb4bd066f",
    "0xfedee40",
-   5071
+   4725
   ],
   [
    "0xb4bd066f",
@@ -117,17 +125,17 @@
   [
    "0x3c84d757",
    "0xd6d6080a",
-   682
+   442
   ],
   [
    "0xb4bd7aca",
    "0xfedee40",
-   390
+   382
   ],
   [
    "0xb4bd066f",
    "0xfedee40",
-   1020
+   1018
   ],
   [
    "0xc5a6a26a",
@@ -142,12 +150,12 @@
   [
    "0x4bb53dca",
    "0xfedee40",
-   374
+   617
   ],
   [
    "0x4bb53dca",
    "0x2787edab",
-   1521
+   2258
   ],
   [
    "0xb4bd066f",
@@ -162,13 +170,13 @@
   [
    "0xe2799301",
    "0xa6348ee3",
-   44
+   41
   ]
  ],
  "budget": {
-  "body": 21392,
-  "trunk": 20636,
-  "base": 21256
+  "body": 20957,
+  "trunk": 20158,
+  "base": 21299
  },
  "markers": {
   "LEFT_BRAKELIGHT": [
@@ -224,59 +232,59 @@
   "FOCUS_KITW03_BODY_A": 1,
   "FOCUS_KITW04_BODY_A": 1,
   "FOCUS_KIT00_TRUNK_A": 6,
-  "FOCUS_BASE_A": 9
+  "FOCUS_BASE_A": 21
  },
  "normals_fixed": {
-  "FOCUS_KIT00_BODY_A": 2362,
-  "FOCUS_KITW01_BODY_A": 2362,
-  "FOCUS_KITW02_BODY_A": 2362,
-  "FOCUS_KITW03_BODY_A": 2362,
-  "FOCUS_KITW04_BODY_A": 2362,
-  "FOCUS_KIT00_TRUNK_A": 2159,
-  "FOCUS_BASE_A": 1676,
+  "FOCUS_KIT00_BODY_A": 2352,
+  "FOCUS_KITW01_BODY_A": 2352,
+  "FOCUS_KITW02_BODY_A": 2352,
+  "FOCUS_KITW03_BODY_A": 2352,
+  "FOCUS_KITW04_BODY_A": 2352,
+  "FOCUS_KIT00_TRUNK_A": 2198,
+  "FOCUS_BASE_A": 1611,
   "FOCUS_KIT00_FRONT_WHEEL_A": 40
  },
  "solids": {
   "FOCUS_KIT00_BODY_A": {
-   "tris": 21392,
-   "indices": 64176,
-   "verts": 25424,
+   "tris": 20957,
+   "indices": 62871,
+   "verts": 25423,
    "groups": 6
   },
   "FOCUS_KITW01_BODY_A": {
-   "tris": 21392,
-   "indices": 64176,
-   "verts": 25424,
+   "tris": 20957,
+   "indices": 62871,
+   "verts": 25423,
    "groups": 6
   },
   "FOCUS_KITW02_BODY_A": {
-   "tris": 21392,
-   "indices": 64176,
-   "verts": 25424,
+   "tris": 20957,
+   "indices": 62871,
+   "verts": 25423,
    "groups": 6
   },
   "FOCUS_KITW03_BODY_A": {
-   "tris": 21392,
-   "indices": 64176,
-   "verts": 25424,
+   "tris": 20957,
+   "indices": 62871,
+   "verts": 25423,
    "groups": 6
   },
   "FOCUS_KITW04_BODY_A": {
-   "tris": 21392,
-   "indices": 64176,
-   "verts": 25424,
+   "tris": 20957,
+   "indices": 62871,
+   "verts": 25423,
    "groups": 6
   },
   "FOCUS_KIT00_TRUNK_A": {
-   "tris": 20636,
-   "indices": 61908,
-   "verts": 19246,
+   "tris": 20158,
+   "indices": 60474,
+   "verts": 19241,
    "groups": 11
   },
   "FOCUS_BASE_A": {
-   "tris": 21256,
-   "indices": 63768,
-   "verts": 20420,
+   "tris": 21299,
+   "indices": 63897,
+   "verts": 20805,
    "groups": 15
   },
   "FOCUS_KIT00_FRONT_WHEEL_A": {
@@ -442,7 +450,21 @@
  },
  "trunk_lid": 13219,
  "hood": 2638,
- "geometry_bytes": 7482624,
+ "geometry_bytes": 7480320,
+ "tex_cells": [
+  [
+   "FOCUS_KIT00_HEADLIGHT",
+   [
+    4,
+    4
+   ],
+   [
+    5,
+    4
+   ],
+   0.65
+  ]
+ ],
  "textures": {
   "FOCUS_MISC": [
    "DXT1",

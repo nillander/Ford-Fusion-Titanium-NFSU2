@@ -2,6 +2,14 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANGGT`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# v10.2 — faróis do 2012 e faces repetidas (06/10/2026)
+
+Teste da v10.1 (carros salvos em "Selec. Carro Personalizado"): o 2012 abriu inteiro, mas com faróis e faróis de milha como buracos pretos; o 2018 no Mustang mostrou capô, frente do teto, vidros, grade, placa e faróis, sem a pintura das laterais e sem rodas.
+
+- 2012: a carcaça do farol (e do farol de milha, na mesma peça do MW) usa em 63 % da área uma célula preta da folha, que no MW o shader de lâmpada ilumina. A cópia UG2 da folha troca essa célula por cromado escurecido (`tex_cells` em `ports.py`).
+- Os dois: tiradas as faces repetidas viradas para dentro na base, nas carcaças das luzes e no interior (2012: 864 em `MISC`, 563 em `LOGO`, 481 na pintura da base, 3.429 no interior). O interior ganhou detalhe com o orçamento liberado.
+- [ ] 2018 no Mustang: os faróis estão na mesma peça da pintura lateral (`KIT00_BODY_A`) e aparecem, então a peça é desenhada e só a pintura dela some. A pintura da `BASE_A` (capô) aparece. Suspeita: o vinil do carro salvo, que o jogo aplica só na carroceria. Testar o Mustang de série e o salvo sem vinil.
+
 # v10.1 — correção do teste da v10 (06/10/2026)
 
 Teste da v10: o 2012 apareceu sem faróis, lanternas, faróis de milha e detalhe dos escapamentos; o 2018 no Mustang mostrou só o capô e o para-brisa.
