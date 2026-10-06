@@ -2,13 +2,17 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANGGT`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# Continuar daqui
+
+Estado, testes em andamento e pistas: [docs/CONTINUACAO-v10.md](docs/CONTINUACAO-v10.md). Leitor do banco de peças: `scripts/globalb_carparts.py`.
+
 # v10.4 — lista de peças do Mustang no GlobalB (06/10/2026)
 
 Os dois testes da v10.3 falharam. Decifrado o banco de peças do `GlobalB` (`0x80034602`): registros de 14 bytes em `0x34604` (hash do nome `<CARRO>_<PEÇA>`, id da peça, sub-id, flag, índice do carro na lista `0x3460B`, dois índices de atributos, índice da tabela de modelo), tabelas de modelo de 36 bytes em `0x3460A` (`<CARRO>` + texto + entrada por LOD A–D e mais quatro), textos em `0x34606` (deslocamento × 4).
 
 - O Mustang personalizado tinha deixado vazia a entrada do LOD A em quase todas as peças do `MUSTANGGT` (carroceria, roda, para-choques, capô...) e apagado a do porta-malas. O jogo pedia `MUSTANGGT_KIT00_A`. Corrigido com `scripts/globalb_parts.py`: as 270 peças do Mustang passam a usar as tabelas das peças do Focus (153 índices mudaram). As tabelas são compartilhadas entre carros e não foram editadas.
 - A v10.3 do 2018 (LOD B/C com a mesma malha) foi desfeita: no layout do Focus o jogo pede só o A.
-- [ ] Testar o 2018 no Mustang.
+- [x] Testar o 2018 no Mustang: **o jogo trava ao mostrar o carro** com as 270 peças no layout do Focus. Em teste: só a carroceria (ids 5 e 6), `GlobalB` `E5A03095…`.
 - [ ] Depois: o 2012 (faróis, faróis de milha e lanternas). No layout do Focus `KIT00_HEADLIGHT` e `KIT00_BRAKELIGHT` não têm LOD A; as luzes estão dentro da carroceria e do porta-malas.
 
 # v10.3 — teste de estrutura das peças (06/10/2026)
