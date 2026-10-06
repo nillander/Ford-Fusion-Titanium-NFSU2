@@ -7,7 +7,7 @@ def look(az,el):
     up=np.array([0,0,1.])
     r=np.cross(f,up);r/=np.linalg.norm(r);u=np.cross(r,f)
     return np.stack([r,u,-f])  # rows: screen x, screen y, depth(toward camera)
-def render(meshes,az=35,el=15,W=1200,H=700,scale=230,center=(0,0,0.55),light=(0.4,0.3,0.85),bg=(235,238,242),cull=False,ortho=True):
+def render(meshes,az=35,el=15,W=1200,H=700,scale=230,center=(0,0,0.55),light=(0.4,0.3,0.85),bg=(235,238,242),cull=False,ortho=True,flip_normals=True):
     R=look(az,el)
     zb=np.full((H,W),-1e9);img=np.zeros((H,W,3));img[:]=bg
     L=np.array(light);L/=np.linalg.norm(L)
@@ -45,7 +45,8 @@ def render(meshes,az=35,el=15,W=1200,H=700,scale=230,center=(0,0,0.55),light=(0.
             else: n=np.repeat(fn[t][None],upd.sum(),0)
             vd=R[2]
             ndv=n@vd
-            n=np.where((ndv<0)[:,None],-n,n)
+            if flip_normals:
+                n=np.where((ndv<0)[:,None],-n,n)
             sh=0.35+0.65*np.clip(n@L,0,1)
             if tex is not None and uv is not None:
                 u=w0[upd]*uv[i0,0]+w1[upd]*uv[i1,0]+w2[upd]*uv[i2,0]

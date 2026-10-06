@@ -204,7 +204,9 @@ wA = weld(P[MW + '_KIT00_BODY_A']['groups'][0])
 _tA = trunk_region(wA)
 # The 2012 rear end is heavier at every LOD; its port takes the lid from the LOD in ports.py ('trunk_lod').
 # The lid is its own mesh component (a gap separates it from the body), so the LOD change leaves no step.
-TRUNK_LOD = PORT.get('trunk_lod', 'A')
+TRUNK_LOD = os.environ.get('BUILD_TRUNK_LOD', PORT.get('trunk_lod', 'A'))
+assert TRUNK_LOD in ('A', 'B', 'C', 'D'), TRUNK_LOD
+LOG['trunk_lod'] = TRUNK_LOD
 _wT = wA if TRUNK_LOD == 'A' else weld(P[MW + '_KIT00_BODY_' + TRUNK_LOD]['groups'][0])
 trunk_paint = drop_inward_twins(compact(_wT, trunk_region(_wT)), 'trunk_' + TRUNK_LOD)
 # v8: ALL paint from LOD A, no decimation, split over the retail part slots that are drawn with every kit
@@ -297,6 +299,8 @@ def face_out(g):
     return merge([keep, flip])
 
 head_opaque, head_glass, brake_opaque, brake_glass = [], [], [], []
+fog_meshes = []
+tail_outlines, fog_outlines = [], []
 lamp_sides = [sd for sd in ('RIGHT', 'LEFT') if '%s_KIT00_%s_HEADLIGHT_%s' % (MW, sd, LOD['head']) in P]
 for side in lamp_sides:
     for part, role, lod in (('HEADLIGHT', 'head', LOD['head']), ('HEADLIGHT_GLASS', 'head', LOD['head_glass']),
@@ -305,6 +309,10 @@ for side in lamp_sides:
         if MW + '_' + name not in P:
             continue
         for g in groups_of(name):
+            if PORT.get('fog_lod') and role == 'head':
+                c = g['pos'][g['tri']].mean(1)
+                fog = (c[:, 0] > 1.9) & (c[:, 2] < .3) & (np.abs(c[:, 1]) > .5)
+                g = compact(g, ~fog) | {'tex': g['tex'], 'mat': g['mat']}
             if part.endswith('GLASS') and g['mat'] != 'BRAKELIGHT':
                 lg = double_sided(g) if LENS == 'double' else face_out(g)
                 m = mesh(lg, bh(lens_tex(g['tex'], role)), M['HEADLIGHTGLASS'] if role == 'head' else bh('MOLDINGS'))
@@ -313,9 +321,64 @@ for side in lamp_sides:
                 g = drop_inward_twins(g, name + '_' + g['mat'])
                 m = mesh(g, bh(opaque_tex(g['tex'])), M['HEADLIGHTREFLECTOR'] if role == 'head' else M['DULLPLASTIC'])
                 (head_opaque if role == 'head' else brake_opaque).append(m)
+if PORT.get('solid_tail'):
+    import solid_lamps
+    # Both SOLID_LAMPS and KIT00_BRAKELIGHT tests were invisible in-game.
+    # Reuse the MISC entry and material group drawn by visible base details.
+    solid_tex = UG2 + '_MISC'
+    # Keep the centre stop lamp and cabin details; remove the four rear housings.
+    retained = []
+    for m in brake_opaque:
+        c = m['pos'][m['tri']].mean(1)
+        if (c[:, 0] > -1.7).any():
+            keep = compact(m, c[:, 0] > -1.7)
+            retained.append(mesh(keep, m['tex'], m['mat']))
+    brake_opaque, brake_glass = retained, []
+    LOG['solid_tail'] = {}
+    for side in lamp_sides:
+        for g in groups_of('KIT00_%s_BRAKELIGHT_GLASS_A' % side):
+            for name, red, white in solid_lamps.tail_patches(g):
+                tail_outlines.append(red)
+                red = face_out(drop_inward_twins(red, 'solid_tail_' + name))
+                for layer in (red, white):
+                    brake_opaque.append(mesh(layer, bh(solid_tex), M['DULLPLASTIC']))
+                LOG['solid_tail'][name] = dict(red=len(red['tri']), white=len(white['tri']), backing_m=.003)
+            c = g['pos'][g['tri']].mean(1)
+            low = c[:, 2] < .5
+            if low.any():
+                reflector = face_out(drop_inward_twins(compact(g, low), 'solid_reflector'))
+                brake_opaque.append(mesh(solid_lamps.colour(reflector, [.25, .5]), bh(solid_tex), M['DULLPLASTIC']))
+if PORT.get('fog_lod'):
+    import solid_lamps
+    for side in lamp_sides:
+        for part in ('HEADLIGHT', 'HEADLIGHT_GLASS'):
+            for g in groups_of('KIT00_%s_%s_%s' % (side, part, PORT['fog_lod'])):
+                c = g['pos'][g['tri']].mean(1)
+                sel = (c[:, 0] > 1.9) & (c[:, 2] < .3) & (np.abs(c[:, 1]) > .5)
+                if not sel.any():
+                    continue
+                g = compact(g, sel) | {'tex': g['tex'], 'mat': g['mat']}
+                if part.endswith('GLASS'):
+                    for sign in (1, -1):
+                        fg = compact(g, g['pos'][g['tri']].mean(1)[:, 1] * sign > 0)
+                        lens = solid_lamps.backing(fg, radial=[1., sign, 0.])
+                        fog_outlines.append(lens)
+                        fog_meshes.append(mesh(lens, bh(solid_tex), M['DULLPLASTIC']))
+                else:
+                    fog_meshes.append(mesh(face_out(g), bh(opaque_tex(g['tex'])), M['DULLPLASTIC']))
+    LOG['fog'] = dict(lod=PORT['fog_lod'], destination='BASE_A', tris=ntris(fog_meshes))
+if PORT.get('solid_tail'):
+    for m in brake_opaque + fog_meshes:
+        if m['tex'] == bh(solid_tex):
+            u = m['uv'][:, 0]
+            m['uv'] = np.where((u > .75)[:, None], solid_lamps.GRAY_UV,
+                               np.where((u < .5)[:, None], solid_lamps.RED_UV, solid_lamps.WHITE_UV))
+    LOG['lamp_atlas'] = dict(texture=solid_tex, red_uv=solid_lamps.RED_UV.tolist(),
+                            white_uv=solid_lamps.WHITE_UV.tolist())
 LOG['lamps'] = dict(lod=LOD, sides=lamp_sides, head=ntris(head_opaque) + ntris(head_glass), brake=ntris(brake_opaque) + ntris(brake_glass))
 
-def split_y(ms, lim=0.6):
+def split_y(ms, lim=None):
+    lim = (.585 if PORT.get('solid_tail') else .6) if lim is None else lim
     inner, outer = [], []
     for m in ms:
         c = m['pos'][m['tri']].mean(1)
@@ -328,6 +391,22 @@ def split_y(ms, lim=0.6):
 
 brake_opaque_in, brake_opaque = split_y(brake_opaque)
 brake_glass_in, brake_glass = split_y(brake_glass)
+if PORT.get('solid_tail'):
+    # Painted inner lips from the donor must not poke through the new white sheets.
+    for name, paint_mesh in (('body', body_paint), ('trunk', trunk_paint)):
+        remove = solid_lamps.volume_mask(paint_mesh['pos'][paint_mesh['tri']].mean(1), tail_outlines)
+        LOG.setdefault('tail_paint_under_lens_removed', {})[name] = int(remove.sum())
+        clean = compact(paint_mesh, ~remove)
+        if name == 'body':
+            body_paint = clean
+        else:
+            trunk_paint = clean
+trunk_target = os.environ.get('BUILD_TRUNK_PAINT_TARGET', PORT.get('trunk_paint_target'))
+if trunk_target:
+    target = int(trunk_target)
+    assert target > 0, target
+    trunk_paint = dec(trunk_paint, target, 'trunk_paint')
+    LOG['trunk_paint_target'] = target
 VP = lambda m: mesh(vinyluv.apply(m, UG2), T_PAINT, M['CARSKIN'])       # paint with vinyl UVs
 body_list = [VP(body_paint)] + head_opaque + head_glass
 NOSE_IN = PORT.get('nose_in', 'base')          # LOD A nose and roof front: BASE (v9) or BODY
@@ -338,6 +417,19 @@ trunk_list = [VP(trunk_paint)] + brake_opaque_in + brake_glass_in
 if PORT.get('outer_brake_in', 'base') == 'trunk':      # outer tail lights next to the rear bumper
     trunk_list = [VP(trunk_paint)] + brake_opaque_in + brake_opaque + brake_glass_in + brake_glass
     brake_opaque, brake_glass = [], []
+
+if PORT.get('solid_tail'):
+    # Preserve the real 2018 trim from MW. The 2012 removal does not apply to this source.
+    for g in groups_of('BASE_A'):
+        if g['tex'] != MW + '_MISC':
+            continue
+        selected = solid_lamps.trunk_trim_mask(g)
+        if selected.any():
+            trim = face_out(drop_inward_twins(compact(g, selected), 'original_2018_trunk_trim'))
+            trim = solid_lamps.colour(trim, solid_lamps.GRAY_UV)
+            trunk_list.append(mesh(trim, bh(solid_tex), M['DULLPLASTIC']))
+            LOG['trunk_trim'] = dict(source='MW BASE_A/MISC', tris=len(trim['tri']), color='white', destination='TRUNK_A')
+    assert 'trunk_trim' in LOG, 'original 2018 trunk trim missing'
 
 # ---------------------------------------------------------------- BASE
 _G = np.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'vidros_v5.npz')) \
@@ -372,6 +464,13 @@ for g in groups_of('BASE_B'):             # v7: exhaust tips and diffuser from L
     if k.any() and g['tex'] in (MW + '_MISC', MW + '_LOGO'):
         _baseC.append(compact(g, k) | {'tex': g['tex'], 'mat': g['mat']}); LOG.setdefault('rear_low_from_B', {})[g['tex']] = int(k.sum())
 for g in _baseC:
+    if PORT.get('solid_tail'):
+        c = g['pos'][g['tri']].mean(1)
+        removed = solid_lamps.volume_mask(c, tail_outlines) | solid_lamps.volume_mask(c, fog_outlines, front=True)
+        if g['tex'] == MW + '_MISC':
+            removed |= solid_lamps.trunk_trim_mask(g)
+        LOG.setdefault('lamp_base_internals_removed', {})[g['tex']] = LOG.get('lamp_base_internals_removed', {}).get(g['tex'], 0) + int(removed.sum())
+        g = compact(g, ~removed) | {'tex': g['tex'], 'mat': g['mat']}
     g = drop_inward_twins(g, 'base_' + g['tex'][len(MW) + 1:] + '_' + str(g['mat']))
     if g['tex'] in (MW + '_LOGO', MW + '_MISC'):
         fr = near_glass(g['pos'][g['tri']].mean(1))
@@ -398,7 +497,7 @@ for g in _baseC:
     base.append(mesh(g, t, m))
 for g in groups_of('KIT00_DRIVER_A'):
     base.append(mesh(dec(g, 700, 'driver'), bh(UG2 + '_DRIVER'), M['DRIVER']))
-base += brake_opaque
+base += brake_opaque + fog_meshes
 base.append(VP(hood))
 if NOSE_IN == 'base':
     base.append(VP(noseA))
@@ -574,6 +673,27 @@ solids.append(solid(UG2 + '_KIT00_TRUNK_A', trunk_list))
 
 solids.append(solid(UG2 + '_BASE_A', base, base_markers))
 solids.append(solid(UG2 + '_KIT00_FRONT_WHEEL_A', wheel))
+if PORT.get('wheel_donor'):
+    import ug2, hashlib
+    donor = PORT['wheel_donor']
+    donor_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'CARS', donor, 'GEOMETRY.BIN')
+    s = next(s for s in ug2.parse(donor_path)[3] if s['hash'] == bh(donor + '_KIT00_FRONT_WHEEL_A'))
+    v = np.frombuffer(s['vb'], np.uint8).reshape(-1, 36)
+    tex_map = {bh(donor + '_' + k): bh(UG2 + '_' + k) for k in ('RIM', 'TIRE')}
+    assert set(s['tex']) <= set(tex_map), s['tex']
+    copied = dict(name=UG2 + '_KIT00_FRONT_WHEEL_A',
+                  pos=v[:, :12].copy().view('<f4').reshape(-1, 3),
+                  nrm=v[:, 12:24].copy().view('<f4').reshape(-1, 3),
+                  col=v[:, 24:28].copy().view('<u4').reshape(-1),
+                  uv=v[:, 28:36].copy().view('<f4').reshape(-1, 2),
+                  tex=[tex_map[t] for t in s['tex']], light=s['light'],
+                  groups=[dict(tex_i=g['tex'], sh_i=g['sh'],
+                               tri=s['ib'][g['off']:g['off'] + g['len']].reshape(-1, 3)) for g in s['groups']], markers=[])
+    solids[-1] = copied
+    LOG['wheel_donor'] = dict(slot=donor, sha256=hashlib.sha256(open(donor_path, 'rb').read()).hexdigest())
+    LOG['solids'][copied['name']] = dict(tris=sum(len(g['tri']) for g in copied['groups']),
+                                       indices=sum(g['tri'].size for g in copied['groups']),
+                                       verts=len(copied['pos']), groups=len(copied['groups']))
 # 'lod_alias' (MUSTANGGT): the retail slots list B/C LODs for body, trunk and wheel. The FOCUS slot (set up by the
 # Escort installer) draws _A only; the Mustang slot drew none of these three. Same mesh under the other LOD names.
 for letter in PORT.get('lod_alias', ()):
@@ -635,9 +755,12 @@ out_tex = []
 place = 0
 for name, spec in TEX.items():
     suffix, sz, fmt = spec[:3]
-    src = sheet(suffix)
-    img = Image.open(f'texdump/mw_{src}.png').convert('RGBA')
-    full = np.array(img)
+    if suffix == '@solid_lamps':
+        full = solid_lamps.atlas(sz)
+    else:
+        src = sheet(suffix)
+        img = Image.open(f'texdump/mw_{src}.png').convert('RGBA')
+        full = np.array(img)
     # 'tex_cells' (2012): MW lights the black inside of the headlight with its reflective lamp shader; UG2 draws it
     # black, so the lamps read as holes. Fill that 1/8 cell of the sheet with a darker copy of the chrome cell.
     for dst, srcc, k in PORT.get('tex_cells', {}).get(name[len(UG2) + 1:], ()):
@@ -647,6 +770,8 @@ for name, spec in TEX.items():
         full[dst[1] * ch:(dst[1] + 1) * ch, dst[0] * cw:(dst[0] + 1) * cw] = cell.astype(np.uint8)
         LOG.setdefault('tex_cells', []).append([name, dst, srcc, k])
     rgba = np.array(Image.fromarray(full).resize((sz, sz), Image.LANCZOS))
+    if PORT.get('solid_tail') and name == UG2 + '_MISC':
+        rgba = solid_lamps.paint_misc(rgba)
     if len(spec) > 3 and spec[3] == 'boost':   # v6: MW lens is dark red (lit by emission in MW); UG2 needs it bright
         f = rgba[..., :3].astype(float)
         red = f[..., 0] > f[..., 1:].max(-1) + 20

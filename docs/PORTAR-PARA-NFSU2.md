@@ -239,3 +239,9 @@ O que o slot desenha está no banco de peças do `GlobalB` (`0x80034602`). Cada 
 | Plano original do Codex | `fusion-mw2005/docs/historico/demanda-inicial.md` |
 | Scripts do port | `scripts/` (`build.py`, `ug2write.py`, `globalb_patch.py`, `clip.py`, `newglass.py`, `decals.py`, `vinyluv.py`) |
 | Instalador | `release/instalar.bat` |
+
+### 10. Orçamento da combinação tampa + roda (v10.5)
+
+No Mustang, habilitar só o id 10 (tampa) ou só o 28 (roda) abriu. Habilitar ambos com a tampa A inteira fechou na rotina de carregamento (`0x80000003`, breakpoint `0x43BD50`, retorno `0x63A265`). A tampa B abriu; a tampa A reduzida para 11.000 faces pintadas fechou, mesmo abaixo de 65.535 vértices/triângulos no conjunto. A tampa A com 8.000 faces pintadas abriu normalmente, segundo o usuário. Isso delimita um orçamento observado, sem estabelecer qual limite de memória ou contagem causa a falha.
+
+O port 2018 usa `trunk_paint_target: 8000` por padrão. Manter o estado validado: 63.444 vértices / 60.777 triângulos em BODY + BASE + TRUNK + WHEEL, lanternas preservadas e roda copiada exatamente do 2012 instalado. `BUILD_TRUNK_LOD` e `BUILD_TRUNK_PAINT_TARGET` são substituições de diagnóstico. O GlobalB aprovado copia apenas ids 5/6, 10 e 28 do Focus para o Mustang, sem aplicar as 270 peças. O instalador genérico ainda precisa incorporar esse patch seletivo; a aprovação refere-se à cópia instalada e aos arquivos consolidados no repositório.

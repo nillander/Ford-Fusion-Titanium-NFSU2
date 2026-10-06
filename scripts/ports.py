@@ -13,6 +13,11 @@ PORTS = {
         'zip': 'Fusion2018_AWD_MW2005.zip',
         'drive': 'AWD',
         'split': 0.5,
+        'solid_tail': True,
+        'fog_lod': 'A',
+        'wheel_donor': 'FOCUS',
+        # Test E opened with both trunk and wheel enabled; larger A lids crashed.
+        'trunk_paint_target': 8000,
     },
     '2012': {
         'id': '2012',

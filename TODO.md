@@ -2,9 +2,139 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANGGT`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# v10.9 — friso original branco, lentes sem faces opostas e copyright (06/10/2026)
+
+Usuário reprovou a aparência v10.8: lanternas/refletores e friso continuaram escuros. Confirmado que o friso existe na fonte 2018 do MW, em BASE/MISC; a remoção no 2012 não explica o 2018. A faixa criada sobre a pintura foi removida; recuperado o friso LOD A original (100 triângulos), em branco opaco, anexado a TRUNK. Removidas as cópias opacas coincidentes com normais opostas nas lentes/refletores/milhas. O usuário aprovou a v10.9: “perfeito”. BIN e log consolidados no repositório.
+
+README atualizado com os aprendizados, capturas enviadas e novas prévias compiladas sem inverter normais para a câmera. Detalhes em [REPARO-LANTERNAS-2018.md](docs/REPARO-LANTERNAS-2018.md). Mensagem inicial restaurada somente na chave `181419E5` de `LANGUAGES/English.bin`: © 2004 Electronic Arts Inc. Todos os direitos reservados. A troca anterior de CREDITS não atingia essa mensagem.
+
+Instalado v10.9 e reaplicado após o usuário fechar o jogo. Backup v10.8 e idioma anterior em `backup/antes-v10.9/`. Validação passou; conjunto 62.920 vértices / 59.868 triângulos. GEOMETRY `C1BB98C69F47D35DD57A23FF5A84271B8730905A1EE96EC99518FFE965CC6B5C`; TEXTURES `92B437E1BE6B57CD9FEBDD4425920BBC70F9649D9D04576BBFAF20C2B896C50B`; English `3F54514EE3527B87D24855E3B9DEDBC3060B214C5158CC4AAC05F3F5C8142CAA`.
+
+- [x] Usuário aprovou copyright, lanternas/refletores e friso: “perfeito”.
+- [ ] Conferir friso acompanhando abertura da tampa.
+
+# v10.8 — lanternas claras e faixa traseira cinza (06/10/2026)
+
+O teste v10.7 fez as lanternas aparecerem, mas ficaram escuras e o friso não era visível. v10.8 clareou a célula vermelha e acrescentou uma faixa cinza sobre lentes/pintura. O friso original 2018 ainda estava em BASE, com textura escura. Usuário confirmou que tudo continuou escuro; versão substituída pela v10.9. Backups v10.7 em `backup/antes-v10.8/`.
+
+Build em `local/v10.5/out-lamps-gray/`; validação passou (índices, referências de textura, roda idêntica à do Focus e chamadas BODY/TRUNK/WHEEL). Instalado para teste no jogo. GEOMETRY `E1E82EA663BFCB66BED0FFE2C1E092CB7E23A40540F82445089FA4C1703DB6B4`; TEXTURES `D867CD3FAB640A1C39EC1A84936044821015AE0059C249C2779CF296575C4719`. Aguardar avaliação visual.
+
 # Continuar daqui
 
 Estado, testes em andamento e pistas: [docs/CONTINUACAO-v10.md](docs/CONTINUACAO-v10.md). Leitor do banco de peças: `scripts/globalb_carparts.py`.
+
+# v10.7 — lanternas na textura MISC já desenhada (06/10/2026)
+
+Teste v10.6 não teve efeito, segundo o usuário: lanternas/refletores continuam ausentes. O nome padrão KIT00_BRAKELIGHT não resolveu; não atribuir a falha somente ao nome personalizado.
+
+Instalado teste v10.7: lentes e refletores agora usam **MUSTANGGT_MISC + DULLPLASTIC**, a mesma combinação de peças visíveis da base. Os grupos iguais são unidos pelo escritor: as lentes externas entram no grupo MISC existente da BASE; internas usam MISC na TRUNK. Redirecionadas somente as UVs de cor para duas células livres, vermelho (13,14) e branco (14,14), grade 16×16 da folha 512×512. Células pintadas depois do redimensionamento e alinhadas aos blocos DXT1, evitando alterar pixels vizinhos. UVs das peças originais de MISC não passam de v=.75; células novas em v=.875–.9375.
+
+Resultado visual: lanternas/refletores apareceram, mas escuros; a faixa transversal estava ausente. Substituído pelo v10.8 abaixo.
+
+Verificações: mesmas posições/orientações de todas as faces de BODY/BASE/TRUNK/WHEEL da E; mesmas contagens 63.444 vértices / 60.777 triângulos; texels de MISC fora das duas células idênticos; outras texturas idênticas às da E (atlas personalizado removido). Banco intacto. Validação de arquivos passou.
+
+- [ ] Usuário testar as quatro lanternas e refletores: aparecem vermelho/branco/vermelho opaco? Conferir também se o carro continua abrindo.
+- Se continuar ausente mesmo dentro do grupo MISC visível, investigar caminho de renderização/atributos das faces, sem assumir que só um nome de textura ou transparência explique o problema.
+
+GEOMETRY instalado `5F3C0750E5BF8FF8493AE9D168109D761DAFBCFC3B2B69F322A5388865347572`, TEXTURES `076DE305750BD6C89E99A974AA5D688A9CCFD8BBEBF7BC2796E8CCB425464146`. Backup v10.6 em `backup/antes-v10.7/`; E preservada em `backup/antes-v10.6/`. Variante `local/v10.5/out-lamps-misc/`. CARS no repositório ainda E; build prepara v10.7, pendente validação no jogo.
+
+# v10.6 — lanternas ausentes: atlas padrão (06/10/2026)
+
+Usuário enviou [captura](docs/in-game-v10.6/antes-lanternas-ausentes.png): os quatro vãos das lanternas mostram o interior; os refletores inferiores não estão vermelhos opacos. **A execução normal do teste E não aprovou as luzes.**
+
+Todas as lentes novas usam `MUSTANGGT_SOLID_LAMPS` (DXT1 32×32), inclusive as milhas. Esse nome personalizado era lido pela prévia, sem validar o carregamento do jogo. Instalado teste com o atlas opaco vermelho/branco em **`MUSTANGGT_KIT00_BRAKELIGHT`**, entrada padrão já presente no pacote, em 256×256. A textura personalizada foi eliminada. Restante da antiga carcaça mantido para luz central/detalhes da cabine recebe a célula vermelha. Material DULLPLASTIC preservado.
+
+Todas as faces de BODY/BASE/TRUNK/WHEEL comparadas: posições e orientação exatamente iguais às da versão E que abre. Conjunto ainda 63.444 vértices / 60.777 triângulos. Banco de peças intacto. Essa variante testa o carregamento/nome/formato do atlas, não é prova de causa confirmada antes de observar o jogo.
+
+- [x] Resultado v10.6: nenhum efeito, mesmo cenário; não resolveu.
+- Se ainda ausentes: investigar seleção de textura pelo shader e nome/material de grupo; não voltar à hipótese de fundo preto/transparência — o usuário confirmou que a geometria não é desenhada.
+
+Instalado GEOMETRY `B8BC0C045CE7FD93E3A35D5576C3F4AE987DA15553CA522B33171AB8E24382E5` e TEXTURES `DD499C805E3EF4E46711F21218C0A5C8B31551A75B6106CF0CF405A402FE01DE`. Backup da E em `backup/antes-v10.6/`. Variante em `local/v10.5/out-lamps-standard/`. O repositório CARS mantém a E até validar essa mudança; script build já prepara o atlas padrão.
+
+# v10.5 — versão funcional consolidada (06/10/2026)
+
+**Teste E aprovado pelo usuário: "funcionou normalmente".** Tampa A com pintura reduzida para 8.000 triângulos e rodas habilitadas juntas. A configuração aprovada agora é o padrão do port 2018 (`trunk_paint_target: 8000` em `scripts/ports.py`). Build sem variáveis de diagnóstico reproduziu GEOMETRY/TEXTURES byte a byte iguais aos instalados. Geometria aprovada copiada para `CARS/MUSTANGGT`, log atualizado em `docs/build_log.json`. Não foi instalada outra malha após a aprovação.
+
+- [x] Carro abre com carroceria, tampa e rodas juntas.
+- [x] Roda exatamente igual à do 2012; lentes vermelhas/brancas opacas e milhas incluídas na versão funcional.
+- [x] Reprodução da build padrão e validação dos arquivos.
+- [ ] Conferência visual específica das lanternas/milhas, cidade e abertura da tampa na loja de som, se ainda não testadas. "Funcionou normalmente" confirma a execução; não equivale a aprovação visual detalhada de cada item.
+
+Contagens do conjunto BODY + BASE + TRUNK + WHEEL: **63.444 vértices / 60.777 triângulos**. A tampa completa tem 10.328 triângulos; base 21.253, carroceria 20.582, roda 8.614. Versões maiores A original e D fecharam na mesma cadeia de carregamento. Não ficou comprovado um limite de 65.535: D também estava abaixo e fechou; manter o orçamento que passou até investigar memória/carregamento.
+
+GEOMETRY aprovado: `4DD5BB956B26CC04FADFC482570E4FAA2A83F3DCFC9773CC8AEC316E79E9CE9C`. TEXTURES: `FBFAEA3378D306B2ABCF0227065B71B21CB3CAB940DEC9E680458D9F6CCE0DD8`. GlobalB: `0D9F51AF2F920E52F5C7AE62BC121F5FDFF1EDFC475F4F6E42A77CAFB3403E2B`, carroceria no layout aprovado + somente ids 10/28 do Focus. **Não aplicar a cópia integral de 270 peças**, que fechou. Instalação genérica pelo bat ainda precisa incorporar esse patch seletivo.
+
+# v10.5 — teste E após fechamento do D (06/10/2026)
+
+Teste D **reprovado**: usuário informou travamento e fechamento. Evento Windows às 19:49:47; dump `SPEED2.EXE.30952.dmp`: `0x80000003` em `0x43BD50`, sequência `0x63A265 → 0x63ADAC → 0x63B25D → 0x610A40`, igual aos fechamentos anteriores. Backup do D e dump em `backup/v10.5-teste-D-fechamento/`. O limite simples de 65.535 vértices/triângulos não explica sozinho: D estava abaixo de ambos. Memória/orçamento de carregamento ainda não comprovados.
+
+Teste C restaurado durante a preparação. Agora instalado **teste E**, ainda com tampa e roda juntas: pintura da tampa A reduzida para 8.000 triângulos; tampa completa 10.328 triângulos / 10.569 vértices; conjunto **63.444 vértices / 60.777 triângulos**. Mantém mais geometria que a tampa B do C (8.563 triângulos), mas menos que a tampa do D. Lanternas, rodas, base, carroceria e texturas mantidas. Variante `local/v10.5/out-trunk-A8000/`; construir com `BUILD_TRUNK_PAINT_TARGET=8000`.
+
+- [x] Usuário confirmou: "funcionou normalmente". Acabamento detalhado não descrito.
+- Se falhar: restaurar C (LOD B) como configuração funcional e investigar carregamento antes de outra tentativa de aumentar detalhe. Não continuar tratando 65.535 como limite suficiente.
+
+GEOMETRY instalado `4DD5BB956B26CC04FADFC482570E4FAA2A83F3DCFC9773CC8AEC316E79E9CE9C`; banco tampa+roda inalterado (`0D9F51AF…403E2B`). Teste C preservado em `backup/v10.5-teste-C/` e `local/v10.5/out-trunk-B/`.
+
+# v10.5 — teste D: tampa A reduzida, roda original (06/10/2026)
+
+Resposta do usuário ao teste C: "ok, próximo", interpretada como combinação tampa B + rodas funcionando. Essa interpretação foi informada na conversa. Backup desse estado em `backup/v10.5-teste-C/`.
+
+Instalado teste D: tampa extraída do **LOD A**, com pintura reduzida de 15.340 para 10.999 triângulos (QEM com bordas/costuras preservadas pelo decimador). A tampa completa tem 13.327 triângulos e 12.445 vértices; teste C tinha 8.563 / 9.174. Lanternas não foram decimadas. Base, carroceria, roda e texturas comparadas e idênticas às originais. O conjunto BODY + BASE + TRUNK + WHEEL tem **65.320 vértices e 63.776 triângulos**, abaixo de 65.535; hipótese do limite agregado ainda não isolada de um limite de memória.
+
+- [x] Resultado: travou e fechou. Teste D reprovado.
+- Se fechar: retornar ao teste C e investigar orçamento/memória; estar abaixo de 65.535 não bastou.
+- Se abrir: comparar visualmente A reduzido × B antes de consolidar a versão final.
+
+Variante em `local/v10.5/out-trunk-A11000/`, produzida com `BUILD_TRUNK_PAINT_TARGET=11000`. GEOMETRY instalado `E91EC3E9FB4751370D76C7132F6ECCF0E657CD04895917DF2AE12B819644B73A`; banco permanece `0D9F51AF2F920E52F5C7AE62BC121F5FDFF1EDFC475F4F6E42A77CAFB3403E2B` (tampa e roda habilitadas). Repositório mantém a geometria A original, sem redução; teste ainda não consolidado. [Prévia D](docs/in-game-v10.5/previa-teste-D.png).
+
+# v10.5 — teste C: tampa e roda juntas, tampa LOD B (06/10/2026)
+
+**Teste B aprovado pelo usuário: rodas OK.** A tampa (teste A) e as rodas (teste B) funcionam isoladamente. A combinação da tampa A com roda fecha.
+
+Hipótese em teste: limite agregado de 16 bits. Contagens reais dos buffers compilados de BODY + BASE + TRUNK + WHEEL: 67.856 vértices e 68.117 triângulos na versão final, ambas acima de 65.535. Abaixo do limite em cada teste isolado. Isso é correlação, ainda não demonstra um limite real do motor.
+
+Instalado teste C: **tampa e roda habilitadas juntas**, mesma base, carroceria, roda e texturas (comparadas byte a byte). Só a pintura da tampa usa o LOD B da fonte em vez do A. Contagens da tampa: 9.174 vértices / 8.563 triângulos; conjunto 62.049 vértices / 59.012 triângulos. Lanternas opacas vermelhas/brancas mantidas. O teste reduz simultaneamente vértices/triângulos e memória da tampa; se abrir, não distinguirá qual desses limites é a causa.
+
+- [x] Usuário respondeu "ok, próximo"; tratado como teste C aprovado, conforme comentário na conversa.
+- Se abrir: investigar qual limite agregado/memória causa o fechamento antes de decidir a qualidade final da tampa.
+- Se fechar: descartar a hipótese simples de soma >65.535; investigar interação/carregamento das duas peças.
+
+Banco instalado: `0D9F51AF2F920E52F5C7AE62BC121F5FDFF1EDFC475F4F6E42A77CAFB3403E2B` (tampa + roda). GEOMETRY instalado: `72A1B07232ADB385EBE9A8125FC0A78C24E5D10D0AB384BF0A77CE96DEE4C415`. Variante em `local/v10.5/out-trunk-B/`; construir com `BUILD_TRUNK_LOD=B`. A geometria original no repositório permanece com tampa A. Backup do teste B aprovado em `backup/v10.5-roda-aprovada/`.
+
+# v10.5 — teste B: só a roda habilitada (06/10/2026)
+
+**Teste A aprovado pelo usuário: a tampa foi exibida.** Banco aprovado preservado em `backup/v10.5-tampa-aprovada/GLOBAL/GlobalB.lzc`.
+
+Instalado teste B: carroceria e roda habilitadas; tampa temporariamente desabilitada. Geometria/texturas finais intactas. Variante gerada da carroceria aprovada, copiando somente o id 28 do Focus. Arquivo `local/v10.5/GlobalB.wheel.lzc`; SHA do banco instalado `A4B190F056DC09876B80C0F22DAA64CE9936DD4E62E0414089B966E8014A37EC`.
+
+- [x] Usuário testou: rodas OK, sem fechamento.
+- Se fechar: a chamada da roda basta para reproduzir o erro; investigar aro/tabela/atributos e carregamento do slot. A malha já é idêntica à roda do 2012.
+- Se abrir: a combinação tampa+roda é o fator, investigar orçamento/gerenciamento de recursos; não concluir que a roda sozinha está defeituosa.
+
+# v10.5 — teste A: só a tampa habilitada (06/10/2026)
+
+A v10.5 com tampa e roda habilitadas fechou ao mostrar o Mustang. Dump `SPEED2.EXE.27412.dmp`, 19:38: exceção `0x80000003` em `0x43BD50`, retorno `0x63A265` e sequência `0x63ADAC → 0x63B25D → 0x610A40`; idênticos ao dump das 18:01 (`33184`, cópia integral do layout que travou). A falha ocorre numa verificação interna na cadeia de carregamento de recursos; o dump não nomeia a peça nem comprova a causa exata.
+
+Instalado **teste A**: geometria e texturas finais da v10.5 intactas, carroceria e tampa habilitadas, roda com a tabela anterior que não chama `FRONT_WHEEL_A`. Só um byte do GlobalB mudou em relação à variante que fechou (offset 10295894, índice de tabela do id 28). SHA do GlobalB: `59E3BC4BA1ACEDAFE7F52B1905B0203FC36953CFF7634824B67B03F1D44FDC8D`. Backup do banco e do dump em `backup/v10.5-fechamento/`.
+
+- [x] Usuário testou o Mustang: a tampa foi exibida, sem fechamento.
+- Se abrir e mostrar a tampa: a ativação da roda é o fator isolado; investigar tabela/atributos do slot e dimensões de aro antes de reativá-la.
+- Se fechar: testar só a carroceria com a geometria atual; se abrir, investigar a chamada da tampa. Se ainda fechar, comparar a geometria atual com a anterior aprovada, com o mesmo banco.
+
+# v10.5 — TODO do 2018, imagens do usuário (06/10/2026)
+
+A v10.4 com só a carroceria foi aprovada nas imagens: laterais, portas e teto aparecem. Referências guardadas em [traseira](docs/in-game-v10.5/antes-traseira.png) e [frente](docs/in-game-v10.5/antes-frente.png).
+
+- [x] Preparar a tampa: a tabela do Mustang não tinha modelo. Só o id 10 recebe a tabela `FOCUS_KIT00_TRUNK_A`, com prefixo do Mustang.
+- [x] Preparar as rodas: só o id 28 recebe a chamada `MUSTANGGT_KIT00_FRONT_WHEEL_A`. A malha é copiada do 2012 instalado: buffers de vértices e índices idênticos; texturas RIM/TIRE também idênticas. O banco muda apenas os dois índices de tabela (três bytes). Aro/performance continuam como estavam no teste da carroceria.
+- [x] Preparar as lanternas: quatro conjuntos (esquerda/direita × carroceria/tampa), com anel vermelho opaco e fundo branco opaco seguindo o contorno da lente. Atlas DXT1 sem transparência, material DULLPLASTIC. Miolo cromado removido das peças de luz e da base; lábios pintados que atravessavam o fundo branco também removidos. Parte externa fica na BASE, interna na TRUNK. Refletores baixos continuam vermelhos. Método do item 27 do MW (fundo sólido por trás da lente), adaptado para o 2018, em `scripts/solid_lamps.py`.
+- [x] Preparar os faróis de milha: LOD A na BASE, carcaça orientada para fora e lente branca opaca preenchendo o contorno. Sai o conjunto antigo de LOD C da carroceria; removidas peças da base que atravessavam a lente.
+- [x] Validar arquivos reabertos: limite de índices, referências de textura, alfa 255, igualdade exata da roda do 2012 e chamadas BODY/TRUNK/WHEEL. `scripts/validate_2018.py` passou também nos arquivos instalados.
+- [ ] Testar no jogo: tampa, quatro rodas, lentes vermelhas/brancas sem cromado e os dois faróis de milha. Conferir garagem e cidade, além de abrir o porta-malas na loja de som. **Ainda não aprovado no jogo.**
+
+Instalado para teste com backup em `backup/antes-v10.5/`. O 2012 não foi editado. A build usa o ZIP aprovado do MW e a roda do `CARS/FOCUS/GEOMETRY.BIN`; fontes do MW intactas. Variantes só da tampa e da tampa+roda em `local/v10.5/GlobalB.trunk.lzc` e `local/v10.5/GlobalB.lzc` para diagnóstico se houver fechamento.
+
+Orçamento final: carroceria 20,582, porta-malas 17,668, base 21,262 e roda 8.614 triângulos; todas abaixo de 21.500. [Prévia de bancada](docs/in-game-v10.5/previa-bancada.png); a imagem não comprova o que o slot desenha no jogo.
 
 # v10.4 — lista de peças do Mustang no GlobalB (06/10/2026)
 
