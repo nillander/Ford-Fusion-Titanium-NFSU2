@@ -45,9 +45,9 @@ O 2012 tem faróis e lanternas nos dois lados e cerca de 2,5 vezes mais triângu
 
 | Peça UG2 (2012) | Conteúdo | Triângulos |
 | --- | --- | --- |
-| `KIT00_BODY_A` e `KITW01–04` | pintura LOD B, bico e frente do teto em LOD A, faróis LOD D com lente LOD C | 21.402 |
-| `KIT00_TRUNK_A` | tampa LOD B, para-choque traseiro LOD A e as lanternas LOD D | 21.020 |
-| `BASE_A` | base, peças pintadas da base, capô, vidros, interior e motorista | 21.254 |
+| `KIT00_BODY_A` e `KITW01–04` | pintura LOD B, bico e frente do teto em LOD A, faróis LOD D com lente LOD C | 21.392 |
+| `KIT00_TRUNK_A` | tampa LOD B, para-choque traseiro LOD B e as lanternas LOD D | 20.636 |
+| `BASE_A` | base, peças pintadas da base, capô, vidros, interior e motorista | 21.256 |
 | `KIT00_FRONT_WHEEL_A` | a mesma roda do 2018 | 8.614 |
 
 Cada peça fica em até 21.500 triângulos (64.500 índices). A v1, com até 62.886 índices concentrados, fechou o jogo.
@@ -130,7 +130,12 @@ As faixas coloridas são as peças `DECAL`, não a pintura. Elas sentam no para-
    vermelho forte.
 8. **Tração dianteira é 0,0.** No `GlobalB` o valor em 720 é a parte que vai para o eixo traseiro: os FWD do
    jogo gravam 0,0 e os RWD 1,0. O `ports.py` tinha 1,0 para o 2012, o que o deixaria com tração traseira.
-9. **Rodas fixadas nos dois slots.** O registro do Mustang chega com Z 0,17 e raio 0,343. O patch grava X, Y,
+9. **Pacote de texturas com identidade própria (v10.1).** O cabeçalho `0x33310001` herdado do MW tinha nome
+   vazio e hash `FFFFFFFF`. Com um carro só assim (v9 no Focus) o jogo carregou; com o Focus e o Mustang assim,
+   faltaram texturas nos dois (no 2018 só sobraram capô e para-brisa, que usam textura global). Agora cada pacote
+   leva o nome, o caminho e o hash que os carros originais usam: `CARTEXTURES`,
+   `Global\Pipeline\CarTemplateTextures_<SLOT>.tpk` e o hash desse caminho.
+10. **Rodas fixadas nos dois slots.** O registro do Mustang chega com Z 0,17 e raio 0,343. O patch grava X, Y,
    Z, raio e largura aprovados na v9, em vez de herdar os do slot.
 
 ## Performance (`scripts/globalb_patch.py`)
@@ -158,9 +163,9 @@ O backup do estado anterior desta cópia (Escort RS + GlobalB) está em `backup/
 | Arquivo instalado | SHA-256 |
 | --- | --- |
 | `CARS/MUSTANGGT/GEOMETRY.BIN` | `44D8DA37D152510BB4DF8209D072351AA35D0E98C025AE71C0659101C1305D05` |
-| `CARS/MUSTANGGT/TEXTURES.BIN` | `323C490CC438BEC6BC522422F7BBD5AB045E476FD09BF752AC57620B739DA060` |
-| `CARS/FOCUS/GEOMETRY.BIN` | `6A419075389B7A5AF38323D9E8A8413E7D96DAB34280B67889503B43E079327E` |
-| `CARS/FOCUS/TEXTURES.BIN` | `8CE1E404134699F06AB5CCEA176D0143188B1211ECCA11C2FDA46068E80BF0BF8` |
+| `CARS/MUSTANGGT/TEXTURES.BIN` | `D57805B128BFF00420C32E7EE06C04E2398834954D9E3F56831E086C72E91170` |
+| `CARS/FOCUS/GEOMETRY.BIN` | `A58CF92A698ACAF6859DA379FFA29D9B8787F2499BDF85C0D791E46FDD22C94F` |
+| `CARS/FOCUS/TEXTURES.BIN` | `0FA4FE86D41210D3FE39EBAC311111CEDAE770F32C8FF0FDF817A601E5567770` |
 | `GLOBAL/GlobalB.lzc` | `0A026C97DBDD588E6E9B263D8EAAFC9DD7B2324C2600B129CE81762809B5A5DB` (`FOCUS` 2012 FWD + `MUSTANGGT` 2018 AWD) |
 
 ## Reconstruir

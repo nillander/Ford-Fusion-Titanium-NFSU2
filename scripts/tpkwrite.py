@@ -62,7 +62,17 @@ def write(textures, path):
     return len(out)
 
 
-def write_raw(textures, path, template=None):
+def car_identity(slot):
+    """Name, path and hash of a car texture pack exactly as the retail cars write them in chunk 0x33310001
+    (COROLLA: 'CARTEXTURES', 'Global\\Pipeline\\CarTemplateTextures_COROLLA.tpk', hash of that path).
+    v10 lesson: the MW template carried an empty name and hash 0xFFFFFFFF. One pack like that (v9 in FOCUS)
+    loaded; with two of them installed (FOCUS and MUSTANGGT) the cars lost their own textures in the game."""
+    from hashes import bh
+    path = 'Global\\Pipeline\\CarTemplateTextures_%s.tpk' % slot
+    return b'CARTEXTURES', path.encode('latin1'), bh(path)
+
+
+def write_raw(textures, path, template=None, slot=None):
     """Uncompressed (RAWW) TPK in the mwtc layout.  The old Cursor port used the MW TPK as-is in
     this slot and the game loaded it, so this layout is known to be accepted by UG2.
     The two header chunks (0x33310001, 0x33320001) are copied from the template; they are the same bytes
@@ -71,8 +81,14 @@ def write_raw(textures, path, template=None):
     tm = open(template or ports.TEMPLATE, 'rb').read()
     info = c1 = None
     for a, b, p, s in ug2.chunks(tm, 0, len(tm), 0, []):
-        if b == 0x33310001: info = tm[p + 8:p + 8 + s]
+        if b == 0x33310001: info = bytearray(tm[p + 8:p + 8 + s])
         if b == 0x33320001: c1 = tm[p + 8:p + 8 + s]
+    if slot:
+        name, tpath, h = car_identity(slot)
+        info[4:32] = name.ljust(28, b'\0')
+        info[32:96] = tpath.ljust(64, b'\0')
+        struct.pack_into('<I', info, 96, h)
+    info = bytes(info)
     textures = sorted(textures, key=lambda t: t['hash'])
     place = 0
     for t in textures:

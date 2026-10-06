@@ -24,11 +24,11 @@ PORTS = {
         # Budget knobs (see build.py). The 2012 front lamps and rear end are about 2.5x heavier than the 2018
         # ones at every LOD; these settings keep each solid under 21,500 triangles.
         'lamps': dict(head='D', head_glass='C', brake='D', brake_glass='D'),
-        'lens': 'outward',
-        'valance': 'inward',
         'rear_in': 'trunk',
         'rear_x': -1.95,
-        'body_b_target': 15600,
+        'body_b_target': 15200,
+        'rear_lod': 'B',
+        'base_dec': 0.75,
         'trunk_lod': 'B',
         'outer_brake_in': 'trunk',
         'nose_in': 'body',

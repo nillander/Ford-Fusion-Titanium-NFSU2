@@ -174,14 +174,16 @@ Os ajustes ficam em `scripts/ports.py` e só valem para o port que os declara; o
 | Chave | 2018 | 2012 | O que faz |
 | --- | --- | --- | --- |
 | `lamps` | C/C/B/B | D/C/D/D | LOD de farol, lente do farol, lanterna e lente da lanterna |
-| `lens` | `double` | `outward` | `outward` vira para fora as faces da lente que olham para dentro, sem duplicar |
-| `valance` | `all` | `inward` | na base baixa, só ganham verso as faces que olham para dentro |
-| `rear_in` | `body` | `trunk` | onde fica o para-choque traseiro LOD A |
-| `rear_x` | −1,90 | −1,95 | início da caixa traseira em LOD A |
+| `rear_in` | `body` | `trunk` | onde fica o para-choque traseiro |
+| `rear_lod` | A | B | LOD do para-choque traseiro |
+| `rear_x` | −1,90 | −1,95 | início da caixa traseira |
+| `base_dec` | 0,9 | 0,75 | fração mantida nos grupos grandes de `MISC`/`LOGO` da base |
 | `trunk_lod` | A | B | LOD da tampa (no 2012 o B tem 9,3 mil triângulos, mais que o A do 2018 decimado) |
 | `outer_brake_in` | `base` | `trunk` | lanternas externas |
 | `nose_in` | `base` | `body` | bico e frente do teto LOD A |
-| `body_b_target` | 14.900 | 15.600 | triângulos da pintura plana LOD B depois da decimação |
+| `body_b_target` | 14.900 | 15.200 | triângulos da pintura plana LOD B depois da decimação |
+
+As chaves `lens: outward` e `valance: inward` existem, mas ficaram fora dos dois ports: no teste da v10 o 2012 perdeu faróis de milha e o detalhe dos escapamentos. O MW desenha as duas faces, e nem toda face que o UG2 precisa ver aponta para fora do eixo do carro. Lentes e saias baixas continuam com as duas faces, como na v9.
 
 `BUILD_DRY=1 python build.py out 2012` imprime o orçamento sem gravar. O efeito colateral aceito é a tela de som: no 2012 o para-choque traseiro e as lanternas externas abrem junto com a tampa.
 
@@ -192,6 +194,7 @@ Valem para os dois ports desde a v10:
 - **Pintura na base.** O 2012 tem peças `SKIN1` dentro da base do MW. Elas recebem a pintura global e a UV de vinil, como a carroceria.
 - **Assoalho fora.** Triângulos do interior abaixo de z = 0,30 saem antes da decimação; o resto do orçamento vai para bancos e painel.
 - **Rodas e vinil por slot.** O patch grava Z, raio e largura aprovados nos dois registros. O molde de vinil do Mustang (`MUSTANGGT_DEBUG`, P8 com paleta) segue a convenção do Focus; os discos ficam em u 125,5/411,5 px e v 47,8/364 px e a linha do teto em v 206 px (`scripts/vinyluv.py`).
+- **Identidade do pacote de texturas.** Cada `TEXTURES.BIN` grava em `0x33310001` o nome `CARTEXTURES`, o caminho `Global\Pipeline\CarTemplateTextures_<SLOT>.tpk` e o hash desse caminho, como os carros originais. Com o nome vazio e `FFFFFFFF` herdados do MW, dois carros instalados perderam as texturas no jogo (teste da v10).
 - **Cabeçalho do TPK.** `tpkwrite.write_raw` copia os dois chunks de cabeçalho de `ports.TEMPLATE`; eles são iguais nos dois ZIPs do MW e na v9 instalada.
 
 ## O que não copiar do Most Wanted

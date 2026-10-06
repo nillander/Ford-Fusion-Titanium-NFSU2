@@ -2,6 +2,16 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANGGT`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# v10.1 — correção do teste da v10 (06/10/2026)
+
+Teste da v10: o 2012 apareceu sem faróis, lanternas, faróis de milha e detalhe dos escapamentos; o 2018 no Mustang mostrou só o capô e o para-brisa.
+
+- Os dois `TEXTURES.BIN` tinham o mesmo cabeçalho herdado do MW (nome vazio, hash `FFFFFFFF`). O v9 era o único assim no jogo. Agora cada pacote tem a identidade dos carros originais (`CarTemplateTextures_<SLOT>.tpk`). A geometria do 2018 é a mesma da v10: só a textura mudou, para isolar a causa.
+- 2012: voltaram as lentes e as saias baixas com as duas faces (como na v9); `lens: outward` e `valance: inward` tiravam faces que o jogo precisa. Para caber, o para-choque traseiro passou a LOD B e a base decima mais (0,75).
+- O Mustang personalizado (mod de 2019 que ocupava o slot) não foi doador: nada dele entra na build. O registro `MUSTANGGT` do `GlobalB` foi comparado com o original do jogo e só difere nas tabelas que o Nikki reescreveu em todos os carros.
+
+- [ ] Testar de novo os dois carros.
+
 # v10 — os dois Fusion reexportados da release v2.7 do MW (06/10/2026)
 
 Instalados para teste: 2018 em `CARS/MUSTANGGT`, 2012 em `CARS/FOCUS`, `GlobalB.lzc` com os dois registros (SHA no README). Backup do estado anterior em `backup/antes-v10-2026-10-06/`. Orçamento e regras novas em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md), seção 8.

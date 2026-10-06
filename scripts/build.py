@@ -246,10 +246,11 @@ REAR_X, NOSE_X, NOSE_Y = PORT.get('rear_x', -1.9), 2.0, 0.45
 BOXES = {'rear': dict(xmax=REAR_X), 'nose': dict(xmin=NOSE_X, ymin=-NOSE_Y, ymax=NOSE_Y, zmin=0.52, zmax=0.75),
          'roof_front': dict(xmin=0.15, xmax=0.6, ymin=-0.5, ymax=0.5, zmin=1.05)}
 bB = body_paint; A_parts = {}
+REAR_LOD = PORT.get('rear_lod', 'A')         # 2012: the rear bumper from LOD B (same cut, lighter)
 for nm, box in BOXES.items():
-    _, bB = clip.split_box(bB, box)
+    insB, bB = clip.split_box(bB, box)
     ins, _ = clip.split_box(restA, box)
-    A_parts[nm] = ins
+    A_parts[nm] = insB if (nm == 'rear' and REAR_LOD == 'B') else ins
 rearA = A_parts['rear']
 noseA = merge([A_parts['nose'], A_parts['roof_front']])      # these go into BASE
 BODY_B_TARGET = PORT.get('body_b_target', 14900)
@@ -640,6 +641,6 @@ for t in tex_e:
     place += t['size']
     out_tex.append(dict(hash=bh(name), info=info, dds=t['dds'], data=t['data'], tail=t['tail'], name=name, fmt=_fmt(t), size=t['w']))
 LOG['textures'] = {t['name']: [t['fmt'], t['size']] for t in out_tex}
-LOG['textures_bytes'] = tpkwrite.write_raw(out_tex, f'{OUT}/TEXTURES.BIN')  # v3: RAWW (mwtc layout) instead of JDLZ
+LOG['textures_bytes'] = tpkwrite.write_raw(out_tex, f'{OUT}/TEXTURES.BIN', slot=UG2)  # v3: RAWW (mwtc layout) instead of JDLZ
 json.dump(LOG, open(f'{OUT}/build_log.json', 'w'), indent=1)
 print(json.dumps(LOG, indent=1))

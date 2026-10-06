@@ -11,15 +11,15 @@
  "decimation": {
   "paint_B_flat": [
    21049,
-   15600
+   15200
   ],
   "base_MISC": [
    3384,
-   3044
+   2538
   ],
   "base_LOGO": [
    4715,
-   4243
+   3536
   ],
   "driver": [
    1415,
@@ -27,7 +27,12 @@
   ],
   "interior_DULLPLASTIC": [
    3079,
-   611
+   538
+  ],
+  "interior_grid_DULLPLASTIC": [
+   538,
+   374,
+   "cluster 0.023 m"
   ],
   "interior_INTERIOR": [
    12625,
@@ -35,20 +40,19 @@
   ],
   "interior_grid_INTERIOR": [
    3696,
-   2463,
-   "cluster 0.007 m"
+   1521,
+   "cluster 0.044 m"
   ]
  },
  "inner_faces_removed": {
   "hood_B": 2810
  },
  "paint_lods": {
-  "rear_A": 6262,
+  "rear_A": 4339,
   "nose_A": 691,
   "roof_front_A": 499,
-  "body_B_A": 15600
+  "body_B_A": 15200
  },
- "lens_faces_turned": 106,
  "lamps": {
   "lod": {
    "head": "D",
@@ -60,8 +64,8 @@
    "RIGHT",
    "LEFT"
   ],
-  "head": 4612,
-  "brake": 5878
+  "head": 5002,
+  "brake": 7417
  },
  "emblem_removed": 46,
  "rear_low_from_B": {
@@ -73,8 +77,8 @@
   "COBALTSS_LOGO": 336
  },
  "double_sided_valance": {
-  "COBALTSS_MISC": 79,
-  "COBALTSS_LOGO": 137
+  "COBALTSS_MISC": 195,
+  "COBALTSS_LOGO": 510
  },
  "base_paint": 682,
  "glass": {
@@ -88,7 +92,7 @@
   [
    "0xb4bd7aca",
    "0xfedee40",
-   3095
+   2689
   ],
   [
    "0x4bb53dca",
@@ -103,12 +107,12 @@
   [
    "0xb4bd066f",
    "0xfedee40",
-   5029
+   5071
   ],
   [
    "0xb4bd066f",
    "0xfedee40",
-   1386
+   2442
   ],
   [
    "0x3c84d757",
@@ -118,12 +122,12 @@
   [
    "0xb4bd7aca",
    "0xfedee40",
-   274
+   390
   ],
   [
    "0xb4bd066f",
    "0xfedee40",
-   647
+   1020
   ],
   [
    "0xc5a6a26a",
@@ -138,12 +142,12 @@
   [
    "0x4bb53dca",
    "0xfedee40",
-   611
+   374
   ],
   [
    "0x4bb53dca",
    "0x2787edab",
-   2463
+   1521
   ],
   [
    "0xb4bd066f",
@@ -162,9 +166,9 @@
   ]
  ],
  "budget": {
-  "body": 21402,
-  "trunk": 21020,
-  "base": 21254
+  "body": 21392,
+  "trunk": 20636,
+  "base": 21256
  },
  "markers": {
   "LEFT_BRAKELIGHT": [
@@ -223,56 +227,56 @@
   "FOCUS_BASE_A": 9
  },
  "normals_fixed": {
-  "FOCUS_KIT00_BODY_A": 2432,
-  "FOCUS_KITW01_BODY_A": 2432,
-  "FOCUS_KITW02_BODY_A": 2432,
-  "FOCUS_KITW03_BODY_A": 2432,
-  "FOCUS_KITW04_BODY_A": 2432,
-  "FOCUS_KIT00_TRUNK_A": 2001,
-  "FOCUS_BASE_A": 1838,
+  "FOCUS_KIT00_BODY_A": 2362,
+  "FOCUS_KITW01_BODY_A": 2362,
+  "FOCUS_KITW02_BODY_A": 2362,
+  "FOCUS_KITW03_BODY_A": 2362,
+  "FOCUS_KITW04_BODY_A": 2362,
+  "FOCUS_KIT00_TRUNK_A": 2159,
+  "FOCUS_BASE_A": 1676,
   "FOCUS_KIT00_FRONT_WHEEL_A": 40
  },
  "solids": {
   "FOCUS_KIT00_BODY_A": {
-   "tris": 21402,
-   "indices": 64206,
-   "verts": 25639,
+   "tris": 21392,
+   "indices": 64176,
+   "verts": 25424,
    "groups": 6
   },
   "FOCUS_KITW01_BODY_A": {
-   "tris": 21402,
-   "indices": 64206,
-   "verts": 25639,
+   "tris": 21392,
+   "indices": 64176,
+   "verts": 25424,
    "groups": 6
   },
   "FOCUS_KITW02_BODY_A": {
-   "tris": 21402,
-   "indices": 64206,
-   "verts": 25639,
+   "tris": 21392,
+   "indices": 64176,
+   "verts": 25424,
    "groups": 6
   },
   "FOCUS_KITW03_BODY_A": {
-   "tris": 21402,
-   "indices": 64206,
-   "verts": 25639,
+   "tris": 21392,
+   "indices": 64176,
+   "verts": 25424,
    "groups": 6
   },
   "FOCUS_KITW04_BODY_A": {
-   "tris": 21402,
-   "indices": 64206,
-   "verts": 25639,
+   "tris": 21392,
+   "indices": 64176,
+   "verts": 25424,
    "groups": 6
   },
   "FOCUS_KIT00_TRUNK_A": {
-   "tris": 21020,
-   "indices": 63060,
-   "verts": 20000,
+   "tris": 20636,
+   "indices": 61908,
+   "verts": 19246,
    "groups": 11
   },
   "FOCUS_BASE_A": {
-   "tris": 21254,
-   "indices": 63762,
-   "verts": 21017,
+   "tris": 21256,
+   "indices": 63768,
+   "verts": 20420,
    "groups": 15
   },
   "FOCUS_KIT00_FRONT_WHEEL_A": {
@@ -436,9 +440,9 @@
   "DECAL_HOOD_RECT_MEDIUM_A": 800,
   "DECAL_HOOD_RECT_SMALL_A": 1600
  },
- "trunk_lid": 15142,
+ "trunk_lid": 13219,
  "hood": 2638,
- "geometry_bytes": 7572608,
+ "geometry_bytes": 7482624,
  "textures": {
   "FOCUS_MISC": [
    "DXT1",
