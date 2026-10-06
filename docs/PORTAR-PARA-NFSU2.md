@@ -197,6 +197,12 @@ Valem para os dois ports desde a v10:
 - **Identidade do pacote de texturas.** Cada `TEXTURES.BIN` grava em `0x33310001` o nome `CARTEXTURES`, o caminho `Global\Pipeline\CarTemplateTextures_<SLOT>.tpk` e o hash desse caminho, como os carros originais. Com o nome vazio e `FFFFFFFF` herdados do MW, dois carros instalados perderam as texturas no jogo (teste da v10).
 - **Cabeçalho do TPK.** `tpkwrite.write_raw` copia os dois chunks de cabeçalho de `ports.TEMPLATE`; eles são iguais nos dois ZIPs do MW e na v9 instalada.
 
+### 9. Lista de peças do slot (v10.4)
+
+O que o slot desenha está no banco de peças do `GlobalB` (`0x80034602`). Cada uma das 270 peças de um carro aponta para uma tabela de modelo com o nome por LOD (`<CARRO>` + `_KIT00` + `_BODY` + `_A`). O instalador do Escort deixou no `FOCUS` só `BASE_A`, `KIT00_BODY_A`, `KITW01–04_BODY_A`, `KIT00_TRUNK_A` e `KIT00_FRONT_WHEEL_A` (mais o LOD D da carroceria e B/C da base); é esse o layout que os dois ports usam. Um slot que não desenha uma peça que existe no `GEOMETRY.BIN` tem a tabela errada, não a malha.
+
+`python globalb_parts.py GlobalB.lzc out/GlobalB.lzc FOCUS MUSTANGGT` copia esse layout para outro slot. No `MUSTANGGT` o mod de Mustang personalizado tinha deixado vazia a entrada do LOD A (`MUSTANGGT_KIT00_A`).
+
 ## O que não copiar do Most Wanted
 
 | No MW | No UG2 |

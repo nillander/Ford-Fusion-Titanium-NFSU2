@@ -141,7 +141,13 @@ As faixas coloridas são as peças `DECAL`, não a pintura. Elas sentam no para-
     cabine), e o orçamento que sobra vai para o interior.
 11. **Farol do 2012.** O MW ilumina o fundo preto do farol com o shader de lâmpada; no UG2 ele fica preto e o farol
     parece um buraco. A cópia UG2 da folha do farol troca essa célula preta por uma cópia escurecida da célula cromada.
-12. **Rodas fixadas nos dois slots.** O registro do Mustang chega com Z 0,17 e raio 0,343. O patch grava X, Y,
+12. **Lista de peças do Mustang (v10.4).** No banco de peças do `GlobalB` (chunk `0x80034602`) cada peça aponta
+    para uma tabela de modelo: `<CARRO>` + `_KIT00` + `_BODY` + `_<LOD>`. As tabelas do `MUSTANGGT` tinham sido
+    reescritas pelo mod de Mustang personalizado com a entrada do LOD A vazia: o jogo procurava
+    `MUSTANGGT_KIT00_A` em vez de `MUSTANGGT_KIT00_BODY_A`, e o mesmo na roda e no porta-malas. Só a base, cuja
+    entrada vazia é a original, aparecia. `scripts/globalb_parts.py` aponta cada peça do Mustang para a tabela do
+    seu par no Focus (o layout do Escort em que a v9 foi aprovada). Nada mais do registro muda.
+13. **Rodas fixadas nos dois slots.** O registro do Mustang chega com Z 0,17 e raio 0,343. O patch grava X, Y,
    Z, raio e largura aprovados na v9, em vez de herdar os do slot.
 
 ## Performance (`scripts/globalb_patch.py`)
@@ -168,11 +174,11 @@ O backup do estado anterior desta cópia (Escort RS + GlobalB) está em `backup/
 
 | Arquivo instalado | SHA-256 |
 | --- | --- |
-| `CARS/MUSTANGGT/GEOMETRY.BIN` | `7DBCC211F50135524B909A37F341B800F7D52F39E8C3EAC987B69EA191E06D41` |
+| `CARS/MUSTANGGT/GEOMETRY.BIN` | `451516A9223923C10E557A711EE190BA44DA7C986AAFAC2493A68268B4D681CA` |
 | `CARS/MUSTANGGT/TEXTURES.BIN` | `D57805B128BFF00420C32E7EE06C04E2398834954D9E3F56831E086C72E91170` |
 | `CARS/FOCUS/GEOMETRY.BIN` | `CD9C0F7F555DAF61A0C3F1DB9A599B40752444523B2FD35BE81B6E9EB0193349` |
 | `CARS/FOCUS/TEXTURES.BIN` | `5D3911E60F49089B30AD88CFAAA00A97046FF8FF1A70A77C81DE6C34B68A539D` |
-| `GLOBAL/GlobalB.lzc` | `0A026C97DBDD588E6E9B263D8EAAFC9DD7B2324C2600B129CE81762809B5A5DB` (`FOCUS` 2012 FWD + `MUSTANGGT` 2018 AWD) |
+| `GLOBAL/GlobalB.lzc` | `9BBF534ACE91ABEF709453037F7072EEFA22D65E88F9B38F1DF943D31DC6FCF2` (`FOCUS` 2012 FWD + `MUSTANGGT` 2018 AWD, peças do Mustang no layout do Focus) |
 
 ## Reconstruir
 

@@ -13,7 +13,6 @@ PORTS = {
         'zip': 'Fusion2018_AWD_MW2005.zip',
         'drive': 'AWD',
         'split': 0.5,
-        'lod_alias': ('B', 'C'),
     },
     '2012': {
         'id': '2012',

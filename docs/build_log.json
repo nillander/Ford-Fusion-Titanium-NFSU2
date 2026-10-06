@@ -448,7 +448,7 @@
  },
  "trunk_lid": 16365,
  "hood": 2623,
- "geometry_bytes": 11670016,
+ "geometry_bytes": 7657472,
  "textures": {
   "MUSTANGGT_MISC": [
    "DXT1",
