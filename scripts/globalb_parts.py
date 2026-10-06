@@ -20,6 +20,9 @@ from hashes import bh
 src, dst = sys.argv[1], sys.argv[2]
 FROM = sys.argv[3] if len(sys.argv) > 3 else 'FOCUS'
 TO = sys.argv[4] if len(sys.argv) > 4 else 'MUSTANGGT'
+# optional 5th argument: comma-separated part ids to copy (5 = KIT00_BODY, 6 = KITW bodies, 10 = TRUNK,
+# 28 = FRONT_WHEEL, 0 = BASE...). Default: all parts. Used to bisect the v10.4 crash.
+ONLY = {int(x) for x in sys.argv[5].split(',')} if len(sys.argv) > 5 else None
 D = bytearray(open(src, 'rb').read())
 assert D[:4] != b'JDLZ', 'GlobalB is compressed; decompress first'
 p = 0
@@ -46,6 +49,8 @@ for a, b in zip(rf, rt):          # same parts in the same order (part id and su
     assert D[a + 4:a + 6] == D[b + 4:b + 6], (a, b)
 changed = 0
 for a, b in zip(rf, rt):
+    if ONLY is not None and D[b + 4] not in ONLY:
+        continue
     xf = struct.unpack_from('<H', D, a + 12)[0]
     if struct.unpack_from('<H', D, b + 12)[0] != xf:
         struct.pack_into('<H', D, b + 12, xf)
