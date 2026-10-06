@@ -335,6 +335,12 @@ if PORT.get('solid_tail'):
             retained.append(mesh(keep, m['tex'], m['mat']))
     brake_opaque, brake_glass = retained, []
     LOG['solid_tail'] = {}
+    trim_sources = []
+    for source in groups_of('BASE_A'):
+        if source['tex'] == MW + '_MISC':
+            selected = solid_lamps.trunk_trim_mask(source)
+            if selected.any():
+                trim_sources.append(compact(source, selected))
     for side in lamp_sides:
         for g in groups_of('KIT00_%s_BRAKELIGHT_GLASS_A' % side):
             for name, red, white in solid_lamps.tail_patches(g):
@@ -342,6 +348,14 @@ if PORT.get('solid_tail'):
                 red = face_out(drop_inward_twins(red, 'solid_tail_' + name))
                 for layer in (red, white):
                     brake_opaque.append(mesh(layer, bh(solid_tex), M['DULLPLASTIC']))
+                sign = 1 if name.startswith('left') else -1
+                detail = (solid_lamps.outer_trim(red, white, sign) if name.endswith('body')
+                          else solid_lamps.lower_inner_white(red, white, trim_sources))
+                if len(detail['tri']):
+                    detail = face_out(detail)
+                    brake_opaque.append(mesh(detail, bh(solid_tex), M['DULLPLASTIC']))
+                LOG.setdefault('tail_white_details', {})[name] = dict(tris=len(detail['tri']),
+                    role='outer_trim' if name.endswith('body') else 'lower_inner_white')
                 LOG['solid_tail'][name] = dict(red=len(red['tri']), white=len(white['tri']), backing_m=.003)
             c = g['pos'][g['tri']].mean(1)
             low = c[:, 2] < .5

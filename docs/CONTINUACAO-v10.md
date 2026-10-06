@@ -1,4 +1,8 @@
-# Estado atual — v10.9 aprovada: friso original branco e lentes opacas (06/10/2026)
+# Teste atual — v10.10 friso externo e branco interno inferior (06/10/2026)
+
+v10.9 foi aprovada, mas o usuário pediu extensão do friso nas lentes da carroceria e clareamento da área abaixo dele nas lentes da tampa. Instalado v10.10: duas extensões curvas em BASE, dois painéis brancos inferiores em TRUNK; material/textura da v10.9 e faces exteriores únicas. Validação passou. Visual pendente; backup em `backup/antes-v10.10/`. Candidato `local/v10.5/out-lamps-full-trim/`; BIN versionados atualizados para a release pública v1.1, com teste visual deste ajuste pendente. [TODO](../TODO.md), [prévia](in-game-v10.10/previa-rear.png).
+
+# Histórico — v10.9 aprovada: friso original branco e lentes opacas (06/10/2026)
 
 v10.8 reprovada visualmente: lanternas/refletores e friso continuam escuros. v10.9 recupera o friso original 2018 de BASE_A/MISC (100 triângulos) em branco e TRUNK, removendo a faixa criada sobre pintura e a peça escura antiga da BASE. Lentes/refletores/milhas opacos usam faces exteriores únicas, sem cópias opostas coincidentes. Textura vermelha clara preservada. Não atribuir a ausência do friso ao 2012: ele existe no MW 2018.
 

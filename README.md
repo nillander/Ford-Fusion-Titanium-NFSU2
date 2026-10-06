@@ -1,5 +1,7 @@
 # Ford Fusion — Need for Speed Underground 2
 
+> **Release v1.1 (06/10/2026):** dois ZIPs, Fusion 2018 AWD e Fusion 2012 FWD. O 2018 inclui a extensão do friso nas lentes externas e o branco inferior nas lentes da tampa (v10.10, avaliação visual pendente). Instalador para os dois slots, com suporte a GlobalB JDLZ. Versões públicas usam somente `vX.X`. A publicação não aguarda a finalização do friso; os próximos ajustes seguem v1.2, v1.3 etc.
+
 > **Atualização v10.9 (06/10/2026):** aprovado pelo usuário o 2018 com lentes opacas sem faces opostas coincidentes e o **friso original do MW em branco**, anexado à tampa. v10.7/v10.8 exibiram as lanternas, mas escuras. O texto da tela inicial foi corrigido na entrada de copyright do idioma. Validação dos arquivos passou; a aparência no jogo foi aprovada pelo usuário. [Registro e novas prévias](docs/REPARO-LANTERNAS-2018.md).
 
 Dois ports, a partir dos ZIPs do Most Wanted 2005. Os arquivos de lá não são alterados. A estrutura que o Underground 2 aceita foi medida no **Escort RS**.
@@ -12,6 +14,19 @@ Dois ports, a partir dos ZIPs do Most Wanted 2005. Os arquivos de lá não são 
 O Fusion Titanium 2012 reaproveita o caminho do 2018 (corte, vidros, adesivos, vinil, chassi). O que muda é o slot e a tração, dianteira no 2012. O método está em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md).
 
 > **Estado:** em 06/10/2026 os dois carros foram reexportados da release **v2.7** do Most Wanted e instalados para teste (v10): o Fusion Titanium 2018 AWD em `CARS/MUSTANGGT`, no lugar do Ford Mustang GT, e o Fusion Titanium 2012 FWD em `CARS/FOCUS`, no lugar do Ford Focus. A v9 do 2018, aprovada no jogo em 27/09/2026 no slot do Focus, é a das capturas abaixo. O histórico está em [TODO.md](TODO.md).
+
+O protótipo `front_sheet` no código-fonte prepara a próxima tentativa do friso e ainda não integra os BIN publicados. A v1.1 distribui o candidato v10.10 validado, exibido nas prévias.
+
+## Downloads — v1.1
+
+Uma tag e uma release para os dois veículos, como no projeto MW2005. As tags/releases antigas foram substituídas por `v1.1`; os números v10.x abaixo registram as etapas internas do diagnóstico.
+
+| Pacote | Substitui | Estado |
+| --- | --- | --- |
+| [Fusion 2018 AWD](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/download/v1.1/Fusion2018_AWD_NFSU2.zip) | Mustang GT (`MUSTANGGT`) | Base v10.9 aprovada; ajuste do friso/área branca v10.10 aguardando teste visual |
+| [Fusion 2012 FWD](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/download/v1.1/Fusion2012_FWD_NFSU2.zip) | Focus (`FOCUS`) | Port de desenvolvimento; exibição das luzes ainda pendente |
+
+[Release e hashes dos arquivos](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/tag/v1.1). Cada ZIP inclui seu instalador, patch PowerShell, instruções e manifesto SHA-256.
 
 ## No jogo
 
@@ -29,7 +44,25 @@ O **friso existe no Fusion 2018 do MW**. Sua remoção no 2012 não se aplica a 
 
 ![Prévia em ângulo do reparo](docs/in-game-v10.9/previa-v10.9-angle.png)
 
-As prévias novas respeitam o descarte de faces de costas e não viram as normais para a câmera. Elas verificam a malha e as cores do pacote, mas não reproduzem a iluminação/shader do jogo. O usuário aprovou a v10.9 no jogo. Os BIN em `CARS/MUSTANGGT` correspondem à versão instalada e aprovada; a build e seu log foram consolidados no repositório.
+As prévias novas respeitam o descarte de faces de costas e não viram as normais para a câmera. Elas verificam a malha e as cores do pacote, mas não reproduzem a iluminação/shader do jogo. O usuário aprovou a base v10.9 no jogo. A release v1.1 e os BIN atuais incluem também o ajuste v10.10 abaixo, ainda sem aprovação visual específica.
+
+### Friso nas lentes externas e branco abaixo dele (v10.10)
+
+O friso original termina na emenda da tampa. Foram acrescentadas duas continuações brancas na BASE, sobre as lentes externas da carroceria, acompanhando a superfície curva. Nas lentes internas, dois pequenos painéis planos deixam mais branca a área abaixo do friso sem alterar toda a borda vermelha. O trecho central e os painéis internos pertencem a TRUNK.
+
+| Estado anterior no jogo | Referência real |
+| --- | --- |
+| ![v10.9 antes do prolongamento](docs/in-game-v10.10/antes-v10.9.png) | ![Traseira real do Fusion](docs/in-game-v10.10/referencia-real.png) |
+
+| Friso esperado, marcado pelo usuário | Área inferior branca, marcada pelo usuário |
+| --- | --- |
+| ![Extensão esperada](docs/in-game-v10.10/friso-esperado.png) | ![Área branca abaixo do friso](docs/in-game-v10.10/branco-interno-esperado.png) |
+
+| Nova prévia traseira | Nova prévia em ângulo |
+| --- | --- |
+| ![Friso completo na malha compilada](docs/in-game-v10.10/previa-rear.png) | ![Detalhe em ângulo](docs/in-game-v10.10/previa-angle.png) |
+
+Estas são prévias dos arquivos compilados. O resultado do ajuste no jogo ainda precisa ser confirmado.
 
 ### Capturas da v9 aprovada no slot Focus
 
@@ -54,13 +87,13 @@ As prévias novas respeitam o descarte de faces de costas e não viram as normai
 
 ### Peças
 
-Contagens abaixo: v10.9 instalada e aprovada.
+Contagens abaixo: arquivos do 2018 incluídos na release v1.1 (ajuste v10.10).
 
 | Peça UG2 | Origem (MW z10) | Triângulos |
 | --- | --- | --- |
 | `KIT00_BODY_A` e `KITW01–04` | pintura LOD B nas áreas planas + LOD A no bico, na frente do teto e no para-choque traseiro. As cinco carrocerias são a mesma malha | 20.582 |
-| `KIT00_TRUNK_A` | tampa LOD A com pintura reduzida para 8.000 triângulos, lentes internas e friso original branco | 9.457 |
-| `BASE_A` | base, capô LOD B, bico/teto LOD A, vidros, luzes externas, interior e motorista | 21.215 |
+| `KIT00_TRUNK_A` | tampa LOD A com pintura reduzida para 8.000 triângulos, lentes internas e friso original branco | 9.515 |
+| `BASE_A` | base, capô LOD B, bico/teto LOD A, vidros, luzes externas, interior e motorista | 21.259 |
 | `KIT00_FRONT_WHEEL_A` | roda de 20 raios, aro 18" (LOD B) | 8.614 |
 
 O 2012 tem faróis e lanternas nos dois lados e cerca de 2,5 vezes mais triângulos neles e na traseira, em todos os LODs. Para caber, a distribuição muda (valores em `scripts/ports.py`, explicados em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md)):
@@ -177,6 +210,11 @@ As faixas coloridas são as peças `DECAL`, não a pintura. Elas sentam no para-
 17. **Friso do 2018: recuperar a peça certa.** Ele está em BASE/MISC do MW, separado da pintura. A peça original escura permaneceu na frente da faixa criada na v10.8. Na v10.9 ela sai da BASE e entra em TRUNK com textura branca, mantendo sua forma original. A remoção do friso no 2012 é uma alteração específica daquele modelo.
 18. **Texto da tela inicial e créditos são arquivos distintos.** `CREDITS/NA_ENGLISH.TXT` controla a lista de créditos. A mensagem inicial é a chave `181419E5` de `LANGUAGES/English.bin`. `scripts/restore_startup_copyright.py` restaura somente essa entrada como “© 2004 Electronic Arts Inc. Todos os direitos reservados.”, preservando as outras strings e os offsets.
 
+19. **Friso externo acompanha a carroceria.** O friso original de BASE_A cobre somente a tampa. As continuações externas ficam em BASE e são recortadas na emenda Y ±0,585, preservando a separação da tampa. A camada deve seguir a lente vermelha e o fundo branco: uma folha só no fundo pode ficar escondida pela curvatura da lente.
+20. **Branco inferior precisa de superfície e normal coerentes.** Um fundo triangulado em leque pode não ser plano e conter faces voltadas para baixo. Os pequenos painéis abaixo do friso nas lentes internas usam um plano frontal e faces orientadas para fora. A cor branca na textura, sozinha, não corrige um painel encoberto ou sombreado incorretamente.
+21. **Instalador seletivo e verificável.** `release/globalb_patch.ps1` aceita GlobalB JDLZ, aplica a tração correta por veículo e copia somente ids 5/6/10/28 no Mustang. Seus resultados foram comparados byte a byte com os scripts Python. Não distribuir o banco completo desta instalação e não copiar as 270 peças: essa combinação fechou o jogo.
+22. **Uma release, dois pacotes.** `scripts/package_release.py` aceita versões `vX.X`, gera ZIPs separados por veículo e inclui hashes de conteúdo. O manifesto identifica exatamente os BIN publicados, sem confundir prévias e aprovação no jogo.
+
 ## Performance (`scripts/globalb_patch.py`)
 
 - **Motor e câmbio do Toyota Corolla levados a 248 cv** (o 2.0 EcoBoost do Fusion Titanium 2018): todas as
@@ -193,19 +231,18 @@ Valores finais em `docs/globalb_2018.json` (`MUSTANGGT`) e `docs/globalb_2012.js
 
 ## Instalação
 
-A v10 foi instalada direto nesta cópia do jogo: `CARS/MUSTANGGT`, `CARS/FOCUS` e o `GlobalB.lzc` gerado por `scripts/globalb_patch.py` (2012 e depois 2018, sobre o arquivo atual). O estado anterior (v9 no Focus, Mustang do mod e GlobalB `689B5935…`) está em `backup/antes-v10-2026-10-06` (fora do git).
+Baixe o ZIP do veículo na release v1.1, extraia e execute `instalar.bat` com o jogo fechado. Cada pacote detecta seu slot. Para instalar os dois, execute o instalador de cada pasta. Na cópia do repositório, `release/instalar.bat` instala o 2018; `release/instalar.bat 2012` seleciona o 2012.
 
-Para o 2018 sozinho, feche o jogo e execute `instalar.bat` (na release ele fica ao lado de `CARS`; no repositório, `release/instalar.bat`). O script procura o Underground 2, copia `CARS/MUSTANGGT` e aplica no `GLOBAL/GlobalB.lzc` o mesmo ajuste de `scripts/globalb_patch.py` no registro `MUSTANGGT`: 248 cv, tração integral e chassi do Lancer. Na primeira execução o GlobalB anterior fica em `GLOBAL/GlobalB.lzc.antes-fusion`. Se o arquivo estiver compactado (JDLZ), salve-o descompactado no Nikki e rode de novo.
+Mantenha `globalb_patch.ps1` ao lado do BAT. O instalador aceita GlobalB original compactado em JDLZ ou já descompactado; não exige Python nem Nikki. Ele ajusta somente o veículo selecionado e, no 2018, as tabelas dos ids 5/6/10/28. Os BIN anteriores ficam com sufixo `.antes-fusion`; o banco anterior fica em `GLOBAL/GlobalB.lzc.antes-fusion` (backup inicial compartilhado pelos dois instaladores).
 
-O backup do estado anterior desta cópia (Escort RS + GlobalB) está em `backup/antes-fusion-2026-09-25` (fora do git).
+A release inclui os carros e o patch, sem distribuir o GlobalB ou o idioma completo da instalação local. A correção opcional do copyright está no script `scripts/restore_startup_copyright.py`, documentado no registro do reparo.
 
-| Arquivo instalado | SHA-256 |
+| Arquivo publicado | SHA-256 |
 | --- | --- |
-| `CARS/MUSTANGGT/GEOMETRY.BIN` | `5F3C0750E5BF8FF8493AE9D168109D761DAFBCFC3B2B69F322A5388865347572` (teste v10.7 instalado; CARS no repositório ainda E) |
-| `CARS/MUSTANGGT/TEXTURES.BIN` | `076DE305750BD6C89E99A974AA5D688A9CCFD8BBEBF7BC2796E8CCB425464146` (teste v10.7 instalado; CARS no repositório ainda E) |
+| `CARS/MUSTANGGT/GEOMETRY.BIN` | `A9E01CD5F50556FDA8B0601119C8166A631A2127314BDCF82D0987F25E0B7B28` |
+| `CARS/MUSTANGGT/TEXTURES.BIN` | `92B437E1BE6B57CD9FEBDD4425920BBC70F9649D9D04576BBFAF20C2B896C50B` |
 | `CARS/FOCUS/GEOMETRY.BIN` | `CD9C0F7F555DAF61A0C3F1DB9A599B40752444523B2FD35BE81B6E9EB0193349` |
 | `CARS/FOCUS/TEXTURES.BIN` | `5D3911E60F49089B30AD88CFAAA00A97046FF8FF1A70A77C81DE6C34B68A539D` |
-| `GLOBAL/GlobalB.lzc` | `0D9F51AF2F920E52F5C7AE62BC121F5FDFF1EDFC475F4F6E42A77CAFB3403E2B` (versão funcional: tampa e roda habilitadas) |
 
 ## Reconstruir
 
@@ -232,14 +269,9 @@ O compressor JDLZ foi validado com ida e volta contra o descompressor que lê os
 
 ## Limites conhecidos
 
-A v9 do 2018 foi aprovada na garagem, no modo exploração e na largada: carroceria completa (teto, portas e capô), faróis, lanternas e rodas dentro dos arcos. A v10 dos dois carros ainda não foi vista no jogo.
-
-- O slot `MUSTANGGT` nunca foi medido no jogo com o Fusion. O mod de Mustang instalado antes não tinha `TRUNK_A`; se a tampa do porta-malas faltar no 2018, é esse slot que não desenha a peça.
-- No 2012 o para-choque traseiro e as lanternas externas estão na `TRUNK_A`. Na tela de som eles abrem junto com a tampa.
-- O interior perdeu o assoalho (z < 0,30), que não aparece pelas janelas, e ficou mais simples que o da v9: a base do MW cresceu e não sobra orçamento.
-
-- Freios (`KIT00_FRONT/REAR_BRAKE_A`) não entram.
-- Na tela de som o jogo anima a `TRUNK_A` com o pivô do slot.
-- Logo da tela de seleção (`FrontB.lzc`) e o nome no menu continuam os do Escort/Focus.
-- O `VINYLS.BIN` de cada slot continua o do jogo; a pintura usa a UV projetada no molde dele (`FOCUS_DEBUG` ou `MUSTANGGT_DEBUG`, ver `docs/diagnostico-v8/vinil-molde-mustanggt.png`).
-- `release/instalar.bat` ainda instala só o 2018.
+- O 2018 v10.9 foi aprovado no slot Mustang com tampa, rodas, lanternas/refletores e friso. A extensão do friso externo e o branco inferior da v10.10 aguardam conferência visual no jogo.
+- No 2012, a exibição das luzes permanece pendente. Sua release é um port de desenvolvimento, sem aprovação visual completa.
+- No 2012, o para-choque traseiro e as lanternas externas estão em TRUNK e acompanham a tampa na tela de som.
+- A abertura da tampa usa o pivô do slot e ainda não foi relatada especificamente após o reparo.
+- O interior perdeu o assoalho (Z < 0,30) para preservar o orçamento da BASE; as peças de freio não entram.
+- Os nomes/logos no menu continuam os dos slots. VINYLS.BIN e PARTS_ANIMATIONS.bin continuam os do jogo.

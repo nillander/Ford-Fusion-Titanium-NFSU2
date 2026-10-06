@@ -8,24 +8,28 @@ set "PERGUNTADAS=%TEMP%\fusion-nfsu2-perguntadas.txt"
 if exist "%CANDIDATOS%" del /f /q "%CANDIDATOS%"
 if exist "%PERGUNTADAS%" del /f /q "%PERGUNTADAS%"
 
+set "SLOT=MUSTANGGT"
+if /i "%~1"=="2012" set "SLOT=FOCUS"
+if not exist "%~dp0CARS\MUSTANGGT\GEOMETRY.BIN" if exist "%~dp0CARS\FOCUS\GEOMETRY.BIN" set "SLOT=FOCUS"
 set "RAIZ=%~dp0"
-if exist "%~dp0CARS\MUSTANGGT\GEOMETRY.BIN" goto TemCarro
-if exist "%~dp0..\CARS\MUSTANGGT\GEOMETRY.BIN" (
+if exist "%~dp0CARS\!SLOT!\GEOMETRY.BIN" goto TemCarro
+if exist "%~dp0..\CARS\!SLOT!\GEOMETRY.BIN" (
     set "RAIZ=%~dp0..\"
     goto TemCarro
 )
-echo Nao encontrei CARS\MUSTANGGT\GEOMETRY.BIN ao lado deste script:
+echo Nao encontrei CARS\!SLOT!\GEOMETRY.BIN ao lado deste script:
 echo %~dp0
 pause
 exit /b 1
 
 :TemCarro
-if not exist "!RAIZ!CARS\MUSTANGGT\TEXTURES.BIN" (
-    echo Nao encontrei CARS\MUSTANGGT\TEXTURES.BIN
+if not exist "!RAIZ!CARS\!SLOT!\TEXTURES.BIN" (
+    echo Nao encontrei CARS\!SLOT!\TEXTURES.BIN
     pause
     exit /b 1
 )
-set "MENSAGEM=O Fusion 2018 substitui o Ford Mustang."
+set "MENSAGEM=O Fusion 2018 AWD substitui o Ford Mustang GT."
+if /i "!SLOT!"=="FOCUS" set "MENSAGEM=O Fusion 2012 FWD substitui o Ford Focus."
 
 echo Procurando Need for Speed: Underground 2...
 echo.
@@ -140,10 +144,13 @@ exit /b 1
 :Instalar
 echo.
 echo Feche o jogo se ele estiver aberto.
-echo Copiando CARS\MUSTANGGT para:
+echo Copiando CARS\!SLOT! para:
 echo !JOGO!
-if not exist "!JOGO!\CARS\MUSTANGGT" mkdir "!JOGO!\CARS\MUSTANGGT"
-robocopy "!RAIZ!CARS\MUSTANGGT" "!JOGO!\CARS\MUSTANGGT" GEOMETRY.BIN TEXTURES.BIN /R:1 /W:1
+if not exist "!JOGO!\CARS\!SLOT!" mkdir "!JOGO!\CARS\!SLOT!"
+for %%F in (GEOMETRY.BIN TEXTURES.BIN) do (
+    if exist "!JOGO!\CARS\!SLOT!\%%F" if not exist "!JOGO!\CARS\!SLOT!\%%F.antes-fusion" copy /y "!JOGO!\CARS\!SLOT!\%%F" "!JOGO!\CARS\!SLOT!\%%F.antes-fusion" >nul
+)
+robocopy "!RAIZ!CARS\!SLOT!" "!JOGO!\CARS\!SLOT!" GEOMETRY.BIN TEXTURES.BIN /R:1 /W:1
 if errorlevel 8 goto Falhou
 call :AplicarGlobalB
 if errorlevel 1 goto FalhouGlobalB
@@ -154,7 +161,7 @@ pause
 exit /b 0
 
 :AplicarGlobalB
-set "FUSION_BAT=%~f0"
+set "FUSION_SLOT=!SLOT!"
 set "FUSION_IN=!JOGO!\GLOBAL\GlobalB.lzc"
 set "FUSION_OUT=!JOGO!\GLOBAL\GlobalB.lzc.fusion-novo"
 if not exist "!FUSION_IN!" (
@@ -166,13 +173,7 @@ if not exist "!JOGO!\GLOBAL\GlobalB.lzc.antes-fusion" (
     if errorlevel 1 exit /b 1
     set "FEZBACKUP=1"
 )
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$raw = [IO.File]::ReadAllText($env:FUSION_BAT); $i = $raw.LastIndexOf('# BEGIN-FUSION-PATCH'); if ($i -lt 0) { exit 2 }; Invoke-Expression $raw.Substring($i)"
-if errorlevel 3 (
-    echo.
-    echo O GlobalB.lzc esta compactado. Salve-o descompactado no Nikki e execute de novo.
-    echo Os arquivos do carro ja foram copiados.
-    exit /b 1
-)
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0globalb_patch.ps1"
 if errorlevel 1 (
     echo.
     echo Nao foi possivel ajustar o GlobalB. Os arquivos do carro ja foram copiados.
@@ -196,95 +197,3 @@ pause
 exit /b 1
 
 exit /b 0
-
-# BEGIN-FUSION-PATCH
-$ErrorActionPreference = 'Stop'
-try {
-  $Src = $env:FUSION_IN
-  $Dst = $env:FUSION_OUT
-  $REC = 2192
-  $D = [System.IO.File]::ReadAllBytes($Src)
-  if ($D.Length -ge 4 -and $D[0] -eq 0x4A -and $D[1] -eq 0x44 -and $D[2] -eq 0x4C -and $D[3] -eq 0x5A) {
-    [Console]::Error.WriteLine('GlobalB esta compactado (JDLZ).')
-    [Environment]::Exit(3)
-  }
-  $found = New-Object System.Collections.Generic.List[object]
-  function Walk([int]$start, [int]$end) {
-    $p = $start
-    while (($p + 8) -le $end) {
-      $cid = [BitConverter]::ToUInt32($D, $p)
-      $sz = [BitConverter]::ToInt32($D, $p + 4)
-      if ($cid -eq 0x34600) { $script:found.Add(@($p, $sz)) | Out-Null }
-      if (($cid -band 0x80000000) -ne 0) { Walk ($p + 8) ($p + 8 + $sz) }
-      $p += 8 + $sz
-    }
-  }
-  Walk 0 $D.Length
-  if ($found.Count -eq 0) { throw 'Chunk 0x34600 nao encontrado.' }
-  $last = $found[$found.Count - 1]
-  $base = $last[0] + 8
-  $size = $last[1]
-  $recs = @{}
-  for ($off = $base + 8; $off + $REC -le $base + $size; $off += $REC) {
-    $name = [System.Text.Encoding]::ASCII.GetString($D, $off, 32).Split([char]0)[0]
-    $recs[$name] = $off
-  }
-  foreach ($need in @('MUSTANGGT','COROLLA','LANCEREVO8')) {
-    if (-not $recs.ContainsKey($need)) { throw "Registro $need ausente no GlobalB." }
-  }
-  $F = $recs['MUSTANGGT']; $C = $recs['COROLLA']; $L = $recs['LANCEREVO8']
-  function Copy-Range([int]$srcOff, [int]$a, [int]$b) {
-    [Buffer]::BlockCopy($D, $srcOff + $a, $D, $F + $a, $b - $a)
-  }
-  Copy-Range $L 272 288
-  for ($w = 0; $w -lt 4; $w++) { Copy-Range $L (288 + 48 * $w + 28) (288 + 48 * $w + 36) }
-  Copy-Range $L 480 704
-  Copy-Range $L 880 992
-  Copy-Range $L 1616 2032
-  Copy-Range $C 704 880
-  Copy-Range $C 992 1616
-  function Get-PeakKw([int]$rec) {
-    $maxRpm = [double][BitConverter]::ToSingle($D, $rec + 776)
-    $best = [double]::NegativeInfinity
-    for ($k = 0; $k -lt 9; $k++) {
-      $t = [double][BitConverter]::ToSingle($D, $rec + 784 + 4 * $k)
-      $p = $t * $maxRpm * $k / 8 * 2 * [Math]::PI / 60
-      if ($p -gt $best) { $best = $p }
-    }
-    return $best
-  }
-  $power = (248 * 0.73549875) / (Get-PeakKw $C)
-  $arrays = @(
-    @(784,820), @(820,856), @(992,1100),
-    @(1328,1376), @(1392,1440), @(1456,1504), @(1520,1568), @(1572,1604)
-  )
-  foreach ($pair in $arrays) {
-    for ($o = $pair[0]; $o -lt $pair[1]; $o += 4) {
-      $scaled = [single]([double][BitConverter]::ToSingle($D, $C + $o) * $power)
-      [Buffer]::BlockCopy([BitConverter]::GetBytes($scaled), 0, $D, $F + $o, 4)
-    }
-  }
-  foreach ($o in @(720,1136,1200,1264)) { Copy-Range $L $o ($o + 4) }
-  $wheels = @(@(1.431,0.78), @(1.431,-0.78), @(-1.311,-0.78), @(-1.311,0.78))
-  for ($i = 0; $i -lt 4; $i++) {
-    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]$wheels[$i][0]), 0, $D, $F + 288 + 48 * $i, 4)
-    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]$wheels[$i][1]), 0, $D, $F + 288 + 48 * $i + 4, 4)
-    # Z, raio e largura aprovados no jogo (o registro do Mustang vem com Z 0,17 e raio 0,343)
-    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]0.09754), 0, $D, $F + 288 + 48 * $i + 8, 4)
-    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]0.3075), 0, $D, $F + 288 + 48 * $i + 16, 4)
-    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]0.195), 0, $D, $F + 288 + 48 * $i + 20, 4)
-  }
-  $mass = 1.63; $length = 4.73; $width = 1.85; $height = 1.46
-  $ix = $mass / 12 * ($width * $width + $height * $height)
-  $iy = $mass / 12 * ($length * $length + $height * $height)
-  $iz = $mass / 12 * ($length * $length + $width * $width)
-  $fields = @(544, $mass), @(548, $length), @(552, $width), @(556, $height), @(560, $ix), @(580, $iy), @(600, $iz)
-  foreach ($item in $fields) {
-    [Buffer]::BlockCopy([BitConverter]::GetBytes([single]$item[1]), 0, $D, $F + [int]$item[0], 4)
-  }
-  [System.IO.File]::WriteAllBytes($Dst, $D)
-  [Environment]::Exit(0)
-} catch {
-  [Console]::Error.WriteLine($_.Exception.Message)
-  [Environment]::Exit(1)
-}

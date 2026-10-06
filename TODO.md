@@ -1,6 +1,16 @@
 # TODO — Fusion no NFSU2
 
-A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos da v9 estão em `CARS/MUSTANGGT`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
+A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.1 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
+
+# v10.10 — friso externo e branco abaixo do friso (06/10/2026)
+
+Usuário enviou quatro referências: estado v10.9, traseira real, friso estendido esperado e área inferior branca na lanterna da tampa. Friso original da v10.9 termina na emenda Y ±0,585; adicionadas continuações brancas sobre as lentes externas (na BASE, não na tampa), seguindo tanto a superfície curva vermelha como o fundo branco para não ficarem escondidas. Faixa Z 0,710–0,729. Pequeno painel branco plano Z 0,663–0,688 abaixo do friso nas duas lentes internas, em TRUNK, sem recolorir a borda vermelha inteira. Faces exteriores únicas; mesmo atlas da v10.9.
+
+Instalado para avaliação visual. Validação passou: limites/índices, texturas, opacidade, roda do Focus e chamadas de peças. Backup v10.9 em `backup/antes-v10.10/`; candidato em `local/v10.5/out-lamps-full-trim/`. Conjunto 63.125 vértices / 59.970 triângulos. GEOMETRY `A9E01CD5F50556FDA8B0601119C8166A631A2127314BDCF82D0987F25E0B7B28`; TEXTURES permanece `92B437E1BE6B57CD9FEBDD4425920BBC70F9649D9D04576BBFAF20C2B896C50B`. Referências e prévias em `docs/in-game-v10.10/`. BIN versionados e log atualizados para a release pública v1.1; ajuste visual ainda pendente.
+
+Publicação v1.1 autorizada sem aguardar a finalização do friso. Próximos ajustes seguem v1.2, v1.3 etc., com uma release compartilhada pelos dois veículos.
+
+- [ ] Usuário conferir extensão do friso nas duas partes externas e branco inferior nas duas partes internas.
 
 # v10.9 — friso original branco, lentes sem faces opostas e copyright (06/10/2026)
 

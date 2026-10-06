@@ -60,3 +60,23 @@ Validação de limites, índices, referências de textura, opacidade, roda idên
 | English.bin | `3F54514EE3527B87D24855E3B9DEDBC3060B214C5158CC4AAC05F3F5C8142CAA` |
 
 Conjunto BODY/BASE/TRUNK/WHEEL: 62.920 vértices e 59.868 triângulos. Resultado visual aprovado pelo usuário. A abertura da tampa no jogo ainda não foi relatada especificamente.
+
+## Continuação v10.10 — friso nas lentes externas
+
+Após aprovar a v10.9, o usuário pediu que o friso continue sobre as lanternas na carroceria e que a área abaixo dele nas partes da tampa fique mais branca. Referências recebidas:
+
+| Estado no jogo | Traseira real |
+| --- | --- |
+| ![v10.9](in-game-v10.10/antes-v10.9.png) | ![Referência real](in-game-v10.10/referencia-real.png) |
+
+| Extensão esperada, marcada em magenta | Área interna inferior a clarear |
+| --- | --- |
+| ![Friso esperado](in-game-v10.10/friso-esperado.png) | ![Branco esperado](in-game-v10.10/branco-interno-esperado.png) |
+
+As duas continuações seguem a curva das lentes externas e usam a célula branca do friso, com faces únicas em BASE. Os dois pequenos painéis inferiores usam a mesma cor, com superfície plana voltada para trás em TRUNK. O friso original e as bordas vermelhas foram preservados.
+
+![Prévia compilada da v10.10](in-game-v10.10/previa-rear.png)
+
+Instalado para avaliação visual, ainda sem aprovação. Limites, índices, referências de textura, opacidade, rodas e chamadas de peças passaram na validação. Candidato em `local/v10.5/out-lamps-full-trim/`, backup v10.9 em `backup/antes-v10.10/`. Os BIN versionados da release v1.1 correspondem ao candidato v10.10 validado e às prévias acima. A publicação foi autorizada sem aguardar a finalização do friso; os próximos ajustes seguirão v1.2, v1.3 etc.
+
+O protótipo `front_sheet` em `scripts/solid_lamps.py` representa a próxima tentativa de ajuste: ainda não foi recompilado nos BIN da v1.1. Os ZIPs são montados a partir dos BIN versionados, preservando o candidato já validado.

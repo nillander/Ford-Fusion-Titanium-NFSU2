@@ -51,8 +51,8 @@
   ],
   "interior_grid_DULLPLASTIC": [
    507,
-   474,
-   "cluster 0.005 m"
+   411,
+   "cluster 0.016 m"
   ],
   "interior_INTERIOR": [
    11898,
@@ -60,8 +60,8 @@
   ],
   "interior_grid_INTERIOR": [
    2525,
-   1791,
-   "cluster 0.021 m"
+   1593,
+   "cluster 0.030 m"
   ]
  },
  "inner_faces_removed": {
@@ -95,7 +95,25 @@
    "backing_m": 0.003
   }
  },
- "lens_faces_turned": 833,
+ "lens_faces_turned": 848,
+ "tail_white_details": {
+  "left_trunk": {
+   "tris": 32,
+   "role": "lower_inner_white"
+  },
+  "left_body": {
+   "tris": 147,
+   "role": "outer_trim"
+  },
+  "right_trunk": {
+   "tris": 26,
+   "role": "lower_inner_white"
+  },
+  "right_body": {
+   "tris": 158,
+   "role": "outer_trim"
+  }
+ },
  "fog": {
   "lod": "A",
   "destination": "BASE_A",
@@ -123,7 +141,7 @@
    "RIGHT"
   ],
   "head": 1066,
-  "brake": 2157
+  "brake": 2520
  },
  "tail_paint_under_lens_removed": {
   "body": 287,
@@ -217,12 +235,22 @@
   [
    "0x5a00e244",
    "0xfedee40",
+   147
+  ],
+  [
+   "0x5a00e244",
+   "0xfedee40",
    368
   ],
   [
    "0x5a00e244",
    "0xfedee40",
    26
+  ],
+  [
+   "0x5a00e244",
+   "0xfedee40",
+   158
   ],
   [
    "0x5a00e244",
@@ -257,12 +285,12 @@
   [
    "0x2af3d244",
    "0xfedee40",
-   474
+   411
   ],
   [
    "0x2af3d244",
    "0x2787edab",
-   1791
+   1593
   ],
   [
    "0x5a006de9",
@@ -282,8 +310,8 @@
  ],
  "budget": {
   "body": 20582,
-  "trunk": 9457,
-  "base": 21224
+  "trunk": 9515,
+  "base": 21268
  },
  "markers": {
   "LEFT_BRAKELIGHT": [
@@ -339,7 +367,7 @@
   "MUSTANGGT_KITW03_BODY_A": 2016,
   "MUSTANGGT_KITW04_BODY_A": 2016,
   "MUSTANGGT_KIT00_TRUNK_A": 1305,
-  "MUSTANGGT_BASE_A": 1407,
+  "MUSTANGGT_BASE_A": 1450,
   "MUSTANGGT_KIT00_FRONT_WHEEL_A": 44
  },
  "solids": {
@@ -374,15 +402,15 @@
    "groups": 3
   },
   "MUSTANGGT_KIT00_TRUNK_A": {
-   "tris": 9457,
-   "indices": 28371,
-   "verts": 9967,
+   "tris": 9515,
+   "indices": 28545,
+   "verts": 10029,
    "groups": 3
   },
   "MUSTANGGT_BASE_A": {
-   "tris": 21215,
-   "indices": 63645,
-   "verts": 21143,
+   "tris": 21259,
+   "indices": 63777,
+   "verts": 21286,
    "groups": 11
   },
   "MUSTANGGT_KIT00_FRONT_WHEEL_A": {
@@ -537,7 +565,7 @@
   }
  },
  "fixed_normals": {
-  "MUSTANGGT_BASE_A": 16
+  "MUSTANGGT_BASE_A": 18
  },
  "wheel_donor": {
   "slot": "FOCUS",
@@ -555,7 +583,7 @@
  },
  "trunk_lid": 8000,
  "hood": 2623,
- "geometry_bytes": 7261568,
+ "geometry_bytes": 7269504,
  "textures": {
   "MUSTANGGT_MISC": [
    "DXT1",
