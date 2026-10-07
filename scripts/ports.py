@@ -14,7 +14,9 @@ PORTS = {
         'drive': 'AWD',
         'split': 0.5,
         'solid_tail': True,
-        'fog_lod': 'A',
+        # v11.2: fog lamps drawn like the main headlight (LOD B: 410 + 212 triangles, below the 808 of v1.3).
+        'fog_lod': 'B',
+        'fog_glass': True,
         'wheel_donor': 'FOCUS',
         # v10.15 opened with the repaired trim/lenses; keep the lighter approved lid.
         'trunk_paint_target': 6000,

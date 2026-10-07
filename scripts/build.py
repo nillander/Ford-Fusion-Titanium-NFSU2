@@ -401,12 +401,21 @@ if PORT.get('fog_lod'):
                 if not sel.any():
                     continue
                 g = compact(g, sel) | {'tex': g['tex'], 'mat': g['mat']}
+                # v11.2: 'fog_glass' draws the fog lamp like the main headlight (housing with the lamp sheet and
+                # HEADLIGHTREFLECTOR, real lens with HEADLIGHTGLASS) instead of a flat white sheet over it. The
+                # sheet outline is still computed: it removes base-car pieces inside the lamp.
                 if part.endswith('GLASS'):
                     for sign in (1, -1):
                         fg = compact(g, g['pos'][g['tri']].mean(1)[:, 1] * sign > 0)
                         lens = solid_lamps.backing(fg, radial=[1., sign, 0.])
                         fog_outlines.append(lens)
-                        fog_meshes.append(mesh(lens, bh(solid_tex), M['DULLPLASTIC']))
+                        if not PORT.get('fog_glass'):
+                            fog_meshes.append(mesh(lens, bh(solid_tex), M['DULLPLASTIC']))
+                    if PORT.get('fog_glass'):
+                        fog_meshes.append(mesh(face_out(g), bh(lens_tex(g['tex'], 'head')), M['HEADLIGHTGLASS']))
+                elif PORT.get('fog_glass'):
+                    g = drop_inward_twins(g, 'fog_' + side + '_housing')
+                    fog_meshes.append(mesh(g, bh(opaque_tex(g['tex'])), M['HEADLIGHTREFLECTOR']))
                 else:
                     fog_meshes.append(mesh(face_out(g), bh(opaque_tex(g['tex'])), M['DULLPLASTIC']))
     LOG['fog'] = dict(lod=PORT['fog_lod'], destination='BASE_A', tris=ntris(fog_meshes))

@@ -12,8 +12,9 @@ Causa das luzes ausentes: o `CarRenderInfo` do UG2 só vincula as texturas do ca
 - [x] Refletores: manter somente a camada voltada para fora, com uma normal plana por refletor (lição v10.9 do 2018).
 - [x] Conferir no jogo: faróis, faróis de milha, lanternas e refletores do 2012. O usuário aprovou a v11 ("parece bem").
 - [x] Regressão da v11: com o 2012 v11 instalado, visualizar o 2018 fechava o jogo. Ao restaurar o 2012 anterior, o 2018 voltou a abrir (teste A/B do usuário). Hipótese: texturas vinculadas ficam residentes e a memória dos carros já estava no limite, como na v10.14.
-- [ ] v11.1 instalada: lentes em 128 px, BADGING em 256 px, `HEADLIGHT_GLASS` (41 triângulos) de volta a não vinculada e a folha sem uso removida. Texturas vinculadas somam 581.632 B, contra 614.400 B no candidato que funcionava e 843.776 B na v11. Conferir no jogo o 2018 e a aparência do 2012.
-- [ ] Pendente do 2018 (item 4): o farol de milha aparece, mas como uma folha plana. Quando o 2012 for confirmado, aplicar o mesmo alias (`MUSTANGGT_SIDELIGHT`) para usar a estrutura texturizada do farol.
+- [x] v11.1 instalada: lentes em 128 px, BADGING em 256 px, `HEADLIGHT_GLASS` (41 triângulos) de volta a não vinculada e a folha sem uso removida. Texturas vinculadas somam 581.632 B, contra 614.400 B no candidato que funcionava e 843.776 B na v11. Conferir no jogo o 2018 e a aparência do 2012. Usuário: "perfeito".
+- [x] 2018, item 4: o farol de milha aparecia como uma folha plana. A folha branca `backing()` cobria a carcaça. Na v11.2 (`fog_glass`), o farol de milha é desenhado como o farol principal: carcaça com a folha da lâmpada e HEADLIGHTREFLECTOR, lente real com HEADLIGHTGLASS, em LOD B. Ficam 570 triângulos, contra 808 na v1.3; BASE passa de 21.270 para 21.222. Nenhuma textura nova; a folha sem uso `BRAKELIGHT_GLASS` saiu do TPK. Só a BASE mudou. [Prévias](docs/fog-2018-v11.2/).
+- [ ] Conferir no jogo o farol de milha do 2018 e a estabilidade. Backup em `backup/antes-v11.2-fog/`.
 - [ ] `FOCUS_DRIVER` também está fora da lista de nomes; o piloto provavelmente não é desenhado. Avaliar depois.
 
 # 2012 — refletores inferiores opacos (06/10/2026)
