@@ -140,3 +140,18 @@ def transfer_normals(g, src, radius=0.03, k=8, cos_limit=0.5, chunk=256):
         out[v] = n / (np.linalg.norm(n) + 1e-20)
         changed += 1
     return dict(g, nrm=out.astype(g['nrm'].dtype)), changed
+
+
+def orient_to_normals(g):
+    """v12.1: turn faces whose winding disagrees with their own vertex normals (dot < 0). Such faces are
+    culled from outside or, with both faces drawn, are lit from the inside; the export then replaced their
+    vertex normals with the inward face normal, which showed as dark crackle. Returns (mesh, faces turned)."""
+    p, t = g['pos'], g['tri']
+    fn = np.cross(p[t[:, 1]] - p[t[:, 0]], p[t[:, 2]] - p[t[:, 0]])
+    vn = g['nrm'][t].sum(1)
+    bad = (fn * vn).sum(1) < 0
+    if not bad.any():
+        return g, 0
+    t = t.copy()
+    t[bad] = t[bad][:, ::-1]
+    return dict(g, tri=t), int(bad.sum())

@@ -24,6 +24,9 @@ PORTS = {
         'wheel_donor': 'FOCUS',
         # v10.15 opened with the repaired trim/lenses; keep the lighter approved lid.
         'trunk_paint_target': 6000,
+        # v12.1: same smoothing as the 2012 (sides, doors, rear quarter): LOD A normals, faces turned to match
+        'normals_from_A': 'authored',
+        'orient_paint': True,
     },
     '2012': {
         'id': '2012',
@@ -46,7 +49,9 @@ PORTS = {
         'nose_in': 'body',
         'tex_cells': {'KIT00_HEADLIGHT': [((4, 4), (5, 4), 0.65)]},
         'normals_from_A': 'authored',   # v12: smooth paint shading from the LOD A normals
-        'normals_relax': 0,   # tested 3: flatter blocks in the preview, kept off
+        'normals_relax': 0,     # tested 3 on the whole car: flatter blocks in the preview, kept off
+        'orient_paint': True,   # v12.1: paint faces follow the LOD A normals
+        'normals_relax_regions': [dict(xmin=1.2, iters=12), dict(xmax=-1.5, iters=12)],
         # v11: names the game binds (see TEX_ALIAS in build.py). FOCUS_KIT00_HEADLIGHT_GLASS_OFF is the retail
         # Focus headlight lens; SIDELIGHT is drawn by the retail BASE; the other two are unused car slots.
         # v11.1: HEADLIGHT_GLASS (41 small BASE triangles) stays unbound to save memory.

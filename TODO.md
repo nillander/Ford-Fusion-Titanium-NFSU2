@@ -7,8 +7,10 @@ A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTAN
 O usuário relatou craquelado perto dos faróis, na lateral, nas portas e no para-lama traseiro. A pintura passou a receber as normais originais do LOD A, sem mexer na geometria. [Registro](docs/CARROCERIA-2012-v12.md).
 
 - [x] Transferir as normais do LOD A para BODY, TRUNK, capô e bico; instalar com backup.
-- [ ] Conferir no jogo o acabamento da lataria do 2012.
-- [ ] Publicar: push de `main`, tag e release v1.4 e remoção de v1.1–v1.3. A sessão não tem permissão de push; os ZIPs estão em `local/release-v1.4/`.
+- [x] Conferir no jogo o acabamento da lataria do 2012. Aprovado: "superfície bem lisa".
+- [x] Release v1.4: push e tag feitos pelo usuário. A sessão não pode criar nem apagar releases (HTTP 403); comandos `gh` entregues ao usuário.
+- [x] v12.1: frente e traseira do 2012 suavizadas, faces da pintura orientadas pelas normais e mesma técnica aplicada ao 2018 (lateral, portas e para-lama traseiro). Instalado nos dois slots.
+- [ ] Conferir no jogo: frente e traseira do 2012 e lateral do 2018. Se a traseira do 2012 continuar inferior à do 2018, a causa provável é a geometria LOD B (orçamento do TRUNK cheio), não as normais.
 
 # v1.4 — luzes do 2012 e farol de milha do 2018 (07/10/2026)
 

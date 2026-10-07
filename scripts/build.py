@@ -301,6 +301,18 @@ if PORT.get('normals_from_A'):
             _m = dict(_m, nrm=smooth.relax_normals(_m['pos'], _m['tri'], _m['nrm'],
                                                    iters=PORT['normals_relax'], max_deg=30).astype(_m['nrm'].dtype))
         LOG.setdefault('normals_from_A', {})[_nm] = [_n, int(len(_m['pos']))]
+        for _r in PORT.get('normals_relax_regions', ()):
+            # v12.1: front (headlights, nose, hood edge) and rear (lid, bumper) of the 2012 stay crackled even
+            # with the LOD A normals; flatten the shading there, keeping creases sharper than max_deg
+            _rel = smooth.relax_normals(_m['pos'], _m['tri'], _m['nrm'], iters=_r['iters'], max_deg=_r.get('max_deg', 35))
+            _x = _m['pos'][:, 0]
+            _in = (_x >= _r.get('xmin', -9)) & (_x <= _r.get('xmax', 9))
+            _nn = _m['nrm'].copy(); _nn[_in] = _rel[_in]
+            _m = dict(_m, nrm=_nn.astype(_m['nrm'].dtype))
+            LOG.setdefault('normals_relaxed', {}).setdefault(_nm, []).append(int(_in.sum()))
+        if PORT.get('orient_paint'):
+            _m, _f = smooth.orient_to_normals(_m)
+            LOG.setdefault('paint_faces_turned', {})[_nm] = _f
         if _nm == 'body':
             body_paint = _m
         elif _nm == 'trunk':
@@ -490,6 +502,12 @@ if trunk_target:
     target = int(trunk_target)
     assert target > 0, target
     trunk_paint = dec(trunk_paint, target, 'trunk_paint')
+    if PORT.get('normals_from_A'):     # v12.1: the decimation rebuilt the lid normals; take LOD A's again
+        trunk_paint, _n = smooth.transfer_normals(trunk_paint, _srcA)
+        if PORT.get('orient_paint'):
+            trunk_paint, _f = smooth.orient_to_normals(trunk_paint)
+            LOG['paint_faces_turned']['trunk_after_dec'] = _f
+        LOG['normals_from_A']['trunk_after_dec'] = [_n, int(len(trunk_paint['pos']))]
     LOG['trunk_paint_target'] = target
 VP = lambda m: mesh(vinyluv.apply(m, UG2), T_PAINT, M['CARSKIN'])       # paint with vinyl UVs
 body_list = [VP(body_paint)] + head_opaque + head_glass
@@ -739,6 +757,20 @@ def solid(name, meshes, markers=()):
     ok = ln2 > 1e-12
     avg = np.zeros_like(acc); avg[ok] = acc[ok] / ln2[ok, None]
     flip = ok & ((nrm_all * avg).sum(1) < 0.35)
+    if PORT.get('normals_from_A'):
+        # v12.1: paint normals now come from LOD A and the faces were turned to match them; a disagreement
+        # here is a fold of the decimated mesh, where the face average is meaningless (dark crackle)
+        _paint = np.zeros(len(nrm_all), bool)
+        for g in groups:
+            if texs[g['tex_i']] == T_PAINT:
+                _paint[g['tri'].ravel()] = True
+        LOG.setdefault('paint_normals_kept', {})[name] = int((flip & _paint).sum())
+        flip &= ~_paint
+    if os.environ.get('BUILD_DIAG_NORMALS') and flip.any():
+        _gt = np.zeros(len(pos_all), np.int64)
+        for g in groups:
+            _gt[g['tri'].ravel()] = texs[g['tex_i']]
+        np.savez(f'{OUT}/fixed_{name}.npz', pos=pos_all[flip], old=nrm_all[flip], new=avg[flip], tex=_gt[flip])
     if flip.any():
         nrm_all[flip] = avg[flip]
         LOG.setdefault('normals_fixed', {})[name] = int(flip.sum())
