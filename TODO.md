@@ -10,6 +10,7 @@ Uma sessão do Cursor começou o mesmo trabalho em paralelo. A pedido do usuári
 
 - [x] `normals_relax_regions` aceita caixas (x, |y|, z) com transição suave nas bordas (`fade`). Também é aplicada depois da decimação da tampa. Regiões: tampa acima da placa e faixa abaixo dela até o para-choque, nos dois carros; portas e soleiras (z < 0,60) e porta traseira junto ao para-lama, só no 2012. Só as normais mudam: triângulos e texturas iguais, sem custo de memória. [Prévias](docs/carroceria-v12.7/).
 - [x] Conferir no jogo: a qualidade piorou bastante nas traseiras dos dois carros e na lateral do 2012, com aspecto de baixa resolução, e as manchas escuras continuaram. As regiões foram revertidas, e o jogo voltou aos BIN da v1.7. O mecanismo de caixas continua no código, sem uso.
+- [ ] v12.8 (teste, só 2018): tampa decimada para 10.000 faces em vez de 6.000; TRUNK com 11.473 triângulos. Backup em `backup/antes-v12.8/`. Conferir a qualidade da tampa e se o 2018 continua abrindo sem fechar o jogo.
 - [ ] Manchas escuras nas traseiras (também na v1.7). As cores de vértice da pintura são todas brancas: as manchas vêm do reflexo do ambiente nas normais. Relaxar as normais da malha decimada não resolve. Próximo caminho: mais resolução na traseira (tampa do 2018 hoje decimada para 6.000 faces; o TRUNK tem 7.473 de 21.500), com cuidado com a memória (fechamento na v10.14).
 
 # v1.7 — centro branco liso nas lanternas do 2012 (06/10/2026)
