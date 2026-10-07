@@ -27,7 +27,10 @@ PORTS = {
         # v12.1: same smoothing as the 2012 (sides, doors, rear quarter): LOD A normals, faces turned to match
         'normals_from_A': 'authored',
         'orient_paint': True,
-        'normals_relax_regions': [dict(xmin=1.2, iters=16)],   # v12.2: small crackle by the headlights
+        'normals_relax_regions': [dict(xmin=1.2, iters=16),   # v12.2: small crackle by the headlights
+                                  # v12.7: lid above the plate; below the plate and bumper top
+                                  dict(xmax=-1.85, aymax=0.62, zmin=0.62, iters=24, max_deg=30, fade=0.04),
+                                  dict(xmax=-1.95, aymax=0.80, zmin=0.30, zmax=0.60, iters=24, max_deg=30, fade=0.04)],
     },
     '2012': {
         'id': '2012',
@@ -57,7 +60,13 @@ PORTS = {
         'normals_relax': 0,     # tested 3 on the whole car: flatter blocks in the preview, kept off
         'orient_paint': True,   # v12.1: paint faces follow the LOD A normals
         # v12.2: rear relax removed (blocky in the game); the rear now comes from LOD A instead
-        'normals_relax_regions': [dict(xmin=1.2, iters=28, max_deg=45)],
+        'normals_relax_regions': [dict(xmin=1.2, iters=28, max_deg=45),
+                                  # v12.7: lid above the plate; below the plate and bumper top; lower doors
+                                  # and sills; rear door by the quarter
+                                  dict(xmax=-1.85, aymax=0.62, zmin=0.62, iters=24, max_deg=30, fade=0.04),
+                                  dict(xmax=-1.95, aymax=0.80, zmin=0.30, zmax=0.60, iters=24, max_deg=30, fade=0.04),
+                                  dict(xmin=-1.35, xmax=1.25, aymin=0.70, zmax=0.60, iters=24, max_deg=30, fade=0.05),
+                                  dict(xmin=-1.20, xmax=-0.40, aymin=0.70, zmin=0.50, zmax=0.85, iters=24, max_deg=30, fade=0.05)],
         'lens_brake': 'outward',
         'brake_lens_solid': True,      # v12.3: opaque red lens (MISC), no see-through blotches
         'brake_housing_smooth': True,  # v12.3: outward faces and rebuilt normals in the housings

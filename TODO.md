@@ -2,6 +2,15 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.3 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# v12.7 — tampa, para-choque e portas mais planos (07/10/2026)
+
+O usuário marcou áreas ainda craqueladas. No 2012: tampa acima da placa, faixa abaixo da placa, para-choque, parte baixa das portas e soleiras, e a porta traseira junto ao para-lama. No 2018: tampa acima da placa e para-choque.
+
+Uma sessão do Cursor começou o mesmo trabalho em paralelo. A pedido do usuário, as edições dela em `build.py` e `ports.py` foram desfeitas, e as construções dela foram movidas para `local/_to_delete/cursor-v12.7/`.
+
+- [x] `normals_relax_regions` aceita caixas (x, |y|, z) com transição suave nas bordas (`fade`). Também é aplicada depois da decimação da tampa. Regiões: tampa acima da placa e faixa abaixo dela até o para-choque, nos dois carros; portas e soleiras (z < 0,60) e porta traseira junto ao para-lama, só no 2012. Só as normais mudam: triângulos e texturas iguais, sem custo de memória. [Prévias](docs/carroceria-v12.7/).
+- [ ] Conferir no jogo. Na prévia, as áreas ficam mais uniformes, mas aparecem blocos lisos. Se ficarem visíveis no jogo, reduzir `iters`. Backup em `backup/antes-v12.7/`.
+
 # v1.7 — centro branco liso nas lanternas do 2012 (06/10/2026)
 
 - [x] Pacote v1.7 preparado para publish-release.

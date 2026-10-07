@@ -307,6 +307,23 @@ if PORT.get('fill_lid_from_B'):
 else:
     body_paint = merge([bB, rearA])
 hood = outward_only(weld(P[MW + '_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
+def relax_regions(m, label):
+    """v12.1/v12.7: relax the paint normals inside boxes (x, |y|, z bounds), keeping creases sharper than
+    max_deg. With `fade` (m) the relaxed normals blend in from the box edges, so no seam shows."""
+    for r in PORT.get('normals_relax_regions', ()):
+        rel = smooth.relax_normals(m['pos'], m['tri'], m['nrm'], iters=r['iters'], max_deg=r.get('max_deg', 35))
+        p = m['pos']; ay = np.abs(p[:, 1])
+        inside = np.min([p[:, 0] - r.get('xmin', -9), r.get('xmax', 9) - p[:, 0], ay - r.get('aymin', -9),
+                         r.get('aymax', 9) - ay, p[:, 2] - r.get('zmin', -9), r.get('zmax', 9) - p[:, 2]], axis=0)
+        fade = r.get('fade', 0.0)
+        w = (inside >= 0).astype(float) if fade <= 0 else np.clip(inside / fade, 0, 1)
+        n = m['nrm'] * (1 - w[:, None]) + rel * w[:, None]
+        n /= np.linalg.norm(n, axis=1, keepdims=True) + 1e-12
+        m = dict(m, nrm=n.astype(m['nrm'].dtype))
+        LOG.setdefault('normals_relaxed', {}).setdefault(label, []).append(int((w > 0).sum()))
+    return m
+
+
 if PORT.get('normals_from_A'):
     # v12 (2012): the decimated LOD B paint showed a crackled, blotchy finish on the doors, rear quarter and
     # around the headlights (2,352 normals were replaced by hard face normals at export). Use the authored
@@ -324,15 +341,7 @@ if PORT.get('normals_from_A'):
             _m = dict(_m, nrm=smooth.relax_normals(_m['pos'], _m['tri'], _m['nrm'],
                                                    iters=PORT['normals_relax'], max_deg=30).astype(_m['nrm'].dtype))
         LOG.setdefault('normals_from_A', {})[_nm] = [_n, int(len(_m['pos']))]
-        for _r in PORT.get('normals_relax_regions', ()):
-            # v12.1: front (headlights, nose, hood edge) and rear (lid, bumper) of the 2012 stay crackled even
-            # with the LOD A normals; flatten the shading there, keeping creases sharper than max_deg
-            _rel = smooth.relax_normals(_m['pos'], _m['tri'], _m['nrm'], iters=_r['iters'], max_deg=_r.get('max_deg', 35))
-            _x = _m['pos'][:, 0]
-            _in = (_x >= _r.get('xmin', -9)) & (_x <= _r.get('xmax', 9))
-            _nn = _m['nrm'].copy(); _nn[_in] = _rel[_in]
-            _m = dict(_m, nrm=_nn.astype(_m['nrm'].dtype))
-            LOG.setdefault('normals_relaxed', {}).setdefault(_nm, []).append(int(_in.sum()))
+        _m = relax_regions(_m, _nm)
         if PORT.get('orient_paint'):
             _m, _f = smooth.orient_to_normals(_m)
             LOG.setdefault('paint_faces_turned', {})[_nm] = _f
@@ -589,6 +598,7 @@ if trunk_target:
     trunk_paint = dec(trunk_paint, target, 'trunk_paint')
     if PORT.get('normals_from_A'):     # v12.1: the decimation rebuilt the lid normals; take LOD A's again
         trunk_paint, _n = smooth.transfer_normals(trunk_paint, _srcA)
+        trunk_paint = relax_regions(trunk_paint, 'trunk_after_dec')
         if PORT.get('orient_paint'):
             trunk_paint, _f = smooth.orient_to_normals(trunk_paint)
             LOG['paint_faces_turned']['trunk_after_dec'] = _f
