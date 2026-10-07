@@ -23,7 +23,7 @@ PORTS = {
         'tex_size': {'HEADLIGHT_GLASS': 128, 'BADGING': 256},
         'wheel_donor': 'FOCUS',
         # v10.15 opened with the repaired trim/lenses; keep the lighter approved lid.
-        'trunk_paint_target': 10000,   # v12.8: 6000 looked low-res on the lid; textures are 213 KB lighter than at the v10.14 crash
+        'trunk_paint_target': 6000,   # v12.8 tried 10000: the game closed on viewing the 2018 (07/10). Keep 6000.
         # v12.1: same smoothing as the 2012 (sides, doors, rear quarter): LOD A normals, faces turned to match
         'normals_from_A': 'authored',
         'orient_paint': True,
