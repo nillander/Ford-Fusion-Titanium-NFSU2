@@ -8,7 +8,9 @@ O usuário relatou que, mesmo na v1.5, as lanternas do 2012 tinham manchas escur
 
 - [x] Lente opaca em MISC/DULLPLASTIC, com cor tirada do texel do MW em cada face: 1.161 faces vermelhas e 310 brancas. As normais foram refeitas a partir das faces externas. A textura `FOCUS_CENTRE_BRAKELIGHT` saiu do pacote.
 - [x] Carcaça com faces voltadas para fora e normais refeitas. Normais corrigidas na exportação no TRUNK: de 309 para 11.
-- [ ] Conferir no jogo. Backup em `backup/antes-v12.3/`. [Prévias](docs/lanternas-2012-v12.3/).
+- [x] Prévia v12.3 com fundo amarelo, enviada pelo usuário: havia frestas entre o vermelho e o branco, entre o vermelho e a carroceria e uma estrela no branco.
+- [x] v12.4: duas folhas atrás de cada lanterna, seguindo o contorno da lente: branca atrás do centro (3 mm) e vermelha atrás da lanterna inteira (8 mm). As frestas ficam preenchidas, e nada aparece fora das lanternas. Tentativas descartadas: folha branca ampliada (cobria a borda vermelha) e reclassificar faces vermelhas dentro do centro (gerava dentes brancos). Fica um pequeno filete vermelho na base do branco, que vem da geometria da carcaça. TRUNK: 20.241 triângulos.
+- [ ] Conferir no jogo. Backup em `backup/antes-v12.4/`.
 
 # v1.5 — carrocerias lisas nos dois carros (06/10/2026)
 

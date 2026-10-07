@@ -423,6 +423,17 @@ for side in lamp_sides:
                             _p = compact(lg, _sel)
                             _p = solid_lamps.colour(_p, solid_lamps.RED_UV if _k == 'red' else solid_lamps.WHITE_UV)
                             brake_opaque.append(mesh(_p, bh(UG2 + '_MISC'), M['DULLPLASTIC']))
+                    # v12.4: the lens ring, the white centre and the body leave thin see-through gaps; close them
+                    # with sheets behind each lamp: white behind the centre (3 mm), red behind the whole lamp (8 mm)
+                    for _sgn in (1, -1):
+                        _c = lg['pos'][lg['tri']].mean(1)
+                        for _k, _uvc, _dep, _gr in (('white', solid_lamps.WHITE_UV, .003, 1.0), ('red', solid_lamps.RED_UV, .008, 1.0)):
+                            _sel = (_c[:, 1] * _sgn > 0) & (_parts['white'] if _k == 'white' else ~_clear)
+                            if _sel.sum() < 3:
+                                continue
+                            _bk = solid_lamps.backing(compact(lg, _sel), radial=[-1., _sgn, 0.], depth=_dep, grow=_gr)
+                            brake_opaque.append(mesh(solid_lamps.colour(_bk, _uvc), bh(UG2 + '_MISC'), M['DULLPLASTIC']))
+                            LOG.setdefault('brake_lens_backing', []).append([name, _sgn, _k, len(_bk['tri'])])
                     LOG.setdefault('brake_lens_solid', {})[name] = dict(red=int(_parts['red'].sum()),
                         white=int(_parts['white'].sum()), dropped_clear=int(_clear.sum()))
                     continue

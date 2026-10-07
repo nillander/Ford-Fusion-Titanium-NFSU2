@@ -147,7 +147,7 @@ def hull_indices(q):
     return np.array(half(order)[:-1] + half(order[::-1])[:-1])
 
 
-def backing(ring, radial=None):
+def backing(ring, radial=None, depth=0.003, grow=1.0):
     p = ring['pos']
     centre = p.mean(0)
     _, _, axes = np.linalg.svd(p - centre, full_matrices=False)
@@ -158,7 +158,8 @@ def backing(ring, radial=None):
     radial = np.array([-1., np.sign(centre[1]), 0.]) if radial is None else np.asarray(radial)
     if outward @ radial < 0:
         outward *= -1
-    pos = np.vstack([boundary.mean(0), boundary]) - outward * 0.003
+    boundary = boundary.mean(0) + (boundary - boundary.mean(0)) * grow
+    pos = np.vstack([boundary.mean(0), boundary]) - outward * depth
     n = len(boundary)
     tri = np.array([(0, i + 1, (i + 1) % n + 1) for i in range(n)])
     face = np.cross(pos[tri[:, 1]] - pos[tri[:, 0]], pos[tri[:, 2]] - pos[tri[:, 0]])
