@@ -118,7 +118,67 @@
   "roof_front_A": 499,
   "body_B_A": 15200
  },
- "lens_faces_turned": 37,
+ "lens_faces_turned": 1273,
+ "brake_lens_gap_fill": [
+  [
+   "KIT00_RIGHT_BRAKELIGHT_GLASS_D",
+   -1,
+   238
+  ],
+  [
+   "KIT00_RIGHT_BRAKELIGHT_GLASS_D",
+   -1,
+   66
+  ],
+  [
+   "KIT00_LEFT_BRAKELIGHT_GLASS_D",
+   1,
+   226
+  ],
+  [
+   "KIT00_LEFT_BRAKELIGHT_GLASS_D",
+   1,
+   84
+  ]
+ ],
+ "brake_lens_backing": [
+  [
+   "KIT00_RIGHT_BRAKELIGHT_GLASS_D",
+   -1,
+   "white",
+   25
+  ],
+  [
+   "KIT00_RIGHT_BRAKELIGHT_GLASS_D",
+   -1,
+   "red",
+   32
+  ],
+  [
+   "KIT00_LEFT_BRAKELIGHT_GLASS_D",
+   1,
+   "white",
+   24
+  ],
+  [
+   "KIT00_LEFT_BRAKELIGHT_GLASS_D",
+   1,
+   "red",
+   38
+  ]
+ ],
+ "brake_lens_solid": {
+  "KIT00_RIGHT_BRAKELIGHT_GLASS_D": {
+   "red": 575,
+   "white": 148,
+   "dropped_clear": 0
+  },
+  "KIT00_LEFT_BRAKELIGHT_GLASS_D": {
+   "red": 586,
+   "white": 162,
+   "dropped_clear": 0
+  }
+ },
  "opaque_reflectors": {
   "KIT00_RIGHT_BRAKELIGHT_GLASS_D": {
    "tris": 10,
@@ -148,7 +208,7 @@
    "LEFT"
   ],
   "head": 4567,
-  "brake": 5322
+  "brake": 6055
  },
  "trunk_paint_target": 14800,
  "emblem_removed": 46,
@@ -251,7 +311,7 @@
  ],
  "budget": {
   "body": 20957,
-  "trunk": 20122,
+  "trunk": 20855,
   "base": 21299
  },
  "markers": {
@@ -341,7 +401,7 @@
   "FOCUS_KITW02_BODY_A": 221,
   "FOCUS_KITW03_BODY_A": 221,
   "FOCUS_KITW04_BODY_A": 221,
-  "FOCUS_KIT00_TRUNK_A": 384,
+  "FOCUS_KIT00_TRUNK_A": 1256,
   "FOCUS_BASE_A": 1276,
   "FOCUS_KIT00_FRONT_WHEEL_A": 40,
   "FOCUS_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": 1,
@@ -382,10 +442,10 @@
    "groups": 3
   },
   "FOCUS_KIT00_TRUNK_A": {
-   "tris": 20122,
-   "indices": 60366,
-   "verts": 19538,
-   "groups": 4
+   "tris": 20855,
+   "indices": 62565,
+   "verts": 21543,
+   "groups": 3
   },
   "FOCUS_BASE_A": {
    "tris": 21299,
@@ -545,7 +605,6 @@
   }
  },
  "fixed_normals": {
-  "FOCUS_KIT00_TRUNK_A": 6,
   "FOCUS_BASE_A": 21
  },
  "decals": {
@@ -560,7 +619,7 @@
  },
  "trunk_lid": 14800,
  "hood": 2638,
- "geometry_bytes": 7575040,
+ "geometry_bytes": 7651584,
  "tex_cells": [
   [
    "FOCUS_KIT00_HEADLIGHT",
@@ -615,10 +674,6 @@
    "DXT3",
    128
   ],
-  "FOCUS_CENTRE_BRAKELIGHT": [
-   "DXT3",
-   128
-  ],
   "FOCUS_HEADLIGHT_GLASS": [
    "DXT3",
    256
@@ -636,5 +691,5 @@
    128
   ]
  },
- "textures_bytes": 692608
+ "textures_bytes": 675968
 }

@@ -2,6 +2,11 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.3 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# v1.6 — lanternas do 2012 sem manchas, frestas nem entalhe (06/10/2026)
+
+- [x] Pacote v1.6 preparado para publish-release.
+- [ ] Lanterna direita do 2012: depressão no centro branco, a planificar.
+
 # 2012 — manchas nas lanternas (v12.3, 06/10/2026)
 
 O usuário relatou que, mesmo na v1.5, as lanternas do 2012 tinham manchas escuras no vermelho e no branco. A lente DXT3 translúcida (alfa de 221 a 255) deixava a carcaça aparecer por baixo. Na carcaça, cerca de 300 normais eram trocadas na exportação pela média das faces.
@@ -12,7 +17,7 @@ O usuário relatou que, mesmo na v1.5, as lanternas do 2012 tinham manchas escur
 - [x] v12.4: duas folhas atrás de cada lanterna, seguindo o contorno da lente: branca atrás do centro (3 mm) e vermelha atrás da lanterna inteira (8 mm). As frestas ficam preenchidas, e nada aparece fora das lanternas. Tentativas descartadas: folha branca ampliada (cobria a borda vermelha) e reclassificar faces vermelhas dentro do centro (gerava dentes brancos). Fica um pequeno filete vermelho na base do branco, que vem da geometria da carcaça. TRUNK: 20.241 triângulos.
 - [x] v12.4 no jogo: entalhe vermelho no branco de uma lanterna.
 - [x] v12.5: o entalhe é uma rachadura em estrela na própria lente do MW, sob o centro branco, mais uma faixa fina entre o branco e o aro ([mapa da lente](docs/lanternas-2012-v12.3/mapa-lente-mw.png)). As rachaduras, vistas por trás do carro, são fechadas com quadrados de 1 mm logo atrás da lente: brancos perto do centro e vermelhos no aro. TRUNK: 20.855 triângulos. Descartados: reclassificar faces, remover peças da carcaça e ampliar a folha branca.
-- [ ] Conferir no jogo. Backup em `backup/antes-v12.5/`.
+- [x] Conferir no jogo. Aprovado; entra na v1.6. Backup em `backup/antes-v12.5/`.
 
 # v1.5 — carrocerias lisas nos dois carros (06/10/2026)
 
