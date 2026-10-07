@@ -10,6 +10,7 @@ import clip
 RED_UV = np.array([13.5 / 16, 14.5 / 16])
 WHITE_UV = np.array([14.5 / 16, 14.5 / 16])
 GRAY_UV = np.array([12.5 / 16, 14.5 / 16])
+REAR_WHITE_NORMAL = np.array([-1., 0., 0.])
 
 
 def trunk_trim_mask(g):
@@ -51,53 +52,32 @@ def gray_stripe(g, zmin=.685, zmax=.725, xmax=-1.78, ymax=.86, offset=.003):
     return band
 
 
-def front_sheet(surfaces, ymin, ymax, zmin, zmax, steps=20):
-    """Ruled white sheet ahead of the sampled lens/trim envelope, with one exterior face."""
-    triangles = np.concatenate([g['pos'][g['tri']] for g in surfaces if len(g['tri'])])
-    a, b, c = triangles[:, 0], triangles[:, 1], triangles[:, 2]
-    ab, ac = b[:, 1:] - a[:, 1:], c[:, 1:] - a[:, 1:]
-    det = ab[:, 0] * ac[:, 1] - ab[:, 1] * ac[:, 0]
-    valid = abs(det) > 1e-12
-    safe = np.where(valid, det, 1.)
-    positions = []
-    for y in np.linspace(ymin, ymax, steps + 1):
-        samples = []
-        for z in np.linspace(zmin, zmax, 7):
-            q = np.array([y, z]) - a[:, 1:]
-            u = (q[:, 0] * ac[:, 1] - q[:, 1] * ac[:, 0]) / safe
-            v = (ab[:, 0] * q[:, 1] - ab[:, 1] * q[:, 0]) / safe
-            hit = valid & (u >= -1e-5) & (v >= -1e-5) & (u + v <= 1.00001)
-            if hit.any():
-                samples.extend((a[:, 0] + u * (b[:, 0] - a[:, 0]) + v * (c[:, 0] - a[:, 0]))[hit])
-        if not samples:
-            points = triangles.reshape(-1, 3)
-            j = ((points[:, 1] - y) ** 2 + (points[:, 2] - (zmin + zmax) / 2) ** 2).argmin()
-            samples = [points[j, 0]]
-        # Constant depth through the short vertical section avoids a dark downward lip.
-        x = min(samples) - .004
-        positions.extend(((x, y, zmin), (x, y, zmax)))
-    pos = np.asarray(positions)
-    tri = np.array([(2*i, 2*i+1, 2*i+2) for i in range(steps)] +
-                   [(2*i+1, 2*i+3, 2*i+2) for i in range(steps)])
-    fn = np.cross(pos[tri[:, 1]] - pos[tri[:, 0]], pos[tri[:, 2]] - pos[tri[:, 0]])
-    n = np.zeros_like(pos)
-    for k in range(3):
-        np.add.at(n, tri[:, k], fn)
-    n /= np.maximum(np.linalg.norm(n, axis=1, keepdims=True), 1e-12)
-    return dict(pos=pos, nrm=n, tri=tri, uv=np.tile(GRAY_UV, (len(pos), 1)),
-                col=np.full(len(pos), 0xFFFFFFFF, np.uint32))
-
-
 def outer_trim(red, white, sign, seam=.585):
-    """A visible, full-height continuation in front of the curved outer lens."""
-    ymin, ymax = (seam, .8) if sign > 0 else (-.8, -seam)
-    return front_sheet([red, white], ymin, ymax, .697, .731)
+    """Front-facing continuation; stop before the lens wraps onto the body side."""
+    bands = []
+    for g in (red, white):
+        band, _ = clip.split_box(g, dict(xmax=-1.97, ymin=-.775, ymax=.775,
+                                        zmin=.702, zmax=.728))
+        band = dict(band, pos=band['pos'] + np.array([-.003, 0., 0.]))
+        bands.append(band)
+    band = clip._cat(bands, white)
+    return clip.clip_plane(band, [0, sign, 0], seam)
 
 
 def lower_inner_white(red, white, trim):
-    """White lower insert ahead of both the lens backing and the original trim lip."""
-    ymin, ymax = (.365, .584) if white['pos'][:, 1].mean() > 0 else (-.584, -.365)
-    return front_sheet([red, white] + trim, ymin, ymax, .662, .704)
+    """Restore the lower insert's previous outline without extending its ends."""
+    patch, _ = clip.split_box(white, dict(zmin=.663, zmax=.688))
+    if not len(patch['tri']):
+        return patch
+    n = white['nrm'][0].copy()
+    n /= np.linalg.norm(n)
+    d = (patch['pos'] @ n).max() + .002
+    p = patch['pos'].copy()
+    p[:, 0] = (d - p[:, 1] * n[1] - p[:, 2] * n[2]) / n[0]
+    patch = colour(patch, WHITE_UV)
+    patch['pos'] = p
+    patch['nrm'] = np.tile(n, (len(p), 1))
+    return patch
 
 
 def subset(g, selected):
@@ -108,6 +88,13 @@ def colour(g, uv):
     g = dict(g)
     g['uv'] = np.tile(uv, (len(g['pos']), 1))
     g['col'] = np.full(len(g['pos']), 0xFFFFFFFF, np.uint32)
+    return g
+
+
+def uniform_rear_white(g, uv=GRAY_UV):
+    """Uniform shading within each finish: trim white or separate lens white."""
+    g = colour(g, uv)
+    g['nrm'] = np.tile(REAR_WHITE_NORMAL, (len(g['pos']), 1))
     return g
 
 

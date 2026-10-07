@@ -1,6 +1,53 @@
 # TODO — Fusion no NFSU2
 
-A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.1 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
+A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.2 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
+
+# v1.2 — v10.15 aprovada e consolidada (06/10/2026)
+
+Usuário confirmou funcionamento e resultado “quase perfeito”, autorizando commit, tag e release. Consolidados BIN instalados, log, padrão de pintura da tampa em 6.000 faces e novas prévias. Friso com acabamento uniforme próprio; branco inferior das lentes uniforme e distinto. Pacote 2012 preservado. [Registro](docs/FRISO-v10.15.md).
+
+- [x] Confirmar estabilidade e aparência no jogo.
+- [x] Consolidar código e BIN da versão aprovada.
+
+# v10.15 — variante de diagnóstico para carregamento (06/10/2026)
+
+Usuário confirmou que v10.13 restaurada abriu normalmente. Dump v10.14 mostra o mesmo retorno 0x63A265 da falha anterior tampa + roda; causa não confirmada. Preparada e instalada, com jogo fechado, variante de pintura da tampa em 6.000 faces. Lanternas/friso e seus dois acabamentos v10.14 permanecem idênticos; validação passou. Backup funcional em `backup/antes-v10.15/`. [Registro](docs/FRISO-v10.15.md).
+
+- [x] Confirmar estabilidade e aparência da tampa no jogo.
+
+# Regressão v10.14 — restaurada v10.13 (06/10/2026)
+
+Usuário informou fechamento ao visualizar o Fusion 2018. Evento Windows às 21:03:09: SPEED2.EXE, exceção 0x80000003, deslocamento 0x0003BD50. O endereço contém INT3; sem pilha/dump, não identifica a condição interna que falhou. MainLog.txt está antigo (25/09), sem registro desta falha. Comparação v10.13/v10.14 encontrou apenas UVs alterados em 166 vértices; posições, índices, normais, cores, grupos, materiais e TEXTURES.BIN iguais. Não atribuir causa ao branco da lente sem evidência.
+
+Restaurados os arquivos v10.13 diretamente do backup, com hashes verificados e validação estrutural aprovada. Arquivos que falharam preservados em `backup/falha-v10.14/CARS/MUSTANGGT/`. Código v10.14 permanece experimental e não deve ser publicado nem instalado novamente sem diagnóstico. A distinção de acabamentos está pendente; aguarda teste do usuário com a versão restaurada.
+
+# v10.14 — dois acabamentos uniformes separados (06/10/2026)
+
+Usuário esclareceu: uniformidade dentro de cada área, não a mesma cor para as duas. Mantida a geometria v10.13. Friso completo usa a célula branca opaca RGB 255/255/255; fundo branco das quatro lentes e inserções inferiores usam a célula branca de lente RGB 238/240/242. Cada acabamento mantém UVs e normais uniformes. O remapeamento de UV agora preserva as células explícitas do atlas, em vez de transformar qualquer U > 0,75 em branco do friso. [Registro](docs/FRISO-v10.14.md).
+
+- [ ] Conferir no jogo a distinção entre friso e branco das lentes.
+
+# v10.13 — contorno mais curto e branco uniforme (06/10/2026)
+
+v10.12 ainda ultrapassava a área frontal da lente externa. Referência nova marca o friso em rosa e o branco inferior em amarelo: são a mesma cor, não as cores da marcação. Faixa externa limitada a |Y| ≤ 0,775 e X ≤ −1,970, antes do deslocamento de 3 mm para trás; recorte vertical Z 0,702–0,728. Friso original da tampa preservado. Todas as superfícies brancas traseiras usam célula RGB 255/255/255, alfa 255, MISC/DULLPLASTIC e normal (−1,0,0).
+
+A correção genérica de normais do exportador alterava algumas dessas normais intencionais; agora preserva apenas as superfícies brancas traseiras identificadas pela célula UV e material. [Registro e prévias](docs/FRISO-v10.13.md).
+
+- [ ] Confirmar no jogo o limite lateral do friso e a uniformidade do branco.
+
+# v10.12 — reversão dos excessos do friso (06/10/2026)
+
+O teste v10.11 mostrou pontas e bordas inferiores além do contorno esperado. Removida a superfície ampliada `front_sheet` e restaurados os recortes v10.10 sobre as lentes existentes. Mantida a textura branca opaca; clareza no jogo depende também do material, das normais e da iluminação. Não ampliar a geometria para tentar compensar escurecimento. [Referências e registro](docs/FRISO-v10.12.md).
+
+- [ ] Usuário conferir o tamanho restaurado no jogo.
+
+# v10.11 — friso mais visível e branco inferior (06/10/2026)
+
+Usuário informou que v10.10 não mudou o suficiente. Substituídas as faixas anteriores por superfícies regradas à frente da profundidade amostrada das lentes. Faixa externa ampliada de 19 para 34 mm (Z 0,697–0,731), em BASE. Painéis inferiores Z 0,662–0,704, em TRUNK: agora a amostragem inclui o friso original, para não ficarem escondidos atrás de sua borda. Cada coluna mantém profundidade constante no pequeno trecho vertical para evitar um lábio escuro voltado para baixo.
+
+Instalado para teste; validação passou. Conjunto 63.066 vértices / 60.003 triângulos. GEOMETRY `DF7DC386D9A1B766A02AD8996C9EE2D61B6CE8B07F2D385EA633EAC9053E2A02`; TEXTURES inalterado `92B437E1BE6B57CD9FEBDD4425920BBC70F9649D9D04576BBFAF20C2B896C50B`. Backup `backup/antes-v10.11/`; candidato `local/v10.5/out-lamps-visible-trim/`. [Detalhes e prévia](docs/FRISO-v10.11.md). Release existente preservada; teste visual reprovado pelos excessos e revertido na v10.12.
+
+- [ ] Usuário conferir faixa externa e branco inferior mais visíveis.
 
 # v10.10 — friso externo e branco abaixo do friso (06/10/2026)
 

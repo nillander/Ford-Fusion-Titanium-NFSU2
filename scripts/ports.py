@@ -16,8 +16,8 @@ PORTS = {
         'solid_tail': True,
         'fog_lod': 'A',
         'wheel_donor': 'FOCUS',
-        # Test E opened with both trunk and wheel enabled; larger A lids crashed.
-        'trunk_paint_target': 8000,
+        # v10.15 opened with the repaired trim/lenses; keep the lighter approved lid.
+        'trunk_paint_target': 6000,
     },
     '2012': {
         'id': '2012',

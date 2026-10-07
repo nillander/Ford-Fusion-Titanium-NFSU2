@@ -1,4 +1,32 @@
-# Teste atual — v10.10 friso externo e branco interno inferior (06/10/2026)
+# Estado atual — v1.2 aprovada
+
+Usuário confirmou que v10.15 funciona e está quase perfeita, autorizando commit, nova tag e release. Consolidados BIN do 2018 aprovado, log, prévias e padrão de pintura da tampa em 6.000 faces. Pacote 2012 preservado. [Registro](FRISO-v10.15.md).
+
+# Histórico — v10.15 variante de carregamento
+
+Usuário confirmou funcionamento após restaurar v10.13. Instalada variante v10.15 com pintura da tampa reduzida de 8.000 para 6.000 faces e acabamentos separados v10.14. Lanternas/friso intactos, validação passou. Falha anterior ocorre na rotina de carregamento; pressão de orçamento é hipótese. Backup funcional v10.13 preservado. [Registro](FRISO-v10.15.md). Aguardando teste no jogo.
+
+# Histórico — v10.13 restaurada após fechamento v10.14
+
+Usuário informou crash ao visualizar o Fusion 2018 na v10.14. Restaurados BIN v10.13 do backup, hashes conferidos e validação passou. Evento 0x80000003 em SPEED2.EXE+0x3BD50; causa não determinada. Separação de acabamentos v10.14 é experimental, não publicar nem reinstalar. [Registro](FRISO-v10.14.md).
+
+# Histórico — v10.14 dois acabamentos separados (06/10/2026)
+
+A referência rosa/amarela exige uniformidade em cada área, não cor compartilhada. Friso mantém branco opaco; lente inferior retoma seu branco próprio RGB 238/240/242. Geometria v10.13 mantida; normais uniformes para ambos, com UVs separados e preservados no remapeamento. [Registro](FRISO-v10.14.md).
+
+# Histórico — v10.13 contorno mais curto e branco uniforme (06/10/2026)
+
+Nova referência mostra o friso em rosa e a parte inferior em amarelo, ambos destinados ao mesmo branco. Encurtada a faixa externa antes da lateral; unificados UV, material e normais do friso/fundos/inserções brancos. Exportador preserva as normais intencionais destas superfícies. [Registro e prévias](FRISO-v10.13.md). A aparência no jogo ainda depende do teste do usuário.
+
+# Histórico — v10.12 tamanho restaurado (06/10/2026)
+
+Usuário marcou excessos no friso v10.11 e pediu reversão do tamanho. Removida `front_sheet`, restaurados os recortes v10.10. Atlas permanece branco opaco; brilho/material ainda exige avaliação no jogo. [Registro](FRISO-v10.12.md).
+
+# Histórico — v10.11 friso mais visível (06/10/2026)
+
+Usuário não percebeu mudança suficiente na v10.10. Instaladas superfícies regradas brancas à frente da lente/friso, com faixa externa mais espessa. Validação passou; visual pendente. Backup `backup/antes-v10.11/`; candidato `local/v10.5/out-lamps-visible-trim/`. [Registro e prévia](FRISO-v10.11.md). Release existente preservada.
+
+# Histórico — v10.10 friso externo e branco interno inferior (06/10/2026)
 
 v10.9 foi aprovada, mas o usuário pediu extensão do friso nas lentes da carroceria e clareamento da área abaixo dele nas lentes da tampa. Instalado v10.10: duas extensões curvas em BASE, dois painéis brancos inferiores em TRUNK; material/textura da v10.9 e faces exteriores únicas. Validação passou. Visual pendente; backup em `backup/antes-v10.10/`. Candidato `local/v10.5/out-lamps-full-trim/`; BIN versionados atualizados para a release pública v1.1, com teste visual deste ajuste pendente. [TODO](../TODO.md), [prévia](in-game-v10.10/previa-rear.png).
 

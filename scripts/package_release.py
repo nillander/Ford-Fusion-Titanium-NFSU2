@@ -16,7 +16,7 @@ vehicles = [('2018', 'AWD', 'MUSTANGGT', 'Ford Mustang GT'),
 assets = []
 content_hashes = []
 for year, drive, slot, replaces in vehicles:
-    status = ('Base v10.9 aprovada no jogo; extensão do friso e branco inferior da v10.10 aguardam confirmação visual.'
+    status = ('2018 v10.15 aprovado no jogo: friso com pontas limitadas, acabamentos separados e pintura da tampa em 6.000 faces.'
               if year == '2018' else 'Port de desenvolvimento: a exibição das luzes no jogo continua pendente de correção/validação.')
     readme = f'''Ford Fusion Titanium {year} {drive} — NFS Underground 2 — {version}
 
