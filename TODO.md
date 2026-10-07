@@ -10,7 +10,9 @@ O usuário relatou que, mesmo na v1.5, as lanternas do 2012 tinham manchas escur
 - [x] Carcaça com faces voltadas para fora e normais refeitas. Normais corrigidas na exportação no TRUNK: de 309 para 11.
 - [x] Prévia v12.3 com fundo amarelo, enviada pelo usuário: havia frestas entre o vermelho e o branco, entre o vermelho e a carroceria e uma estrela no branco.
 - [x] v12.4: duas folhas atrás de cada lanterna, seguindo o contorno da lente: branca atrás do centro (3 mm) e vermelha atrás da lanterna inteira (8 mm). As frestas ficam preenchidas, e nada aparece fora das lanternas. Tentativas descartadas: folha branca ampliada (cobria a borda vermelha) e reclassificar faces vermelhas dentro do centro (gerava dentes brancos). Fica um pequeno filete vermelho na base do branco, que vem da geometria da carcaça. TRUNK: 20.241 triângulos.
-- [ ] Conferir no jogo. Backup em `backup/antes-v12.4/`.
+- [x] v12.4 no jogo: entalhe vermelho no branco de uma lanterna.
+- [x] v12.5: o entalhe é uma rachadura em estrela na própria lente do MW, sob o centro branco, mais uma faixa fina entre o branco e o aro ([mapa da lente](docs/lanternas-2012-v12.3/mapa-lente-mw.png)). As rachaduras, vistas por trás do carro, são fechadas com quadrados de 1 mm logo atrás da lente: brancos perto do centro e vermelhos no aro. TRUNK: 20.855 triângulos. Descartados: reclassificar faces, remover peças da carcaça e ampliar a folha branca.
+- [ ] Conferir no jogo. Backup em `backup/antes-v12.5/`.
 
 # v1.5 — carrocerias lisas nos dois carros (06/10/2026)
 

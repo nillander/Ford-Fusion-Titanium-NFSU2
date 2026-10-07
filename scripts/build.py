@@ -370,6 +370,7 @@ def face_out(g):
     return merge([keep, flip])
 
 head_opaque, head_glass, brake_opaque, brake_glass = [], [], [], []
+LENS_SOLID = []
 fog_meshes = []
 tail_outlines, fog_outlines = [], []
 lamp_sides = [sd for sd in ('RIGHT', 'LEFT') if '%s_KIT00_%s_HEADLIGHT_%s' % (MW, sd, LOD['head']) in P]
@@ -411,6 +412,7 @@ for side in lamp_sides:
                     lg = dict(lg, nrm=smooth.smooth_normals(lg['pos'], lg['tri'], lg['nrm'], crease_deg=40))
                     # the lens is red only where its MW texel is red: the clear centre over the white housing
                     # becomes the lens-white cell, fully transparent texels are dropped
+                    LENS_SOLID.append(lg)
                     _img = np.array(Image.open(f'texdump/mw_{sheet(lamp_sheet(g["tex"]))}.png').convert('RGBA')).astype(int)
                     _uv = lg['uv'][lg['tri']].mean(1) % 1.0
                     _px = _img[(_uv[:, 1] * _img.shape[0]).astype(int).clip(0, _img.shape[0] - 1),
@@ -418,6 +420,18 @@ for side in lamp_sides:
                     _red = _px[:, 0] > _px[:, 1:3].max(1) + 40
                     _clear = _px[:, 3] < 60
                     _parts = {'red': _red & ~_clear, 'white': ~_red & ~_clear}
+                    # v12.5: cracks of the MW lens (the star under the white centre, the thin band around it) are
+                    # see-through; close each with quads just behind it, white or red after the nearest face
+                    for _sgn in (1, -1):
+                        _ss = (lg['pos'][lg['tri']].mean(1)[:, 1] * _sgn) > 0
+                        if _ss.sum() < 3:
+                            continue
+                        for _fill, _uvc in zip(solid_lamps.fill_gaps(compact(lg, _ss), _parts['white'][_ss], cell=.001),
+                                               (solid_lamps.WHITE_UV, solid_lamps.RED_UV)):
+                            if _fill is not None:
+                                _fill = face_out(_fill)
+                                brake_opaque.append(mesh(solid_lamps.colour(_fill, _uvc), bh(UG2 + '_MISC'), M['DULLPLASTIC']))
+                                LOG.setdefault('brake_lens_gap_fill', []).append([name, _sgn, len(_fill['tri'])])
                     for _k, _sel in _parts.items():
                         if _sel.any():
                             _p = compact(lg, _sel)
@@ -431,7 +445,7 @@ for side in lamp_sides:
                             _sel = (_c[:, 1] * _sgn > 0) & (_parts['white'] if _k == 'white' else ~_clear)
                             if _sel.sum() < 3:
                                 continue
-                            _bk = solid_lamps.backing(compact(lg, _sel), radial=[-1., _sgn, 0.], depth=_dep, grow=_gr)
+                            _bk = solid_lamps.backing(compact(lg, _sel), radial=[-1., _sgn, 0.], depth=_dep, grow_down=_gr)
                             brake_opaque.append(mesh(solid_lamps.colour(_bk, _uvc), bh(UG2 + '_MISC'), M['DULLPLASTIC']))
                             LOG.setdefault('brake_lens_backing', []).append([name, _sgn, _k, len(_bk['tri'])])
                     LOG.setdefault('brake_lens_solid', {})[name] = dict(red=int(_parts['red'].sum()),

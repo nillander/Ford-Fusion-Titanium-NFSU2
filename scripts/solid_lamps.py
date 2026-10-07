@@ -147,7 +147,7 @@ def hull_indices(q):
     return np.array(half(order)[:-1] + half(order[::-1])[:-1])
 
 
-def backing(ring, radial=None, depth=0.003, grow=1.0):
+def backing(ring, radial=None, depth=0.003, grow=1.0, grow_down=1.0):
     p = ring['pos']
     centre = p.mean(0)
     _, _, axes = np.linalg.svd(p - centre, full_matrices=False)
@@ -159,6 +159,9 @@ def backing(ring, radial=None, depth=0.003, grow=1.0):
     if outward @ radial < 0:
         outward *= -1
     boundary = boundary.mean(0) + (boundary - boundary.mean(0)) * grow
+    if grow_down != 1.0:       # stretch only the lower half (covers gaps under a lamp centre)
+        below = boundary[:, 2] < boundary[:, 2].mean()
+        boundary[below, 2] = boundary[:, 2].mean() + (boundary[below, 2] - boundary[:, 2].mean()) * grow_down
     pos = np.vstack([boundary.mean(0), boundary]) - outward * depth
     n = len(boundary)
     tri = np.array([(0, i + 1, (i + 1) % n + 1) for i in range(n)])
@@ -211,3 +214,146 @@ def volume_mask(points, lenses, front=False):
         depth = (points - centre) @ normal
         selected |= inside & (depth > -.18) & (depth < .04)
     return selected
+
+
+def small_holes(g, max_len=24, weld=1e-4):
+    """Closed boundary loops of at most max_len vertices (holes inside a lens). Returns a list of
+    (fan mesh, faces touching the loop). The fan goes from the loop centre; orient it afterwards."""
+    from collections import defaultdict
+    p, t = g['pos'], g['tri']
+    key = np.round(p / weld).astype(np.int64)
+    _, inv = np.unique(key, axis=0, return_inverse=True)
+    inv = inv.reshape(-1)
+    tw = inv[t]
+    edges = defaultdict(list)
+    for f, a in enumerate(tw):
+        for i in range(3):
+            edges[tuple(sorted((a[i], a[(i + 1) % 3])))].append(f)
+    border = {e: fs[0] for e, fs in edges.items() if len(fs) == 1}
+    adj = defaultdict(list)
+    for u, v in border:
+        adj[u].append(v); adj[v].append(u)
+    rep = {}
+    for v in range(len(p)):
+        rep.setdefault(inv[v], v)
+    seen, out = set(), []
+    for s in list(adj):
+        if s in seen or len(adj[s]) != 2:
+            continue
+        loop, prev, cur = [s], None, s
+        ok = True
+        while True:
+            seen.add(cur)
+            nxt = [x for x in adj[cur] if x != prev]
+            if len(adj[cur]) != 2 or not nxt:
+                ok = False; break
+            prev, cur = cur, nxt[0]
+            if cur == s:
+                break
+            loop.append(cur)
+            if len(loop) > max_len:
+                ok = False; break
+        if not ok or len(loop) < 3:
+            continue
+        ring = np.array([p[rep[v]] for v in loop])
+        pos = np.vstack([ring.mean(0), ring])
+        n = len(ring)
+        tri = np.array([(0, i + 1, (i + 1) % n + 1) for i in range(n)])
+        faces = sorted({border[tuple(sorted((loop[i], loop[(i + 1) % n])))] for i in range(n)})
+        fan = dict(pos=pos, nrm=np.zeros_like(pos), uv=np.zeros((n + 1, 2)),
+                   col=np.full(n + 1, 0xFFFFFFFF, np.uint32), tri=tri)
+        out.append((fan, faces))
+    return out
+
+
+def thin_parts(g, sel, cell=.002, radius=3):
+    """Faces of `sel` lying in thin protrusions of their y-z footprint (seen from behind the car): the parts
+    removed by a morphological opening of that footprint with a disc of `radius` cells."""
+    P = g['pos'][g['tri']][:, :, 1:]
+    lo = P.reshape(-1, 2).min(0) - .02
+    shape = tuple(((P.reshape(-1, 2).max(0) + .02 - lo) / cell).astype(int) + 1)
+    cov = np.zeros(shape, bool)
+    gy, gz = np.meshgrid(np.arange(shape[0]), np.arange(shape[1]), indexing='ij')
+    pts = np.stack([gy, gz], -1) * cell + lo
+    for f in np.nonzero(sel)[0]:
+        a, b, c = P[f]
+        mn = ((np.minimum(np.minimum(a, b), c) - lo) / cell).astype(int)
+        mx = ((np.maximum(np.maximum(a, b), c) - lo) / cell).astype(int) + 1
+        q = pts[mn[0]:mx[0] + 1, mn[1]:mx[1] + 1]
+        d1 = np.cross(b - a, q - a); d2 = np.cross(c - b, q - b); d3 = np.cross(a - c, q - c)
+        cov[mn[0]:mx[0] + 1, mn[1]:mx[1] + 1] |= ((d1 >= 0) & (d2 >= 0) & (d3 >= 0)) | ((d1 <= 0) & (d2 <= 0) & (d3 <= 0))
+
+    def morph(m, op):
+        out = m.copy()
+        H, W = m.shape
+        pad = np.pad(m, radius, constant_values=(op is np.logical_or) is False and False)
+        for dy in range(-radius, radius + 1):
+            for dz in range(-radius, radius + 1):
+                if dy * dy + dz * dz <= radius * radius:
+                    out = op(out, pad[radius + dy:radius + dy + H, radius + dz:radius + dz + W])
+        return out
+    opened = morph(morph(cov, np.logical_and), np.logical_or)
+    thin = cov & ~opened
+    ix = ((g['pos'][g['tri']].mean(1)[:, 1:] - lo) / cell).astype(int)
+    return [f for f in np.nonzero(sel)[0] if thin[ix[f, 0], ix[f, 1]]]
+
+
+def fill_gaps(g, white, cell=.002, behind=.0015, white_reach=.005):
+    """Cracks of a lamp lens seen from behind the car (y-z): pixels inside the lens outline that no face
+    covers. Each row run of such pixels becomes a quad just behind the nearest lens point, white or red
+    after the nearest face. Returns (white mesh, red mesh)."""
+    P = g['pos'][g['tri']]
+    Q = P[:, :, 1:]
+    lo = Q.reshape(-1, 2).min(0) - 2 * cell
+    shape = tuple(((Q.reshape(-1, 2).max(0) + 2 * cell - lo) / cell).astype(int) + 1)
+    cov = np.zeros(shape, bool)
+    gy, gz = np.meshgrid(np.arange(shape[0]), np.arange(shape[1]), indexing='ij')
+    pts = np.stack([gy, gz], -1) * cell + lo + cell / 2
+    for f in range(len(Q)):
+        a, b, c = Q[f]
+        mn = np.maximum(((np.minimum(np.minimum(a, b), c) - lo) / cell).astype(int) - 1, 0)
+        mx = ((np.maximum(np.maximum(a, b), c) - lo) / cell).astype(int) + 2
+        q = pts[mn[0]:mx[0], mn[1]:mx[1]]
+        d1 = np.cross(b - a, q - a); d2 = np.cross(c - b, q - b); d3 = np.cross(a - c, q - c)
+        e = 1e-9
+        cov[mn[0]:mx[0], mn[1]:mx[1]] |= ((d1 >= -e) & (d2 >= -e) & (d3 >= -e)) | ((d1 <= e) & (d2 <= e) & (d3 <= e))
+    # exterior = uncovered pixels connected to the border
+    ext = np.zeros(shape, bool)
+    stack = [(i, j) for i in range(shape[0]) for j in (0, shape[1] - 1)] + [(i, j) for i in (0, shape[0] - 1) for j in range(shape[1])]
+    while stack:
+        i, j = stack.pop()
+        if i < 0 or j < 0 or i >= shape[0] or j >= shape[1] or ext[i, j] or cov[i, j]:
+            continue
+        ext[i, j] = True
+        stack += [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
+    hole = ~cov & ~ext
+    fc = P.mean(1)
+    wv = g['pos'][np.unique(g['tri'][np.asarray(white, bool)])] if np.any(white) else np.zeros((0, 3))
+    out = {True: [], False: []}
+    for j in range(shape[1]):
+        i = 0
+        while i < shape[0]:
+            if not hole[i, j]:
+                i += 1; continue
+            k = i
+            while k + 1 < shape[0] and hole[k + 1, j]:
+                k += 1
+            y0, y1 = lo[0] + i * cell - cell * .5, lo[0] + (k + 1) * cell + cell * .5
+            z0, z1 = lo[1] + j * cell - cell * .5, lo[1] + (j + 1) * cell + cell * .5
+            mid = np.array([(y0 + y1) / 2, (z0 + z1) / 2])
+            f = np.argmin(((fc[:, 1:] - mid) ** 2).sum(1))
+            x = fc[f, 0] + behind
+            near_white = len(wv) and (((wv[:, 1:] - mid) ** 2).sum(1).min() < white_reach ** 2)
+            out[bool(white[f] or near_white)].append(np.array([[x, y0, z0], [x, y1, z0], [x, y1, z1], [x, y0, z1]]))
+            i = k + 1
+    meshes = []
+    for key in (True, False):
+        quads = out[key]
+        if not quads:
+            meshes.append(None); continue
+        pos = np.concatenate(quads)
+        n = len(quads)
+        tri = np.array([t for q in range(n) for t in ((4 * q, 4 * q + 1, 4 * q + 2), (4 * q, 4 * q + 2, 4 * q + 3))])
+        meshes.append(dict(pos=pos, nrm=np.tile([-1., 0., 0.], (len(pos), 1)), uv=np.zeros((len(pos), 2)),
+                           col=np.full(len(pos), 0xFFFFFFFF, np.uint32), tri=tri))
+    return meshes[0], meshes[1]
