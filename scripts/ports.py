@@ -27,6 +27,7 @@ PORTS = {
         # v12.1: same smoothing as the 2012 (sides, doors, rear quarter): LOD A normals, faces turned to match
         'normals_from_A': 'authored',
         'orient_paint': True,
+        'normals_relax_regions': [dict(xmin=1.2, iters=16)],   # v12.2: small crackle by the headlights
     },
     '2012': {
         'id': '2012',
@@ -42,16 +43,22 @@ PORTS = {
         'rear_in': 'trunk',
         'rear_x': -1.95,
         'body_b_target': 15200,
-        'rear_lod': 'B',
+        'rear_lod': 'A',          # v12.2: lid and bumper from LOD A, decimated like the 2018 lid
         'base_dec': 0.75,
-        'trunk_lod': 'B',
+        'trunk_lod': 'A',
+        'trunk_paint_target': 14800,
+        'fill_lid_from_B': 0.008,
+        'fill_box': [-2.0, 0.35, 0.40, 0.80],   # x max, |y| max, z min, z max   # m: B faces this far from LOD A close the plate-recess opening
+        'body_src': 'A',           # v12.2: flat paint decimated from LOD A (smoother rear quarter)
         'outer_brake_in': 'trunk',
         'nose_in': 'body',
         'tex_cells': {'KIT00_HEADLIGHT': [((4, 4), (5, 4), 0.65)]},
         'normals_from_A': 'authored',   # v12: smooth paint shading from the LOD A normals
         'normals_relax': 0,     # tested 3 on the whole car: flatter blocks in the preview, kept off
         'orient_paint': True,   # v12.1: paint faces follow the LOD A normals
-        'normals_relax_regions': [dict(xmin=1.2, iters=12), dict(xmax=-1.5, iters=12)],
+        # v12.2: rear relax removed (blocky in the game); the rear now comes from LOD A instead
+        'normals_relax_regions': [dict(xmin=1.2, iters=28, max_deg=45)],
+        'lens_brake': 'outward',
         # v11: names the game binds (see TEX_ALIAS in build.py). FOCUS_KIT00_HEADLIGHT_GLASS_OFF is the retail
         # Focus headlight lens; SIDELIGHT is drawn by the retail BASE; the other two are unused car slots.
         # v11.1: HEADLIGHT_GLASS (41 small BASE triangles) stays unbound to save memory.

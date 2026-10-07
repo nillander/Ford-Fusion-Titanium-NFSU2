@@ -10,7 +10,9 @@ O usuário relatou craquelado perto dos faróis, na lateral, nas portas e no par
 - [x] Conferir no jogo o acabamento da lataria do 2012. Aprovado: "superfície bem lisa".
 - [x] Release v1.4: push e tag feitos pelo usuário. A sessão não pode criar nem apagar releases (HTTP 403); comandos `gh` entregues ao usuário.
 - [x] v12.1: frente e traseira do 2012 suavizadas, faces da pintura orientadas pelas normais e mesma técnica aplicada ao 2018 (lateral, portas e para-lama traseiro). Instalado nos dois slots.
-- [ ] Conferir no jogo: frente e traseira do 2012 e lateral do 2018. Se a traseira do 2012 continuar inferior à do 2018, a causa provável é a geometria LOD B (orçamento do TRUNK cheio), não as normais.
+- [x] v12.1 no jogo: lateral lisa aprovada. Restavam pequenos craquelados nos faróis (2012 e motorista do 2018), traseira e para-lama traseiro do 2012, manchas na lanterna do 2012 e refletores errados no 2018.
+- [x] v12.2: traseira do 2012 em LOD A (rebaixo da placa fechado com LOD B), pintura plana decimada do LOD A, lente da lanterna com uma camada, frentes suavizadas nos dois carros, refletores do 2018 com uma camada. [Registro](docs/CARROCERIA-v12.2.md).
+- [ ] Conferir no jogo a v12.2 nos dois carros e a estabilidade do 2018: o 2012 tem 1,5% mais vértices.
 
 # v1.4 — luzes do 2012 e farol de milha do 2018 (07/10/2026)
 

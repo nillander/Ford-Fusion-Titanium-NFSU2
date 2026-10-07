@@ -1,18 +1,16 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Cria a release GitHub vX.Y e remove releases/tags anteriores.
+  Calcula a próxima versão, usa o título do último commit, cria a release e remove as anteriores.
 
 .EXAMPLE
-  .\publish-release.ps1 -Version 1.5 -Title "v1.5 — descrição" -Push
+  .\publish-release.ps1 -Push
 #>
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
     [ValidatePattern('^\d+\.\d+(\.\d+)?$')]
     [string] $Version,
 
-    [Parameter(Mandatory = $true)]
     [string] $Title,
 
     [switch] $Push,
@@ -26,6 +24,15 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+$script:RequiredAssets = @(
+    'Fusion2018_AWD_NFSU2.zip'
+    'Fusion2012_FWD_NFSU2.zip'
+    'instalar.bat'
+    'globalb_patch.ps1'
+    'SHA256SUMS.txt'
+    'SHA256SUMS-conteudo.txt'
+)
 
 function Resolve-GhExe {
     param([string] $ExplicitPath)
@@ -66,6 +73,134 @@ function Resolve-GhExe {
     return $installed.FullName
 }
 
+function Test-ReleasePackageComplete {
+    param(
+        [string] $ReleaseDir,
+        [string] $NotesFile
+    )
+
+    if (-not (Test-Path -LiteralPath $ReleaseDir)) { return $false }
+    if (-not (Test-Path -LiteralPath $NotesFile)) { return $false }
+    foreach ($assetName in $script:RequiredAssets) {
+        if (-not (Test-Path -LiteralPath (Join-Path $ReleaseDir $assetName))) {
+            return $false
+        }
+    }
+    return $true
+}
+
+function Get-ExistingReleaseTags {
+    param([string] $GhExe)
+
+    $existing = & $GhExe release list --limit 100
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Falha ao listar releases.'
+    }
+
+    $tags = @()
+    if ($existing) {
+        foreach ($line in ($existing -split "`n")) {
+            if ([string]::IsNullOrWhiteSpace($line)) { continue }
+            $columns = $line -split "`t"
+            if ($columns.Count -ge 3) {
+                $tags += $columns[2].Trim()
+            }
+        }
+    }
+    return @($tags | Where-Object { $_ } | Select-Object -Unique)
+}
+
+function ConvertTo-VersionObject {
+    param([string] $VersionText)
+
+    try {
+        return [version]$VersionText
+    }
+    catch {
+        return $null
+    }
+}
+
+function Get-MaxLocalVersionText {
+    param([string] $Root)
+
+    $found = @()
+
+    $localRoot = Join-Path $Root 'local'
+    if (Test-Path -LiteralPath $localRoot) {
+        Get-ChildItem -LiteralPath $localRoot -Directory -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match '^release-v(\d+\.\d+(?:\.\d+)?)$' } |
+            ForEach-Object {
+                $null = $_.Name -match '^release-v(\d+\.\d+(?:\.\d+)?)$'
+                $found += $Matches[1]
+            }
+    }
+
+    $notesRoot = Join-Path $Root 'release'
+    if (Test-Path -LiteralPath $notesRoot) {
+        Get-ChildItem -LiteralPath $notesRoot -Filter 'notes-v*.md' -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -match '^notes-v(\d+\.\d+(?:\.\d+)?)\.md$' } |
+            ForEach-Object {
+                $null = $_.Name -match '^notes-v(\d+\.\d+(?:\.\d+)?)\.md$'
+                $found += $Matches[1]
+            }
+    }
+
+    if (-not $found) { return $null }
+
+    return (
+        $found |
+            ForEach-Object { [pscustomobject]@{ Text = $_; SortKey = ConvertTo-VersionObject $_ } } |
+            Where-Object { $null -ne $_.SortKey } |
+            Sort-Object SortKey -Descending |
+            Select-Object -First 1 -ExpandProperty Text
+    )
+}
+
+function Get-NextVersionText {
+    param(
+        [string[]] $ExistingTags,
+        [string] $Root
+    )
+
+    $versionTexts = @()
+    foreach ($tagName in $ExistingTags) {
+        if ($tagName -match '^v(\d+\.\d+(?:\.\d+)?)$') {
+            $versionTexts += $Matches[1]
+        }
+    }
+
+    $baseText = $null
+    if ($versionTexts.Count -gt 0) {
+        $baseText = (
+            $versionTexts |
+                ForEach-Object { [pscustomobject]@{ Text = $_; SortKey = ConvertTo-VersionObject $_ } } |
+                Where-Object { $null -ne $_.SortKey } |
+                Sort-Object SortKey -Descending |
+                Select-Object -First 1 -ExpandProperty Text
+        )
+    }
+    else {
+        $baseText = Get-MaxLocalVersionText -Root $Root
+    }
+
+    if (-not $baseText) {
+        return '1.0'
+    }
+
+    $parts = $baseText.Split('.')
+    $parts[$parts.Length - 1] = [string](([int]$parts[$parts.Length - 1]) + 1)
+    return ($parts -join '.')
+}
+
+function Get-LastCommitSubject {
+    $subject = git log -1 --pretty=%s
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($subject)) {
+        throw 'Não foi possível ler a mensagem do último commit (git log -1 --pretty=%s).'
+    }
+    return $subject.Trim()
+}
+
 if (-not $RepoRoot) {
     # scripts -> publish-release -> skills -> .cursor -> repo root
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..\..')).Path
@@ -73,39 +208,41 @@ if (-not $RepoRoot) {
 
 Set-Location -LiteralPath $RepoRoot
 
-$tag = "v$Version"
-$releaseDir = Join-Path $RepoRoot "local\release-$tag"
-$notesFile = Join-Path $RepoRoot "release\notes-$tag.md"
-
-$requiredAssets = @(
-    'Fusion2018_AWD_NFSU2.zip'
-    'Fusion2012_FWD_NFSU2.zip'
-    'instalar.bat'
-    'globalb_patch.ps1'
-    'SHA256SUMS.txt'
-    'SHA256SUMS-conteudo.txt'
-)
-
-if (-not (Test-Path -LiteralPath $releaseDir)) {
-    throw "Pasta de artefatos ausente: $releaseDir"
-}
-if (-not (Test-Path -LiteralPath $notesFile)) {
-    throw "Notes ausente: $notesFile"
-}
-
-$assetPaths = foreach ($assetName in $requiredAssets) {
-    $assetPath = Join-Path $releaseDir $assetName
-    if (-not (Test-Path -LiteralPath $assetPath)) {
-        throw "Artefato ausente: $assetPath"
-    }
-    $assetPath
-}
-
 $gh = Resolve-GhExe -ExplicitPath $GhPath
 Write-Host "Usando gh: $gh"
 & $gh auth status
 if ($LASTEXITCODE -ne 0) {
     throw 'gh não autenticado. Rode: gh auth login'
+}
+
+$existingTags = Get-ExistingReleaseTags -GhExe $gh
+
+if (-not $Version) {
+    $Version = Get-NextVersionText -ExistingTags $existingTags -Root $RepoRoot
+}
+
+if (-not $Title) {
+    $Title = Get-LastCommitSubject
+}
+
+$tag = "v$Version"
+$releaseDir = Join-Path $RepoRoot "local\release-$tag"
+$notesFile = Join-Path $RepoRoot "release\notes-$tag.md"
+
+Write-Host "Versão: $tag"
+Write-Host "Título: $Title"
+
+if (-not (Test-ReleasePackageComplete -ReleaseDir $releaseDir -NotesFile $notesFile)) {
+    throw @"
+Pacote incompleto para $tag.
+Esperado:
+  $releaseDir\ (6 artefatos)
+  $notesFile
+"@
+}
+
+$assetPaths = foreach ($assetName in $script:RequiredAssets) {
+    Join-Path $releaseDir $assetName
 }
 
 if ($Push -and -not $SkipPush) {
@@ -116,25 +253,8 @@ if ($Push -and -not $SkipPush) {
     }
 }
 
-$existing = & $gh release list --limit 100
-if ($LASTEXITCODE -ne 0) {
-    throw 'Falha ao listar releases.'
-}
-
-$existingTags = @()
-if ($existing) {
-    foreach ($line in ($existing -split "`n")) {
-        if ([string]::IsNullOrWhiteSpace($line)) { continue }
-        # Colunas: title TAB status TAB tag TAB date
-        $columns = $line -split "`t"
-        if ($columns.Count -ge 3) {
-            $existingTags += $columns[2].Trim()
-        }
-    }
-}
-
 if ($existingTags -contains $tag) {
-    throw "Release/tag $tag já existe. Apague-a antes ou use outra versão."
+    throw "Release/tag $tag já existe. Algo está inconsistente com o cálculo da próxima versão."
 }
 
 Write-Host "Criando release $tag ..."
@@ -146,7 +266,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "Falha ao criar release $tag"
 }
 
-$tagsToDelete = $existingTags | Where-Object { $_ -and $_ -ne $tag } | Select-Object -Unique
+$tagsToDelete = @($existingTags | Where-Object { $_ -and $_ -ne $tag } | Select-Object -Unique)
 foreach ($oldTag in $tagsToDelete) {
     Write-Host "Removendo release/tag $oldTag ..."
     & $gh release delete $oldTag --cleanup-tag -y

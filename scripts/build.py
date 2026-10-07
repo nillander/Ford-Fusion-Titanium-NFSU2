@@ -15,6 +15,7 @@ import decimate, ug2write, tpkwrite, tpk2, dxt, dxtenc, ports
 from hashes import bh
 
 PORT = ports.get(sys.argv[2] if len(sys.argv) > 2 else '2018')
+PORT = dict(PORT, **__import__('json').loads(os.environ.get('BUILD_PORT_OVERRIDE', '{}')))  # experiments
 MW, UG2 = PORT['mw'], PORT['ug2']
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'out'
 os.makedirs(OUT, exist_ok=True)
@@ -266,6 +267,10 @@ REAR_X, NOSE_X, NOSE_Y = PORT.get('rear_x', -1.9), 2.0, 0.45
 BOXES = {'rear': dict(xmax=REAR_X), 'nose': dict(xmin=NOSE_X, ymin=-NOSE_Y, ymax=NOSE_Y, zmin=0.52, zmax=0.75),
          'roof_front': dict(xmin=0.15, xmax=0.6, ymin=-0.5, ymax=0.5, zmin=1.05)}
 bB = body_paint; A_parts = {}
+if PORT.get('body_src') == 'A':
+    # v12.2: decimate the flat paint from LOD A instead of LOD B (2012: B had to lose 28% and the rear
+    # quarter looked crackled); same cuts, so the pieces still meet the LOD A nose/rear exactly
+    bB = restA
 REAR_LOD = PORT.get('rear_lod', 'A')         # 2012: the rear bumper from LOD B (same cut, lighter)
 for nm, box in BOXES.items():
     insB, bB = clip.split_box(bB, box)
@@ -281,6 +286,24 @@ REAR_IN = PORT.get('rear_in', 'body')
 if REAR_IN == 'trunk':
     body_paint = bB
     trunk_paint = merge([trunk_paint, rearA])
+if PORT.get('fill_lid_from_B'):
+    # v12.2 (2012): the LOD A rear has an opening in the plate recess (MW covers it with its plate). Close it with
+    # the LOD B faces that lie away from every LOD A vertex.
+    _cP = paint['pos'][paint['tri']].mean(1)
+    _lidB = compact(paint, _cP[:, 0] < REAR_X)
+    _cB = _lidB['pos'][_lidB['tri']].mean(1)
+    _pa = trunk_paint['pos']
+    _d = np.full(len(_cB), 9.)
+    for _i in range(0, len(_pa), 2048):
+        _q = _pa[_i:_i + 2048]
+        _d = np.minimum(_d, np.sqrt(((_cB[:, None, :] - _q[None]) ** 2).sum(-1)).min(1))
+    _gap = _d > PORT['fill_lid_from_B']
+    _bx = PORT.get('fill_box')        # only the plate recess: elsewhere B lies a little off the A surface
+    if _bx:
+        _gap &= (_cB[:, 0] < _bx[0]) & (np.abs(_cB[:, 1]) < _bx[1]) & (_cB[:, 2] > _bx[2]) & (_cB[:, 2] < _bx[3])
+    if _gap.any():
+        trunk_paint = merge([trunk_paint, compact(_lidB, _gap)])
+    LOG['lid_gap_filled_from_B'] = int(_gap.sum())
 else:
     body_paint = merge([bB, rearA])
 hood = outward_only(weld(P[MW + '_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
@@ -377,7 +400,10 @@ for side in lamp_sides:
                     tris=len(reflector['tri']), texture=UG2 + '_MISC', material='DULLPLASTIC',
                     uv=solid_lamps.RED_UV.tolist(), color=[255, 78, 86, 255])
             elif part.endswith('GLASS') and g['mat'] != 'BRAKELIGHT':
-                lg = double_sided(g) if LENS == 'double' else face_out(g)
+                # v12.2: per-role override; the 2012 tail-light lens drawn on both sides showed dark spots
+                # (the inner copy sits on the outer one when the game draws both faces)
+                lens_mode = PORT.get('lens_' + role, LENS)
+                lg = double_sided(g) if lens_mode == 'double' else face_out(drop_inward_twins(g, name + '_lens'))
                 m = mesh(lg, bh(lens_tex(g['tex'], role)), M['HEADLIGHTGLASS'] if role == 'head' else bh('MOLDINGS'))
                 (head_glass if role == 'head' else brake_glass).append(m)
             else:
@@ -426,7 +452,10 @@ if PORT.get('solid_tail'):
             c = g['pos'][g['tri']].mean(1)
             low = c[:, 2] < .5
             if low.any():
-                reflector = face_out(drop_inward_twins(compact(g, low), 'solid_reflector'))
+                # v12.2: same as the approved 2012 reflectors: outward layer only, one flat normal each
+                lowg = compact(g, low)
+                reflector = solid_lamps.single_face(compact(lowg, outwardness(lowg) > 0))
+                LOG['solid_reflector'] = dict(tris=len(reflector['tri']), removed=int((outwardness(lowg) <= 0).sum()))
                 brake_opaque.append(mesh(solid_lamps.colour(reflector, [.25, .5]), bh(solid_tex), M['DULLPLASTIC']))
 if PORT.get('fog_lod'):
     import solid_lamps

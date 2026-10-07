@@ -1,8 +1,9 @@
 ---
 name: publish-release
 description: >-
-  Publica release do fusion-nfsu2 no GitHub: push da branch, cria tag/release
-  com os artefatos em local/release-vX.Y/, marca como latest e remove tags e
+  Publica release do fusion-nfsu2 no GitHub: push da branch, calcula a próxima
+  versão (última release + 1), usa o título do último commit, cria tag/release
+  com artefatos em local/release-vX.Y/, marca como latest e remove tags e
   releases anteriores. Use quando o usuário pedir publicar, empurrar release,
   criar tag, gh release, ou invocar publish-release.
 disable-model-invocation: true
@@ -10,27 +11,28 @@ disable-model-invocation: true
 
 # Publicar release (fusion-nfsu2)
 
-Fluxo único: push → tag/release nova → apagar releases e tags antigas.
+Fluxo único: push → próxima versão + título do commit → tag/release → apagar antigas.
 
 ## Quando usar
 
 Somente quando o usuário pedir explicitamente (ou invocar esta skill). Não publicar sozinho.
 
-## Entradas obrigatórias
+## Versão e título (automáticos)
 
-Pedir o que faltar:
+Não pedir versão nem título. O script calcula:
 
-| Entrada | Exemplo | Onde |
-| --- | --- | --- |
-| Versão | `1.5` | tag `v1.5`, pasta `local/release-v1.5/`, notes `release/notes-v1.5.md` |
-| Título | `v1.5 — descrição curta` | `--title` da release |
-| Notes | arquivo já existente | `release/notes-vX.Y.md` |
+**Versão** — última release no GitHub (`gh release list`) + 1 no componente final (`v1.4` → `v1.5`). Se não houver release no GitHub, usa a maior pasta/notes local `vX.Y` e soma 1. Se não houver nada, começa em `1.0`.
 
-Padrão da pasta de artefatos: `local/release-vX.Y/` (não versionada).
+**Título** — assunto do último commit: `git log -1 --pretty=%s`.
+
+A pasta e as notes devem existir para a **versão nova**:
+
+```
+local/release-vX.Y/   # ex.: local/release-v1.5/
+release/notes-vX.Y.md
+```
 
 ## Artefatos obrigatórios
-
-Antes de qualquer `gh`, confirmar que existem:
 
 ```
 local/release-vX.Y/Fusion2018_AWD_NFSU2.zip
@@ -42,18 +44,19 @@ local/release-vX.Y/SHA256SUMS-conteudo.txt
 release/notes-vX.Y.md
 ```
 
-Se faltar algum, parar e informar. Não inventar ZIP nem notes.
+Se faltar algum para a versão calculada, parar e informar. Não inventar ZIP nem notes.
 
 ## Checklist
 
 ```
 Progresso:
 - [ ] 1. Resolver gh
-- [ ] 2. Validar artefatos e notes
-- [ ] 3. Push da branch (commit só se o usuário pedir)
-- [ ] 4. Criar release vX.Y com --latest
-- [ ] 5. Apagar todas as releases/tags anteriores
-- [ ] 6. Confirmar URL e lista final
+- [ ] 2. Calcular próxima versão + título do último commit
+- [ ] 3. Validar artefatos/notes da versão nova
+- [ ] 4. Push dos commits já existentes (ignorar WIP)
+- [ ] 5. Criar release com --latest
+- [ ] 6. Apagar todas as releases/tags anteriores
+- [ ] 7. Confirmar URL e lista final
 ```
 
 ## Passo 1 — gh
@@ -78,9 +81,10 @@ $gh = (Get-ChildItem -Path $ghDir -Recurse -Filter 'gh.exe' | Select-Object -Fir
 
 ## Passo 2 — push
 
-1. `git status` e `git log -1 --oneline`.
-2. Se houver alterações não commitadas: **não commitar** a menos que o usuário peça commit nesta mensagem. Avisar e aguardar.
-3. Push da branch atual (em geral `main`):
+Esta skill **não faz commit**. Trabalhos em progresso (working tree suja) **não interferem**: não bloquear, não avisar para limpar, não descartar, não staged/unstaged — apenas ignorar.
+
+1. Conferir o último commit (título da release): `git log -1 --pretty=%s`.
+2. Push só do que já está commitado:
 
 ```powershell
 git push -u origin HEAD
@@ -90,60 +94,38 @@ Se o push falhar por auth/rede, parar — sem criar release desencontrada do rem
 
 ## Passo 3 — criar release e limpar antigas
 
-Preferir o script da skill (PowerShell, na raiz do repo):
-
 ```powershell
-.cursor/skills/publish-release/scripts/publish-release.ps1 `
-  -Version 1.5 `
-  -Title "v1.5 — descrição curta"
+.cursor/skills/publish-release/scripts/publish-release.ps1 -Push
 ```
 
 O script:
 
-1. Valida os 6 artefatos + `release/notes-vX.Y.md`
-2. Resolve `gh` (PATH ou `%TEMP%\gh-cli`)
-3. Roda o equivalente a:
+1. Lê a última release no GitHub e define a próxima (`v1.4` → `v1.5`)
+2. Título = `git log -1 --pretty=%s`
+3. Valida `local/release-vX.Y/` + `release/notes-vX.Y.md`
+4. Resolve `gh` (PATH ou `%TEMP%\gh-cli`)
+5. Cria a release com os 6 artefatos, `--notes-file` e `--latest`
+6. Apaga todas as **outras** releases/tags (as anteriores)
+7. Imprime URL e `gh release list`
 
-```powershell
-gh release create vX.Y `
-  local/release-vX.Y/Fusion2018_AWD_NFSU2.zip `
-  local/release-vX.Y/Fusion2012_FWD_NFSU2.zip `
-  local/release-vX.Y/instalar.bat `
-  local/release-vX.Y/globalb_patch.ps1 `
-  local/release-vX.Y/SHA256SUMS.txt `
-  local/release-vX.Y/SHA256SUMS-conteudo.txt `
-  --title "<título>" `
-  --notes-file release/notes-vX.Y.md `
-  --latest
-```
-
-4. Lista releases existentes e, para cada tag **diferente** da nova, executa:
-
-```powershell
-gh release delete <tag> --cleanup-tag -y
-```
-
-5. Imprime a URL da release e `gh release list`.
-
-Flags úteis do script:
-
-- `-SkipPush` — só release (push já feito)
-- `-Push` — faz `git push -u origin HEAD` antes
-- `-GhPath` — caminho explícito do `gh.exe`
+Overrides opcionais (raros): `-Version 1.5`, `-Title "..."`, `-SkipPush`, `-GhPath`.
 
 ## Regras
 
+- **Não commitar.** Não `git add`, não `git commit`, não `git stash`, não descartar mudanças locais.
+- WIP é irrelevante para o publish: seguir com push + release mesmo com working tree suja.
 - Uma release pública por vez: a nova é `--latest`; as anteriores saem (tag + release).
 - Não apagar a release que acabou de criar.
 - Não usar `pint` / Laravel Sail (irrelevante neste repo).
-- Responder em português com a URL final.
+- Responder em português com versão, título (do commit) e URL final.
 - Histórico git antigo permanece; só some a release/tag no GitHub.
 
-## Exemplo (v1.4)
+## Exemplo
 
-```powershell
-.cursor/skills/publish-release/scripts/publish-release.ps1 `
-  -Version 1.4 `
-  -Title "v1.4 — luzes do 2012 e farol de milha do 2018" `
-  -Push
+Com `v1.4` no GitHub e commit `v12.1: orient paint faces...`:
+
+```text
+Versão: v1.5
+Título: v12.1: orient paint faces...
+Artefatos: local/release-v1.5/ + release/notes-v1.5.md
 ```
