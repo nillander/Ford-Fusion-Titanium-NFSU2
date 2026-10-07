@@ -92,3 +92,51 @@ def fair_region(m, inside, iters=12, lam=0.5, crease_deg=25, weld=1e-4, pin_bord
     nrm[use] = sm[use]
     out = dict(m); out['pos'] = newpos; out['nrm'] = nrm
     return out, int(free.sum())
+
+
+def transfer_normals(g, src, radius=0.03, k=8, cos_limit=0.5, chunk=256):
+    """v12: give a decimated/LOD B paint mesh the authored normals of the LOD A surface. Each vertex takes the
+    distance-weighted mean of the k nearest LOD A vertex normals within `radius` that agree with its own face
+    normal (cos > cos_limit, so hard edges and the other side of thin panels are ignored). Geometry is not
+    moved. Returns (mesh, vertices changed)."""
+    p, t = g['pos'].astype(np.float64), g['tri']
+    fn = np.cross(p[t[:, 1]] - p[t[:, 0]], p[t[:, 2]] - p[t[:, 0]])
+    own = np.zeros_like(p)
+    for kk in range(3):
+        np.add.at(own, t[:, kk], fn)
+    own /= np.linalg.norm(own, axis=1, keepdims=True) + 1e-20
+    sp = src['pos'].astype(np.float64)
+    sn = src['nrm'].astype(np.float64)
+    sn /= np.linalg.norm(sn, axis=1, keepdims=True) + 1e-20
+    # bucket the source by a coarse grid so each chunk only compares against nearby points
+    cell = radius
+    keys = np.floor(sp / cell).astype(np.int64)
+    order = np.lexsort(keys.T[::-1])
+    keys, sp, sn = keys[order], sp[order], sn[order]
+    uniq, start = np.unique(keys, axis=0, return_index=True)
+    end = np.r_[start[1:], len(keys)]
+    lookup = {tuple(u): (s, e) for u, s, e in zip(uniq, start, end)}
+    out = g['nrm'].astype(np.float64).copy()
+    changed = 0
+    qk = np.floor(p / cell).astype(np.int64)
+    offs = np.array([(a, b, c) for a in (-1, 0, 1) for b in (-1, 0, 1) for c in (-1, 0, 1)])
+    for v in range(len(p)):
+        idx = []
+        for o in offs:
+            r = lookup.get(tuple(qk[v] + o))
+            if r:
+                idx.append(np.arange(*r))
+        if not idx:
+            continue
+        idx = np.concatenate(idx)
+        d = np.linalg.norm(sp[idx] - p[v], axis=1)
+        ok = (d < radius) & (sn[idx] @ own[v] > cos_limit)
+        if not ok.any():
+            continue
+        idx, d = idx[ok], d[ok]
+        sel = np.argsort(d)[:k]
+        w = 1.0 / (d[sel] + 1e-4)
+        n = (sn[idx[sel]] * w[:, None]).sum(0)
+        out[v] = n / (np.linalg.norm(n) + 1e-20)
+        changed += 1
+    return dict(g, nrm=out.astype(g['nrm'].dtype)), changed

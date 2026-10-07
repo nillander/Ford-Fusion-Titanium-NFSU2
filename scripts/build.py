@@ -284,6 +284,31 @@ if REAR_IN == 'trunk':
 else:
     body_paint = merge([bB, rearA])
 hood = outward_only(weld(P[MW + '_KIT00_HOOD_B']['groups'][0]), 'hood_B', clamp=(1.2, 1.9), zc=0.35)
+if PORT.get('normals_from_A'):
+    # v12 (2012): the decimated LOD B paint showed a crackled, blotchy finish on the doors, rear quarter and
+    # around the headlights (2,352 normals were replaced by hard face normals at export). Use the authored
+    # LOD A normals instead; positions and triangles are unchanged.
+    _srcA = drop_inward_twins(wA, 'normals_source_A')
+    if PORT['normals_from_A'] == 'geometric':
+        # the authored LOD A normals are noisy around the headlights: rebuild them from the dense surface
+        _srcA = dict(_srcA, nrm=smooth.smooth_normals(_srcA['pos'], _srcA['tri'], _srcA['nrm'],
+                                                      crease_deg=PORT.get('normals_crease', 35)))
+    for _nm in ('body', 'trunk', 'hood', 'nose'):
+        _m = {'body': body_paint, 'trunk': trunk_paint, 'hood': hood, 'nose': noseA}[_nm]
+        _m, _n = smooth.transfer_normals(_m, _srcA)
+        if PORT.get('normals_relax'):
+            # damp the remaining crackle between neighbours (seams and hard edges above 30 deg stay)
+            _m = dict(_m, nrm=smooth.relax_normals(_m['pos'], _m['tri'], _m['nrm'],
+                                                   iters=PORT['normals_relax'], max_deg=30).astype(_m['nrm'].dtype))
+        LOG.setdefault('normals_from_A', {})[_nm] = [_n, int(len(_m['pos']))]
+        if _nm == 'body':
+            body_paint = _m
+        elif _nm == 'trunk':
+            trunk_paint = _m
+        elif _nm == 'nose':
+            noseA = _m
+        else:
+            hood = _m
 A_parts['body_B'] = bB
 LOG['paint_lods'] = {k + '_A': int(len(v['tri'])) for k, v in A_parts.items()}
 

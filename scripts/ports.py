@@ -45,6 +45,8 @@ PORTS = {
         'outer_brake_in': 'trunk',
         'nose_in': 'body',
         'tex_cells': {'KIT00_HEADLIGHT': [((4, 4), (5, 4), 0.65)]},
+        'normals_from_A': 'authored',   # v12: smooth paint shading from the LOD A normals
+        'normals_relax': 0,   # tested 3: flatter blocks in the preview, kept off
         # v11: names the game binds (see TEX_ALIAS in build.py). FOCUS_KIT00_HEADLIGHT_GLASS_OFF is the retail
         # Focus headlight lens; SIDELIGHT is drawn by the retail BASE; the other two are unused car slots.
         # v11.1: HEADLIGHT_GLASS (41 small BASE triangles) stays unbound to save memory.

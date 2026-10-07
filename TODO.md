@@ -2,6 +2,14 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.3 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# 2012 — carroceria lisa (v12, 07/10/2026)
+
+O usuário relatou craquelado perto dos faróis, na lateral, nas portas e no para-lama traseiro. A pintura passou a receber as normais originais do LOD A, sem mexer na geometria. [Registro](docs/CARROCERIA-2012-v12.md).
+
+- [x] Transferir as normais do LOD A para BODY, TRUNK, capô e bico; instalar com backup.
+- [ ] Conferir no jogo o acabamento da lataria do 2012.
+- [ ] Publicar: push de `main`, tag e release v1.4 e remoção de v1.1–v1.3. A sessão não tem permissão de push; os ZIPs estão em `local/release-v1.4/`.
+
 # v1.4 — luzes do 2012 e farol de milha do 2018 (07/10/2026)
 
 # 2012 — luzes ausentes e refletores escuros (v11, 06/10/2026)
