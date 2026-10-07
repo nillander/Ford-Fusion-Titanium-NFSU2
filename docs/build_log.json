@@ -2,6 +2,10 @@
  "port": "2018",
  "mw": "MUSTANGGT",
  "ug2": "MUSTANGGT",
+ "tex_alias": {
+  "MUSTANGGT_KIT00_HEADLIGHT": "MUSTANGGT_SIDELIGHT",
+  "MUSTANGGT_HEADLIGHT_GLASS": "MUSTANGGT_KIT00_HEADLIGHT_GLASS_OFF"
+ },
  "inward_twins_removed": {
   "paint_B": 584,
   "trunk_A": 1084,
@@ -13,6 +17,7 @@
   "solid_tail_right_trunk": 10,
   "solid_tail_right_body": 15,
   "solid_reflector": 16,
+  "fog_RIGHT_housing": 52,
   "original_2018_trunk_trim": 0,
   "base_MISC_DULLPLASTIC": 4,
   "base_KIT00_HEADLIG_HEADLIGHTGLASS": 0,
@@ -51,8 +56,8 @@
   ],
   "interior_grid_DULLPLASTIC": [
    507,
-   426,
-   "cluster 0.013 m"
+   474,
+   "cluster 0.005 m"
   ],
   "interior_INTERIOR": [
    11898,
@@ -60,8 +65,8 @@
   ],
   "interior_grid_INTERIOR": [
    2525,
-   1649,
-   "cluster 0.027 m"
+   1791,
+   "cluster 0.021 m"
   ]
  },
  "inner_faces_removed": {
@@ -95,7 +100,7 @@
    "backing_m": 0.003
   }
  },
- "lens_faces_turned": 833,
+ "lens_faces_turned": 701,
  "tail_white_details": {
   "left_trunk": {
    "tris": 32,
@@ -115,9 +120,9 @@
   }
  },
  "fog": {
-  "lod": "A",
+  "lod": "B",
   "destination": "BASE_A",
-  "tris": 808
+  "tris": 570
  },
  "lamp_atlas": {
   "texture": "MUSTANGGT_MISC",
@@ -259,18 +264,8 @@
   ],
   [
    "0x7b916d49",
-   "0xfedee40",
-   719
-  ],
-  [
-   "0x5a00e244",
-   "0xfedee40",
-   52
-  ],
-  [
-   "0x5a00e244",
-   "0xfedee40",
-   37
+   "0xb51b3acf",
+   358
   ],
   [
    "0x3c84d757",
@@ -285,12 +280,12 @@
   [
    "0x2af3d244",
    "0xfedee40",
-   426
+   474
   ],
   [
    "0x2af3d244",
    "0x2787edab",
-   1649
+   1791
   ],
   [
    "0x5a006de9",
@@ -306,12 +301,17 @@
    "0x16691a3b",
    "0xa6348ee3",
    57
+  ],
+  [
+   "0x16691a3b",
+   "0xa6348ee3",
+   212
   ]
  ],
  "budget": {
   "body": 20582,
   "trunk": 7515,
-  "base": 21279
+  "base": 21231
  },
  "markers": {
   "LEFT_BRAKELIGHT": [
@@ -367,7 +367,7 @@
   "MUSTANGGT_KITW03_BODY_A": 2016,
   "MUSTANGGT_KITW04_BODY_A": 2016,
   "MUSTANGGT_KIT00_TRUNK_A": 1204,
-  "MUSTANGGT_BASE_A": 1418,
+  "MUSTANGGT_BASE_A": 1411,
   "MUSTANGGT_KIT00_FRONT_WHEEL_A": 44
  },
  "solids": {
@@ -408,9 +408,9 @@
    "groups": 3
   },
   "MUSTANGGT_BASE_A": {
-   "tris": 21270,
-   "indices": 63810,
-   "verts": 21248,
+   "tris": 21222,
+   "indices": 63666,
+   "verts": 21172,
    "groups": 11
   },
   "MUSTANGGT_KIT00_FRONT_WHEEL_A": {
@@ -583,7 +583,10 @@
  },
  "trunk_lid": 6000,
  "hood": 2623,
- "geometry_bytes": 7204352,
+ "geometry_bytes": 7201280,
+ "textures_unused_dropped": [
+  "MUSTANGGT_BRAKELIGHT_GLASS"
+ ],
  "textures": {
   "MUSTANGGT_MISC": [
    "DXT1",
@@ -599,9 +602,9 @@
   ],
   "MUSTANGGT_BADGING": [
    "DXT1",
-   512
+   256
   ],
-  "MUSTANGGT_KIT00_HEADLIGHT": [
+  "MUSTANGGT_SIDELIGHT": [
    "DXT1",
    256
   ],
@@ -621,13 +624,9 @@
    "DXT1",
    256
   ],
-  "MUSTANGGT_HEADLIGHT_GLASS": [
+  "MUSTANGGT_KIT00_HEADLIGHT_GLASS_OFF": [
    "DXT3",
-   256
-  ],
-  "MUSTANGGT_BRAKELIGHT_GLASS": [
-   "DXT3",
-   256
+   128
   ],
   "MUSTANGGT_NEON": [
    "DXT3",
@@ -642,5 +641,5 @@
    128
   ]
  },
- "textures_bytes": 856448
+ "textures_bytes": 643200
 }

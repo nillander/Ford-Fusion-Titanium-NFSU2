@@ -2,13 +2,17 @@
  "port": "2012",
  "mw": "COBALTSS",
  "ug2": "FOCUS",
+ "tex_alias": {
+  "FOCUS_KIT00_HEADLIGHT": "FOCUS_SIDELIGHT",
+  "FOCUS_HEADLIGHT_LENS": "FOCUS_KIT00_HEADLIGHT_GLASS_OFF",
+  "FOCUS_BRAKELIGHT_GLASS": "FOCUS_CENTRE_BRAKELIGHT"
+ },
  "inward_twins_removed": {
   "paint_B": 1183,
   "trunk_B": 442,
   "paint_A": 1699,
   "KIT00_RIGHT_HEADLIGHT_D_HEADLIGHT": 227,
   "KIT00_RIGHT_BRAKELIGHT_D_BRAKELIGHT": 266,
-  "KIT00_RIGHT_BRAKELIGHT_GLASS_D_BRAKELIGHT": 0,
   "KIT00_LEFT_HEADLIGHT_D_HEADLIGHT": 208,
   "KIT00_LEFT_BRAKELIGHT_D_BRAKELIGHT": 212,
   "base_MISC_DULLPLASTIC": 4,
@@ -20,6 +24,7 @@
   "interior_INTERIOR": 1513,
   "interior_DULLPLASTIC": 41
  },
+ "trunk_lod": "B",
  "nose_recess_filled_vertices": 117,
  "decimation": {
   "paint_B_flat": [
@@ -53,13 +58,31 @@
   ]
  },
  "inner_faces_removed": {
-  "hood_B": 2810
+  "hood_B": 2810,
+  "KIT00_RIGHT_BRAKELIGHT_GLASS_D_opaque_reflector": 10
  },
  "paint_lods": {
   "rear_A": 4339,
   "nose_A": 691,
   "roof_front_A": 499,
   "body_B_A": 15200
+ },
+ "opaque_reflectors": {
+  "KIT00_RIGHT_BRAKELIGHT_GLASS_D": {
+   "tris": 10,
+   "texture": "FOCUS_MISC",
+   "material": "DULLPLASTIC",
+   "uv": [
+    0.84375,
+    0.90625
+   ],
+   "color": [
+    255,
+    78,
+    86,
+    255
+   ]
+  }
  },
  "lamps": {
   "lod": {
@@ -73,7 +96,7 @@
    "LEFT"
   ],
   "head": 4567,
-  "brake": 6939
+  "brake": 6929
  },
  "emblem_removed": 46,
  "rear_low_from_B": {
@@ -175,7 +198,7 @@
  ],
  "budget": {
   "body": 20957,
-  "trunk": 20158,
+  "trunk": 20148,
   "base": 21299
  },
  "markers": {
@@ -240,7 +263,7 @@
   "FOCUS_KITW02_BODY_A": 2352,
   "FOCUS_KITW03_BODY_A": 2352,
   "FOCUS_KITW04_BODY_A": 2352,
-  "FOCUS_KIT00_TRUNK_A": 2198,
+  "FOCUS_KIT00_TRUNK_A": 2187,
   "FOCUS_BASE_A": 1611,
   "FOCUS_KIT00_FRONT_WHEEL_A": 40
  },
@@ -276,10 +299,10 @@
    "groups": 3
   },
   "FOCUS_KIT00_TRUNK_A": {
-   "tris": 20158,
-   "indices": 60474,
-   "verts": 19241,
-   "groups": 3
+   "tris": 20148,
+   "indices": 60444,
+   "verts": 19238,
+   "groups": 4
   },
   "FOCUS_BASE_A": {
    "tris": 21299,
@@ -450,7 +473,7 @@
  },
  "trunk_lid": 13219,
  "hood": 2638,
- "geometry_bytes": 7478912,
+ "geometry_bytes": 7478784,
  "tex_cells": [
   [
    "FOCUS_KIT00_HEADLIGHT",
@@ -464,6 +487,9 @@
    ],
    0.65
   ]
+ ],
+ "textures_unused_dropped": [
+  "FOCUS_KIT00_BRAKELIGHT"
  ],
  "textures": {
   "FOCUS_MISC": [
@@ -480,13 +506,9 @@
   ],
   "FOCUS_BADGING": [
    "DXT1",
-   512
-  ],
-  "FOCUS_KIT00_HEADLIGHT": [
-   "DXT1",
    256
   ],
-  "FOCUS_KIT00_BRAKELIGHT": [
+  "FOCUS_SIDELIGHT": [
    "DXT1",
    256
   ],
@@ -502,13 +524,13 @@
    "DXT1",
    256
   ],
-  "FOCUS_HEADLIGHT_LENS": [
+  "FOCUS_KIT00_HEADLIGHT_GLASS_OFF": [
    "DXT3",
-   256
+   128
   ],
-  "FOCUS_BRAKELIGHT_GLASS": [
+  "FOCUS_CENTRE_BRAKELIGHT": [
    "DXT3",
-   256
+   128
   ],
   "FOCUS_HEADLIGHT_GLASS": [
    "DXT3",
@@ -527,5 +549,5 @@
    128
   ]
  },
- "textures_bytes": 922240
+ "textures_bytes": 692608
 }

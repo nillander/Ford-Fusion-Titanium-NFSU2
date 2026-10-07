@@ -17,6 +17,10 @@ PORTS = {
         # v11.2: fog lamps drawn like the main headlight (LOD B: 410 + 212 triangles, below the 808 of v1.3).
         'fog_lod': 'B',
         'fog_glass': True,
+        # v11.3: the fog lamps in BASE stayed dark with the unbound lamp names; same fix as the 2012 (v11).
+        # Smaller lens and badging keep the bound total below v1.3 (car memory is tight).
+        'tex_alias': {'KIT00_HEADLIGHT': 'SIDELIGHT', 'HEADLIGHT_GLASS': 'KIT00_HEADLIGHT_GLASS_OFF'},
+        'tex_size': {'HEADLIGHT_GLASS': 128, 'BADGING': 256},
         'wheel_donor': 'FOCUS',
         # v10.15 opened with the repaired trim/lenses; keep the lighter approved lid.
         'trunk_paint_target': 6000,
