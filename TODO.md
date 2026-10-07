@@ -9,7 +9,8 @@ O usuário marcou áreas ainda craqueladas. No 2012: tampa acima da placa, faixa
 Uma sessão do Cursor começou o mesmo trabalho em paralelo. A pedido do usuário, as edições dela em `build.py` e `ports.py` foram desfeitas, e as construções dela foram movidas para `local/_to_delete/cursor-v12.7/`.
 
 - [x] `normals_relax_regions` aceita caixas (x, |y|, z) com transição suave nas bordas (`fade`). Também é aplicada depois da decimação da tampa. Regiões: tampa acima da placa e faixa abaixo dela até o para-choque, nos dois carros; portas e soleiras (z < 0,60) e porta traseira junto ao para-lama, só no 2012. Só as normais mudam: triângulos e texturas iguais, sem custo de memória. [Prévias](docs/carroceria-v12.7/).
-- [ ] Conferir no jogo. Na prévia, as áreas ficam mais uniformes, mas aparecem blocos lisos. Se ficarem visíveis no jogo, reduzir `iters`. Backup em `backup/antes-v12.7/`.
+- [x] Conferir no jogo: a qualidade piorou bastante nas traseiras dos dois carros e na lateral do 2012, com aspecto de baixa resolução, e as manchas escuras continuaram. As regiões foram revertidas, e o jogo voltou aos BIN da v1.7. O mecanismo de caixas continua no código, sem uso.
+- [ ] Manchas escuras nas traseiras (também na v1.7). As cores de vértice da pintura são todas brancas: as manchas vêm do reflexo do ambiente nas normais. Relaxar as normais da malha decimada não resolve. Próximo caminho: mais resolução na traseira (tampa do 2018 hoje decimada para 6.000 faces; o TRUNK tem 7.473 de 21.500), com cuidado com a memória (fechamento na v10.14).
 
 # v1.7 — centro branco liso nas lanternas do 2012 (06/10/2026)
 
