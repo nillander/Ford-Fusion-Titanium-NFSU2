@@ -27,12 +27,16 @@ def trunk_trim_mask(g):
     return selected
 
 
-def paint_misc(rgba):
+def paint_misc(rgba, reflectors_only=False):
     """Three unused cells in the existing MISC sheet (original UVs end at v=.75)."""
     out = rgba.copy()
     h, w = out.shape[:2]
-    for x, rgb in ((12, [255, 255, 255]), (13, [255, 78, 86]), (14, [238, 240, 242])):
+    cells = ((13, [255, 78, 86]),) if reflectors_only else (
+        (12, [255, 255, 255]), (13, [255, 78, 86]), (14, [238, 240, 242]))
+    for x, rgb in cells:
         out[14 * h // 16:15 * h // 16, x * w // 16:(x + 1) * w // 16] = rgb + [255]
+    if reflectors_only:
+        return out
     # A single vertical metallic highlight shared by the entire trim, distinct from
     # the plain lens-white cell. This stays in the existing opaque MISC texture.
     top, bottom = 14 * h // 16, 15 * h // 16
@@ -90,6 +94,24 @@ def lower_inner_white(red, white, trim):
 
 def subset(g, selected):
     return clip._sub(g, selected)
+
+
+def single_face(g, lift=True):
+    """One flat normal per connected island: the area-weighted face normal. With lift, a normal pointing
+    down is levelled (z = 0) so the patch is lit like the vertical bumper around it."""
+    import comps
+    p, t = g['pos'], g['tri']
+    fn = np.cross(p[t[:, 1]] - p[t[:, 0]], p[t[:, 2]] - p[t[:, 0]])
+    labels = comps.components(p, t)
+    nrm = np.zeros_like(p, dtype=float)
+    for label in np.unique(labels):
+        k = labels == label
+        n = fn[k].sum(0)
+        if lift and n[2] < 0:
+            n[2] = 0.
+        n /= max(np.linalg.norm(n), 1e-12)
+        nrm[np.unique(t[k])] = n
+    return dict(g, nrm=nrm.astype(g['nrm'].dtype))
 
 
 def colour(g, uv):

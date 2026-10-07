@@ -77,6 +77,17 @@ def lens_tex(mwtex, role):
 
 
 KEEP_SUFFIXES = ('SHADOWFE', 'SHADOWIG', 'NEON')
+# v11: UG2's CarRenderInfo binds only car textures whose names it builds itself (SPEED2.EXE strings: %s_MISC,
+# %s_SIDELIGHT, %s_DOOR_HANDLE, %s_CENTRE_BRAKELIGHT, <lamp TEXTURE_NAME>_GLASS_OFF, ...). Any other name in
+# TEXTURES.BIN is never bound and the groups using it are not drawn: this is why KIT00_HEADLIGHT, the lens
+# copies and the 2018 SOLID_LAMPS test were invisible while MISC showed. 'tex_alias' renames those sheets.
+TEX_ALIAS = {UG2 + '_' + k: UG2 + '_' + v for k, v in PORT.get('tex_alias', {}).items()}
+ALIAS_H = {bh(k): bh(v) for k, v in TEX_ALIAS.items()}
+LOG['tex_alias'] = TEX_ALIAS
+
+
+def alias(name):
+    return TEX_ALIAS.get(name, name)
 
 
 def weld(g):
@@ -302,6 +313,8 @@ head_opaque, head_glass, brake_opaque, brake_glass = [], [], [], []
 fog_meshes = []
 tail_outlines, fog_outlines = [], []
 lamp_sides = [sd for sd in ('RIGHT', 'LEFT') if '%s_KIT00_%s_HEADLIGHT_%s' % (MW, sd, LOD['head']) in P]
+if PORT.get('opaque_reflectors'):
+    import solid_lamps
 for side in lamp_sides:
     for part, role, lod in (('HEADLIGHT', 'head', LOD['head']), ('HEADLIGHT_GLASS', 'head', LOD['head_glass']),
                             ('BRAKELIGHT', 'brake', LOD['brake']), ('BRAKELIGHT_GLASS', 'brake', LOD['brake_glass'])):
@@ -313,7 +326,20 @@ for side in lamp_sides:
                 c = g['pos'][g['tri']].mean(1)
                 fog = (c[:, 0] > 1.9) & (c[:, 2] < .3) & (np.abs(c[:, 1]) > .5)
                 g = compact(g, ~fog) | {'tex': g['tex'], 'mat': g['mat']}
-            if part.endswith('GLASS') and g['mat'] != 'BRAKELIGHT':
+            if (PORT.get('opaque_reflectors') and role == 'brake'
+                    and part.endswith('GLASS') and g['mat'] == 'BRAKELIGHT'
+                    and g['pos'][:, 0].max() < -1.7 and g['pos'][:, 2].max() < .5):
+                # v11: the plate has a front and a back layer about 1 cm apart (not exact twins) and its source
+                # normals average both, so face_out kept two layers with skewed normals: dark red in the game.
+                # Keep the outward layer only, with one flat normal per reflector (2018 v10.9 lesson).
+                reflector = solid_lamps.single_face(compact(g, outwardness(g) > 0))
+                LOG.setdefault('inner_faces_removed', {})[name + '_opaque_reflector'] = int((outwardness(g) <= 0).sum())
+                reflector = solid_lamps.colour(reflector, solid_lamps.RED_UV)
+                brake_opaque.append(mesh(reflector, bh(UG2 + '_MISC'), M['DULLPLASTIC']))
+                LOG.setdefault('opaque_reflectors', {})[name] = dict(
+                    tris=len(reflector['tri']), texture=UG2 + '_MISC', material='DULLPLASTIC',
+                    uv=solid_lamps.RED_UV.tolist(), color=[255, 78, 86, 255])
+            elif part.endswith('GLASS') and g['mat'] != 'BRAKELIGHT':
                 lg = double_sided(g) if LENS == 'double' else face_out(g)
                 m = mesh(lg, bh(lens_tex(g['tex'], role)), M['HEADLIGHTGLASS'] if role == 'head' else bh('MOLDINGS'))
                 (head_glass if role == 'head' else brake_glass).append(m)
@@ -639,6 +665,7 @@ def solid(name, meshes, markers=()):
     # only part of them.
     keyed = {}
     for m in meshes:
+        m = dict(m, tex=ALIAS_H.get(m['tex'], m['tex']))
         if len(m['tri']):
             keyed.setdefault((m['tex'], m['mat']), []).append(m)
     meshes = [v[0] if len(v) == 1 else mesh(merge(v), k[0], k[1]) for k, v in keyed.items()]
@@ -794,8 +821,8 @@ for name, spec in TEX.items():
         full[dst[1] * ch:(dst[1] + 1) * ch, dst[0] * cw:(dst[0] + 1) * cw] = cell.astype(np.uint8)
         LOG.setdefault('tex_cells', []).append([name, dst, srcc, k])
     rgba = np.array(Image.fromarray(full).resize((sz, sz), Image.LANCZOS))
-    if PORT.get('solid_tail') and name == UG2 + '_MISC':
-        rgba = solid_lamps.paint_misc(rgba)
+    if (PORT.get('solid_tail') or PORT.get('opaque_reflectors')) and name == UG2 + '_MISC':
+        rgba = solid_lamps.paint_misc(rgba, reflectors_only=not PORT.get('solid_tail'))
     if len(spec) > 3 and spec[3] == 'boost':   # v6: MW lens is dark red (lit by emission in MW); UG2 needs it bright
         f = rgba[..., :3].astype(float)
         red = f[..., 0] > f[..., 1:].max(-1) + 20
@@ -807,9 +834,9 @@ for name, spec in TEX.items():
         data = dxtenc.encode_dxt1(rgba); tm = tmpl_dxt1
     else:
         data = dxtenc.encode_dxt3(rgba); tm = tmpl_dxt3
-    info = tpkwrite.build_info(tm['info'], name, bh(name), sz, sz, len(data), place)
+    info = tpkwrite.build_info(tm['info'], alias(name), bh(alias(name)), sz, sz, len(data), place)
     place += len(data)
-    out_tex.append(dict(hash=bh(name), info=info, dds=tm['dds'], data=data, name=name, fmt=fmt, size=sz))
+    out_tex.append(dict(hash=bh(alias(name)), info=info, dds=tm['dds'], data=data, name=alias(name), fmt=fmt, size=sz))
 kept = set()
 for t in tex_e:
     suffix = next((item for item in KEEP_SUFFIXES if t['name'].endswith(item)), None)

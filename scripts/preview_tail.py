@@ -9,8 +9,10 @@ geo, texture, prefix = sys.argv[1:]
 textures = {t['hash']: dxt.decode(t['data'], t['w'], t['h'], t['fmt'])
             for t in tpk2.parse(texture)[1]}
 meshes = []
-parts = {bh('MUSTANGGT_' + name) for name in ('KIT00_BODY_A', 'BASE_A', 'KIT00_TRUNK_A')}
-for solid in ug2.parse(geo)[3]:
+solids = ug2.parse(geo)[3]
+slot = next(s['name'][:-len('_BASE_A')] for s in solids if s['name'].endswith('_BASE_A'))
+parts = {bh(slot + '_' + name) for name in ('KIT00_BODY_A', 'BASE_A', 'KIT00_TRUNK_A')}
+for solid in solids:
     if solid['hash'] not in parts:
         continue
     raw = np.frombuffer(solid['vb'], np.uint8).reshape(-1, 36)

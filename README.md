@@ -1,5 +1,7 @@
 # Ford Fusion — Need for Speed Underground 2
 
+> **Teste do 2012:** aplicado aos refletores inferiores o vermelho opaco MISC/DULLPLASTIC usado no reparo do 2018. Instalado no Focus para avaliação; formato preservado. [Comparação e prévias](docs/REFLETORES-2012.md).
+
 > **Release v1.3 (06/10/2026):** Fusion 2018 aprovado no jogo com friso em gradiente metálico e lentes brancas claras, mantendo o formato da v1.2 e a pintura da tampa em 6.000 faces. Dois ZIPs com instaladores; arquivos do 2012 preservados. [Referências, prévias e validação](docs/FRISO-v10.16.md).
 
 > **Atualização v10.9 (06/10/2026):** aprovado pelo usuário o 2018 com lentes opacas sem faces opostas coincidentes e o **friso original do MW em branco**, anexado à tampa. v10.7/v10.8 exibiram as lanternas, mas escuras. O texto da tela inicial foi corrigido na entrada de copyright do idioma. Validação dos arquivos passou; a aparência no jogo foi aprovada pelo usuário. [Registro e novas prévias](docs/REPARO-LANTERNAS-2018.md).

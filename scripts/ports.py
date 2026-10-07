@@ -26,6 +26,7 @@ PORTS = {
         'zip': 'Fusion2012_FWD_MW2005.zip',
         'drive': 'FWD',
         'split': 0.0,          # offset 720 is the share sent to the rear axle: retail FWD cars store 0.0
+        'opaque_reflectors': True,  # lower rear pair: reuse the 2018 MISC/DULLPLASTIC red finish
         # Budget knobs (see build.py). The 2012 front lamps and rear end are about 2.5x heavier than the 2018
         # ones at every LOD; these settings keep each solid under 21,500 triangles.
         'lamps': dict(head='D', head_glass='C', brake='D', brake_glass='D'),
@@ -38,6 +39,10 @@ PORTS = {
         'outer_brake_in': 'trunk',
         'nose_in': 'body',
         'tex_cells': {'KIT00_HEADLIGHT': [((4, 4), (5, 4), 0.65)]},
+        # v11: names the game binds (see TEX_ALIAS in build.py). FOCUS_KIT00_HEADLIGHT_GLASS_OFF is the retail
+        # Focus headlight lens; SIDELIGHT is drawn by the retail BASE; the other two are unused car slots.
+        'tex_alias': {'KIT00_HEADLIGHT': 'SIDELIGHT', 'HEADLIGHT_LENS': 'KIT00_HEADLIGHT_GLASS_OFF',
+                      'HEADLIGHT_GLASS': 'DOOR_HANDLE', 'BRAKELIGHT_GLASS': 'CENTRE_BRAKELIGHT'},
     },
 }
 

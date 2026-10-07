@@ -1,3 +1,7 @@
+# Teste atual — refletores inferiores do 2012
+
+Instalada no Focus a correção de vermelho opaco aprendida no 2018, somente nos dois refletores acima dos escapes. MISC/DULLPLASTIC e faces exteriores; formato preservado, 20 triângulos. Backup em `backup/antes-refletores-2012/`; candidato em `local/reflectors-2012/out-opaque-reflectors/`. Demais sólidos e texturas idênticos. [Registro e prévias](REFLETORES-2012.md). Aguardar avaliação no jogo antes de consolidar/publicar. O 2018 aprovado permanece intacto.
+
 # Estado atual — v1.3 aprovada
 
 Usuário aprovou a v10.16 (“perfeito”) e autorizou commit, push, tag e release. Consolidados BIN do 2018 testado, log, README, referências e prévias. Friso em gradiente metálico, lentes brancas claras, formato e orçamento v1.2 preservados. Arquivos do 2012 mantidos. [Registro](FRISO-v10.16.md).

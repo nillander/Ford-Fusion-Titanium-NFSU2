@@ -2,6 +2,24 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.3 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# 2012 — luzes ausentes e refletores escuros (v11, 06/10/2026)
+
+Relato do usuário: o 2012 está sem lanternas, faróis e faróis de milha, e os refletores aparecem vermelhos, porém escuros. No 2018, os itens 1–3 (tampa, rodas e lanternas) estão resolvidos.
+
+Causa das luzes ausentes: o `CarRenderInfo` do UG2 só vincula as texturas do carro cujos nomes ele mesmo monta. Entre as strings do SPEED2.EXE estão `%s_MISC`, `%s_SIDELIGHT`, `%s_DOOR_HANDLE`, `%s_CENTRE_BRAKELIGHT` e `<TEXTURE_NAME da lâmpada>_GLASS_OFF`. As texturas `FOCUS_KIT00_HEADLIGHT`, `FOCUS_HEADLIGHT_LENS`, `FOCUS_HEADLIGHT_GLASS` e `FOCUS_BRAKELIGHT_GLASS` nunca eram vinculadas, então seus grupos não eram desenhados. O mesmo explica as tentativas invisíveis do 2018 e por que só MISC funcionou. O Focus original usa exatamente `FOCUS_KIT00_HEADLIGHT_GLASS_OFF` e `FOCUS_SIDELIGHT`. [Registro](docs/LUZES-2012-v11.md).
+
+- [x] Renomear as folhas de lâmpada para nomes vinculados (`tex_alias` em `ports.py`), sem mudar pixels nem geometria.
+- [x] Refletores: manter somente a camada voltada para fora, com uma normal plana por refletor (lição v10.9 do 2018).
+- [ ] Conferir no jogo: faróis, faróis de milha, lanternas e refletores do 2012.
+- [ ] Pendente do 2018 (item 4): o farol de milha aparece, mas como uma folha plana. Quando o 2012 for confirmado, aplicar o mesmo alias (`MUSTANGGT_SIDELIGHT`) para usar a estrutura texturizada do farol.
+- [ ] `FOCUS_DRIVER` também está fora da lista de nomes; o piloto provavelmente não é desenhado. Avaliar depois.
+
+# 2012 — refletores inferiores opacos (06/10/2026)
+
+Aplicada a correção aprendida no 2018: dois refletores com MISC/DULLPLASTIC, vermelho claro opaco e faces exteriores. Ambos vêm no grupo BRAKELIGHT de RIGHT_BRAKELIGHT_GLASS_D; os 20 triângulos e o formato foram preservados. Demais sólidos/texturas permaneceram idênticos. Instalado no Focus com backup; limites, índices, referências e hashes conferidos. [Registro](docs/REFLETORES-2012.md).
+
+- [ ] Conferir os dois refletores e a estabilidade do 2012 no jogo.
+
 # v1.3 — acabamento v10.16 aprovado (06/10/2026)
 
 Usuário aprovou: “perfeito”, autorizando atualização do README, commit, push, tag e release. Consolidados BIN testados, log e prévias do friso metálico em gradiente e das lentes brancas claras. Mantido o formato v1.2 e seu orçamento. Arquivos do 2012 preservados. [Registro](docs/FRISO-v10.16.md).
