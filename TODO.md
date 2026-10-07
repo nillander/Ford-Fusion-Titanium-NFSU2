@@ -1,6 +1,19 @@
 # TODO — Fusion no NFSU2
 
-A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.2 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
+A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.3 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
+
+# v1.3 — acabamento v10.16 aprovado (06/10/2026)
+
+Usuário aprovou: “perfeito”, autorizando atualização do README, commit, push, tag e release. Consolidados BIN testados, log e prévias do friso metálico em gradiente e das lentes brancas claras. Mantido o formato v1.2 e seu orçamento. Arquivos do 2012 preservados. [Registro](docs/FRISO-v10.16.md).
+
+- [x] Aprovar acabamento no jogo.
+- [x] Consolidar os arquivos instalados, documentação e prévias.
+
+# v10.16 — gradiente metálico e branco de lente (06/10/2026)
+
+Usuário pediu o acabamento anterior com o formato da v1.2: friso com gradiente metálico e lente branca clara, sem a superfície plana uniforme entre eles. Retomadas normais de origem e correção geral de exportação; gradiente vertical na célula MISC do friso, com UVs por altura. Célula branca das lentes preservada. Sem mudança de posições, triângulos, materiais ou orçamento. Validação passou; instalado para teste. [Registro e prévias](docs/FRISO-v10.16.md).
+
+- [x] Conferir acabamento e estabilidade no jogo.
 
 # v1.2 — v10.15 aprovada e consolidada (06/10/2026)
 

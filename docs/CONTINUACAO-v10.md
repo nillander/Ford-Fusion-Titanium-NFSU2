@@ -1,4 +1,8 @@
-# Estado atual — v1.2 aprovada
+# Estado atual — v1.3 aprovada
+
+Usuário aprovou a v10.16 (“perfeito”) e autorizou commit, push, tag e release. Consolidados BIN do 2018 testado, log, README, referências e prévias. Friso em gradiente metálico, lentes brancas claras, formato e orçamento v1.2 preservados. Arquivos do 2012 mantidos. [Registro](FRISO-v10.16.md).
+
+# Histórico — v1.2 aprovada
 
 Usuário confirmou que v10.15 funciona e está quase perfeita, autorizando commit, nova tag e release. Consolidados BIN do 2018 aprovado, log, prévias e padrão de pintura da tampa em 6.000 faces. Pacote 2012 preservado. [Registro](FRISO-v10.15.md).
 

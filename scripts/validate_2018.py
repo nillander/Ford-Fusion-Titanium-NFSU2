@@ -35,7 +35,11 @@ def validate(geo, tex, bank, focus):
                         for uv in (solid_lamps.RED_UV, solid_lamps.WHITE_UV, solid_lamps.GRAY_UV)]
     assert red[0] > 220 and 35 < red[1] < red[0] and red[2] < red[0], red
     assert min(white[:3]) > 200, white
-    assert min(gray[:3]) > 245, gray
+    trim_cell = rgba[14 * lamp['h'] // 16:15 * lamp['h'] // 16,
+                     12 * lamp['w'] // 16:13 * lamp['w'] // 16, :3]
+    span = int(trim_cell.max()) - int(trim_cell.min())
+    assert ((span < 10 and min(gray[:3]) > 245)
+            or (span > 80 and trim_cell.max() > 225 and trim_cell.min() > 40)), 'invalid trim finish'
     data, subs = globalb_carparts.load(bank)
     rows = globalb_carparts.car_parts(data, subs, 'MUSTANGGT')
     for pid, name in ((5, 'KIT00_BODY'), (10, 'KIT00_TRUNK'), (28, 'KIT00_FRONT_WHEEL')):

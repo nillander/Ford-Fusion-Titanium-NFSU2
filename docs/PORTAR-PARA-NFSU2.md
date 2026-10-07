@@ -250,6 +250,12 @@ O teste inicial usava `trunk_paint_target: 8000`. Após o fechamento v10.14 e a 
 
 A referência rosa/amarela indica duas regiões, não uma cor única: todo o friso deve ser uniforme, e toda a parte branca da lente deve ser uniforme separadamente. Usar células MISC distintas, com opacidade preservada. O remapeamento deve respeitar as células explícitas; a regra anterior U > 0,75 convertia o branco de lente em branco de friso.
 
-As pontas do friso foram limitadas antes da curva lateral, sem painéis ampliados. Normais traseiras intencionais dos dois acabamentos precisam ser preservadas na etapa final de exportação; a correção genérica de normais reintroduzia bordas escuras. Ler o BIN compilado para verificar UVs e normais, além de conferir a prévia.
+As pontas do friso foram limitadas antes da curva lateral, sem painéis ampliados. A v1.2 tentou normais traseiras constantes nos dois acabamentos, mas o usuário mostrou depois uma aparência plana e escura. Essa tentativa foi substituída na v1.3 pela orientação das superfícies e pelo gradiente de textura descritos abaixo. Ler o BIN compilado para verificar UVs e normais, além de conferir a prévia.
 
 A validação estrutural não garante carregamento no jogo. O usuário confirmou funcionamento após reduzir apenas a pintura da tampa para 6.000 faces; lanternas, friso e rodas permanecem iguais ao candidato anterior. O dump mostra retorno 0x63A265 na rotina de carregamento, mas não prova um limite exato nem que UVs causaram a falha. [Registro final](FRISO-v10.15.md).
+
+### 12. Acabamento uniforme não é iluminação plana — v1.3
+
+Uniformizar todas as normais em (−1,0,0) apagou o gradiente aparente do friso e mudou a iluminação do branco das lentes. A versão aprovada restaura as normais das superfícies e a correção geral de exportação. Um gradiente vertical cinza/branco ocupa a célula de 32×32 já reservada para o friso no MISC; UVs por altura usam o mesmo mapeamento no trecho central e nas continuações. A lente permanece na célula branca separada.
+
+Verificar no BIN que as posições, índices, grupos, materiais e tamanhos permanecem iguais à versão anterior; os UVs do gradiente precisam variar, não apontar todos para um único pixel. Na textura decodificada, somente a célula do friso deve mudar. O usuário aprovou a v10.16 no jogo, consolidada na v1.3. [Referências e prévias](FRISO-v10.16.md).

@@ -348,15 +348,14 @@ if PORT.get('solid_tail'):
                 red = face_out(drop_inward_twins(red, 'solid_tail_' + name))
                 for layer in (red, white):
                     if layer is white:
-                        layer = solid_lamps.uniform_rear_white(layer, solid_lamps.WHITE_UV)
+                        layer = solid_lamps.rear_finish(layer, lens=True)
                     brake_opaque.append(mesh(layer, bh(solid_tex), M['DULLPLASTIC']))
                 sign = 1 if name.startswith('left') else -1
                 detail = (solid_lamps.outer_trim(red, white, sign) if name.endswith('body')
                           else solid_lamps.lower_inner_white(red, white, trim_sources))
                 if len(detail['tri']):
                     detail = face_out(detail)
-                    detail_uv = (solid_lamps.GRAY_UV if name.endswith('body') else solid_lamps.WHITE_UV)
-                    detail = solid_lamps.uniform_rear_white(detail, detail_uv)
+                    detail = solid_lamps.rear_finish(detail, lens=not name.endswith('body'))
                     brake_opaque.append(mesh(detail, bh(solid_tex), M['DULLPLASTIC']))
                 LOG.setdefault('tail_white_details', {})[name] = dict(tris=len(detail['tri']),
                     role='outer_trim' if name.endswith('body') else 'lower_inner_white')
@@ -391,7 +390,7 @@ if PORT.get('solid_tail'):
             u = m['uv'][:, 0]
             # Preserve explicit atlas cells: the lens-white cell also has u > .75.
             # Only the source placeholder UVs need remapping into the MISC atlas.
-            atlas_uv = np.isclose(m['uv'][:, 1], solid_lamps.GRAY_UV[1]) & (
+            atlas_uv = ((m['uv'][:, 1] >= 14 / 16) & (m['uv'][:, 1] < 15 / 16)) & (
                 np.isclose(u, solid_lamps.GRAY_UV[0])
                 | np.isclose(u, solid_lamps.WHITE_UV[0])
                 | np.isclose(u, solid_lamps.RED_UV[0]))
@@ -451,7 +450,7 @@ if PORT.get('solid_tail'):
         selected = solid_lamps.trunk_trim_mask(g)
         if selected.any():
             trim = face_out(drop_inward_twins(compact(g, selected), 'original_2018_trunk_trim'))
-            trim = solid_lamps.uniform_rear_white(trim)
+            trim = solid_lamps.rear_finish(trim)
             trunk_list.append(mesh(trim, bh(solid_tex), M['DULLPLASTIC']))
             LOG['trunk_trim'] = dict(source='MW BASE_A/MISC', tris=len(trim['tri']), color='white', destination='TRUNK_A')
     assert 'trunk_trim' in LOG, 'original 2018 trunk trim missing'
@@ -679,23 +678,6 @@ def solid(name, meshes, markers=()):
     ok = ln2 > 1e-12
     avg = np.zeros_like(acc); avg[ok] = acc[ok] / ln2[ok, None]
     flip = ok & ((nrm_all * avg).sum(1) < 0.35)
-    if PORT.get('solid_tail'):
-        # These rear white surfaces intentionally share a diffuse normal. The generic
-        # crease repair would restore downward/sideways normals and darken the band again.
-        rear_white = np.zeros(len(pos_all), bool)
-        uv_all = np.concatenate(uv)
-        for group in groups:
-            if (texs[group['tex_i']] != bh(solid_tex)
-                    or lights[group['sh_i']] != M['DULLPLASTIC']):
-                continue
-            ids = np.unique(group['tri'])
-            k = ((pos_all[ids, 0] < -1.7) & (pos_all[ids, 2] > .62)
-                 & (pos_all[ids, 2] < .80)
-                 & (np.isclose(uv_all[ids], solid_lamps.GRAY_UV).all(axis=1)
-                    | np.isclose(uv_all[ids], solid_lamps.WHITE_UV).all(axis=1)))
-            rear_white[ids[k]] = True
-        LOG.setdefault('rear_white_normals_preserved', {})[name] = int((flip & rear_white).sum())
-        flip &= ~rear_white
     if flip.any():
         nrm_all[flip] = avg[flip]
         LOG.setdefault('normals_fixed', {})[name] = int(flip.sum())

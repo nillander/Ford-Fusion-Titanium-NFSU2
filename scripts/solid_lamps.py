@@ -10,7 +10,6 @@ import clip
 RED_UV = np.array([13.5 / 16, 14.5 / 16])
 WHITE_UV = np.array([14.5 / 16, 14.5 / 16])
 GRAY_UV = np.array([12.5 / 16, 14.5 / 16])
-REAR_WHITE_NORMAL = np.array([-1., 0., 0.])
 
 
 def trunk_trim_mask(g):
@@ -34,6 +33,15 @@ def paint_misc(rgba):
     h, w = out.shape[:2]
     for x, rgb in ((12, [255, 255, 255]), (13, [255, 78, 86]), (14, [238, 240, 242])):
         out[14 * h // 16:15 * h // 16, x * w // 16:(x + 1) * w // 16] = rgb + [255]
+    # A single vertical metallic highlight shared by the entire trim, distinct from
+    # the plain lens-white cell. This stays in the existing opaque MISC texture.
+    top, bottom = 14 * h // 16, 15 * h // 16
+    height = np.linspace(1., 0., bottom - top)
+    levels = [0., .23, .55, .78, 1.]
+    shades = np.array([[64, 68, 74], [98, 102, 110], [178, 184, 190],
+                       [248, 250, 252], [194, 202, 210]])
+    gradient = np.stack([np.interp(height, levels, shades[:, k]) for k in range(3)], axis=1)
+    out[top:bottom, 12 * w // 16:13 * w // 16, :3] = gradient[:, None].round().astype(np.uint8)
     return out
 
 
@@ -91,10 +99,13 @@ def colour(g, uv):
     return g
 
 
-def uniform_rear_white(g, uv=GRAY_UV):
-    """Uniform shading within each finish: trim white or separate lens white."""
-    g = colour(g, uv)
-    g['nrm'] = np.tile(REAR_WHITE_NORMAL, (len(g['pos']), 1))
+def rear_finish(g, lens=False):
+    """Keep surface normals; map the trim highlight by height and the lens to plain white."""
+    g = colour(g, WHITE_UV if lens else GRAY_UV)
+    if not lens:
+        # Avoid sampling adjacent cells while using the same height mapping for all pieces.
+        height = np.clip((g['pos'][:, 2] - .685) / (.729 - .685), 0., 1.)
+        g['uv'][:, 1] = (14 + (1 + 30 * (1 - height)) / 32) / 16
     return g
 
 
