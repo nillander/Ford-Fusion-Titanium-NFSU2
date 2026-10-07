@@ -435,6 +435,10 @@ for side in lamp_sides:
                     for _k, _sel in _parts.items():
                         if _sel.any():
                             _p = compact(lg, _sel)
+                            if _k == 'white' and PORT.get('flatten_lens_white'):
+                                # v12.6: the white centre has a dip (right lamp); put each lamp's white faces on a
+                                # smooth quadratic x = f(y, z) fitted to them, with the normals of that surface
+                                _p = solid_lamps.flatten_quadratic(_p)
                             _p = solid_lamps.colour(_p, solid_lamps.RED_UV if _k == 'red' else solid_lamps.WHITE_UV)
                             brake_opaque.append(mesh(_p, bh(UG2 + '_MISC'), M['DULLPLASTIC']))
                     # v12.4: the lens ring, the white centre and the body leave thin see-through gaps; close them

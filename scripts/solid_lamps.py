@@ -357,3 +357,28 @@ def fill_gaps(g, white, cell=.002, behind=.0015, white_reach=.005):
         meshes.append(dict(pos=pos, nrm=np.tile([-1., 0., 0.], (len(pos), 1)), uv=np.zeros((len(pos), 2)),
                            col=np.full(len(pos), 0xFFFFFFFF, np.uint32), tri=tri))
     return meshes[0], meshes[1]
+
+
+def flatten_quadratic(g):
+    """Per lamp (sign of y): move vertices along x onto the least-squares quadratic x = f(y, z) of that
+    lamp's vertices and use the surface normals. Removes local dips while keeping the overall curvature."""
+    g = dict(g, pos=g['pos'].copy(), nrm=g['nrm'].copy())
+    p = g['pos']
+    for sgn in (1, -1):
+        k = p[:, 1] * sgn > 0
+        if k.sum() < 6:
+            continue
+        y, z = p[k, 1], p[k, 2]
+        A = np.c_[np.ones_like(y), y, z, y * y, z * z, y * z]
+        x = p[k, 0]
+        use = np.ones(len(x), bool)
+        for _ in range(4):           # fit the outer envelope: dips (deeper, larger x) are left out
+            c, *_ = np.linalg.lstsq(A[use], x[use], rcond=None)
+            use = x <= A @ c + .001
+        p[k, 0] = np.minimum(x, A @ c)  # only pull dips out to the surface, never push faces in
+        dy = c[1] + 2 * c[3] * y + c[5] * z
+        dz = c[2] + 2 * c[4] * z + c[5] * y
+        n = np.c_[-np.ones_like(y), dy, dz]          # gradient of f - x points toward -x (rear) when flipped
+        n /= np.linalg.norm(n, axis=1, keepdims=True)
+        g['nrm'][k] = n
+    return g

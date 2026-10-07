@@ -5,7 +5,8 @@ A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTAN
 # v1.6 — lanternas do 2012 sem manchas, frestas nem entalhe (06/10/2026)
 
 - [x] Pacote v1.6 preparado para publish-release.
-- [ ] Lanterna direita do 2012: depressão no centro branco, a planificar.
+- [x] Depressão no centro branco das duas lanternas do 2012 (v12.6): as faces brancas da lente vão para o envelope externo de uma superfície quadrática ajustada a cada lanterna, só puxando as depressões para fora e usando as normais dessa superfície. [Prévias](docs/lanternas-2012-v12.6/).
+- [ ] Conferir no jogo. Backup em `backup/antes-v12.6/`. A v12.6 ainda não está no pacote v1.6.
 
 # 2012 — manchas nas lanternas (v12.3, 06/10/2026)
 
