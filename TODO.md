@@ -2,6 +2,14 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.3 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# 2012 — manchas nas lanternas (v12.3, 06/10/2026)
+
+O usuário relatou que, mesmo na v1.5, as lanternas do 2012 tinham manchas escuras no vermelho e no branco. A lente DXT3 translúcida (alfa de 221 a 255) deixava a carcaça aparecer por baixo. Na carcaça, cerca de 300 normais eram trocadas na exportação pela média das faces.
+
+- [x] Lente opaca em MISC/DULLPLASTIC, com cor tirada do texel do MW em cada face: 1.161 faces vermelhas e 310 brancas. As normais foram refeitas a partir das faces externas. A textura `FOCUS_CENTRE_BRAKELIGHT` saiu do pacote.
+- [x] Carcaça com faces voltadas para fora e normais refeitas. Normais corrigidas na exportação no TRUNK: de 309 para 11.
+- [ ] Conferir no jogo. Backup em `backup/antes-v12.3/`. [Prévias](docs/lanternas-2012-v12.3/).
+
 # v1.5 — carrocerias lisas nos dois carros (06/10/2026)
 
 - [x] Pacote v1.5 preparado para publish-release.

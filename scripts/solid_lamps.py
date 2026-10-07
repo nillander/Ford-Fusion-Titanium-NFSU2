@@ -31,7 +31,7 @@ def paint_misc(rgba, reflectors_only=False):
     """Three unused cells in the existing MISC sheet (original UVs end at v=.75)."""
     out = rgba.copy()
     h, w = out.shape[:2]
-    cells = ((13, [255, 78, 86]),) if reflectors_only else (
+    cells = ((13, [255, 78, 86]), (14, [238, 240, 242])) if reflectors_only else (
         (12, [255, 255, 255]), (13, [255, 78, 86]), (14, [238, 240, 242]))
     for x, rgb in cells:
         out[14 * h // 16:15 * h // 16, x * w // 16:(x + 1) * w // 16] = rgb + [255]

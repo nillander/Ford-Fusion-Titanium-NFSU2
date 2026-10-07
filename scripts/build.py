@@ -404,10 +404,37 @@ for side in lamp_sides:
                 # (the inner copy sits on the outer one when the game draws both faces)
                 lens_mode = PORT.get('lens_' + role, LENS)
                 lg = double_sided(g) if lens_mode == 'double' else face_out(drop_inward_twins(g, name + '_lens'))
+                if role == 'brake' and PORT.get('brake_lens_solid'):
+                    # v12.3 (2012): the translucent DXT3 lens let the housing show through as dark blotches;
+                    # draw it as the approved opaque red (MISC/DULLPLASTIC, as the reflectors), with normals
+                    # rebuilt from its own outward faces
+                    lg = dict(lg, nrm=smooth.smooth_normals(lg['pos'], lg['tri'], lg['nrm'], crease_deg=40))
+                    # the lens is red only where its MW texel is red: the clear centre over the white housing
+                    # becomes the lens-white cell, fully transparent texels are dropped
+                    _img = np.array(Image.open(f'texdump/mw_{sheet(lamp_sheet(g["tex"]))}.png').convert('RGBA')).astype(int)
+                    _uv = lg['uv'][lg['tri']].mean(1) % 1.0
+                    _px = _img[(_uv[:, 1] * _img.shape[0]).astype(int).clip(0, _img.shape[0] - 1),
+                               (_uv[:, 0] * _img.shape[1]).astype(int).clip(0, _img.shape[1] - 1)]
+                    _red = _px[:, 0] > _px[:, 1:3].max(1) + 40
+                    _clear = _px[:, 3] < 60
+                    _parts = {'red': _red & ~_clear, 'white': ~_red & ~_clear}
+                    for _k, _sel in _parts.items():
+                        if _sel.any():
+                            _p = compact(lg, _sel)
+                            _p = solid_lamps.colour(_p, solid_lamps.RED_UV if _k == 'red' else solid_lamps.WHITE_UV)
+                            brake_opaque.append(mesh(_p, bh(UG2 + '_MISC'), M['DULLPLASTIC']))
+                    LOG.setdefault('brake_lens_solid', {})[name] = dict(red=int(_parts['red'].sum()),
+                        white=int(_parts['white'].sum()), dropped_clear=int(_clear.sum()))
+                    continue
                 m = mesh(lg, bh(lens_tex(g['tex'], role)), M['HEADLIGHTGLASS'] if role == 'head' else bh('MOLDINGS'))
                 (head_glass if role == 'head' else brake_glass).append(m)
             else:
                 g = drop_inward_twins(g, name + '_' + g['mat'])
+                if role == 'brake' and PORT.get('brake_housing_smooth'):
+                    # v12.3 (2012): housing faces turned out and normals rebuilt from them (dark spots in the white)
+                    _keep = {k: g[k] for k in ('tex', 'mat')}
+                    g = face_out(g)
+                    g = dict(g, nrm=smooth.smooth_normals(g['pos'], g['tri'], g['nrm'], crease_deg=40), **_keep)
                 m = mesh(g, bh(opaque_tex(g['tex'])), M['HEADLIGHTREFLECTOR'] if role == 'head' else M['DULLPLASTIC'])
                 (head_opaque if role == 'head' else brake_opaque).append(m)
 if PORT.get('solid_tail'):

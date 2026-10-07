@@ -59,6 +59,8 @@ PORTS = {
         # v12.2: rear relax removed (blocky in the game); the rear now comes from LOD A instead
         'normals_relax_regions': [dict(xmin=1.2, iters=28, max_deg=45)],
         'lens_brake': 'outward',
+        'brake_lens_solid': True,      # v12.3: opaque red lens (MISC), no see-through blotches
+        'brake_housing_smooth': True,  # v12.3: outward faces and rebuilt normals in the housings
         # v11: names the game binds (see TEX_ALIAS in build.py). FOCUS_KIT00_HEADLIGHT_GLASS_OFF is the retail
         # Focus headlight lens; SIDELIGHT is drawn by the retail BASE; the other two are unused car slots.
         # v11.1: HEADLIGHT_GLASS (41 small BASE triangles) stays unbound to save memory.
