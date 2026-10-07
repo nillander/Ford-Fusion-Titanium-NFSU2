@@ -2,6 +2,10 @@
 
 A partir da tabela em `scripts/ports.py`, o 2018 substitui o Mustang GT (`MUSTANGGT`, o mesmo nome nos dois jogos) e o 2012 substitui o Focus (`COBALTSS` → `FOCUS`). Os arquivos atuais da release v1.3 estão em `CARS/MUSTANGGT` e `CARS/FOCUS`. O diário abaixo registra a medição feita no slot Focus; essa lista de peças é o que o port do 2012 reaproveita.
 
+# v1.5 — carrocerias lisas nos dois carros (06/10/2026)
+
+- [x] Pacote v1.5 preparado para publish-release.
+
 # 2012 — carroceria lisa (v12, 07/10/2026)
 
 O usuário relatou craquelado perto dos faróis, na lateral, nas portas e no para-lama traseiro. A pintura passou a receber as normais originais do LOD A, sem mexer na geometria. [Registro](docs/CARROCERIA-2012-v12.md).
@@ -12,7 +16,7 @@ O usuário relatou craquelado perto dos faróis, na lateral, nas portas e no par
 - [x] v12.1: frente e traseira do 2012 suavizadas, faces da pintura orientadas pelas normais e mesma técnica aplicada ao 2018 (lateral, portas e para-lama traseiro). Instalado nos dois slots.
 - [x] v12.1 no jogo: lateral lisa aprovada. Restavam pequenos craquelados nos faróis (2012 e motorista do 2018), traseira e para-lama traseiro do 2012, manchas na lanterna do 2012 e refletores errados no 2018.
 - [x] v12.2: traseira do 2012 em LOD A (rebaixo da placa fechado com LOD B), pintura plana decimada do LOD A, lente da lanterna com uma camada, frentes suavizadas nos dois carros, refletores do 2018 com uma camada. [Registro](docs/CARROCERIA-v12.2.md).
-- [ ] Conferir no jogo a v12.2 nos dois carros e a estabilidade do 2018: o 2012 tem 1,5% mais vértices.
+- [x] Conferir no jogo a v12.2 nos dois carros e a estabilidade do 2018. Aprovado pelo usuário.
 
 # v1.4 — luzes do 2012 e farol de milha do 2018 (07/10/2026)
 
@@ -30,7 +34,7 @@ Causa das luzes ausentes: o `CarRenderInfo` do UG2 só vincula as texturas do ca
 - [x] 2018, item 4: o farol de milha aparecia como uma folha plana. A folha branca `backing()` cobria a carcaça. Na v11.2 (`fog_glass`), o farol de milha é desenhado como o farol principal: carcaça com a folha da lâmpada e HEADLIGHTREFLECTOR, lente real com HEADLIGHTGLASS, em LOD B. Ficam 570 triângulos, contra 808 na v1.3; BASE passa de 21.270 para 21.222. Nenhuma textura nova; a folha sem uso `BRAKELIGHT_GLASS` saiu do TPK. Só a BASE mudou. [Prévias](docs/fog-2018-v11.2/).
 - [x] v11.2 no jogo: farol de milha escuro, quase invisível. Na v11.3 foi aplicada a mesma estratégia do 2012: `tex_alias` (`MUSTANGGT_SIDELIGHT`, `MUSTANGGT_KIT00_HEADLIGHT_GLASS_OFF`), lente em 128 px e emblemas em 256 px. Texturas: 630.784 B, contra 843.776 B na v1.3. Só a referência de textura mudou; geometria igual à v11.2.
 - [x] Release v1.4 publicada com os dois carros; releases e tags antigas removidas a pedido do usuário.
-- [ ] Conferir no jogo o farol de milha do 2018 v11.3.
+- [x] Conferir no jogo o farol de milha do 2018 v11.3. Aprovado com a v12.2.
 - [ ] `FOCUS_DRIVER` também está fora da lista de nomes; o piloto provavelmente não é desenhado. Avaliar depois.
 
 # 2012 — refletores inferiores opacos (06/10/2026)

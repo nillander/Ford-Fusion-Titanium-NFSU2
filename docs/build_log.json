@@ -10,13 +10,13 @@
   "paint_B": 584,
   "trunk_A": 1084,
   "paint_A": 1169,
+  "normals_source_A": 2261,
   "KIT00_RIGHT_HEADLIGHT_C_HEADLIGHT": 9,
   "KIT00_RIGHT_BRAKELIGHT_B_BRAKELIGHT": 222,
   "solid_tail_left_trunk": 87,
   "solid_tail_left_body": 12,
   "solid_tail_right_trunk": 10,
   "solid_tail_right_body": 15,
-  "solid_reflector": 16,
   "fog_RIGHT_housing": 52,
   "original_2018_trunk_trim": 0,
   "base_MISC_DULLPLASTIC": 4,
@@ -36,7 +36,7 @@
   ],
   "trunk_paint": [
    15340,
-   6000
+   5999
   ],
   "base_MISC": [
    3328,
@@ -65,12 +65,55 @@
   ],
   "interior_grid_INTERIOR": [
    2525,
-   1791,
-   "cluster 0.021 m"
+   1876,
+   "cluster 0.017 m"
   ]
  },
  "inner_faces_removed": {
   "hood_B": 2825
+ },
+ "normals_from_A": {
+  "body": [
+   21809,
+   21922
+  ],
+  "trunk": [
+   11993,
+   12162
+  ],
+  "hood": [
+   548,
+   1606
+  ],
+  "nose": [
+   905,
+   918
+  ],
+  "trunk_after_dec": [
+   6006,
+   6014
+  ]
+ },
+ "normals_relaxed": {
+  "body": [
+   3009
+  ],
+  "trunk": [
+   0
+  ],
+  "hood": [
+   1433
+  ],
+  "nose": [
+   565
+  ]
+ },
+ "paint_faces_turned": {
+  "body": 391,
+  "trunk": 346,
+  "hood": 9,
+  "nose": 30,
+  "trunk_after_dec": 41
  },
  "paint_lods": {
   "rear_A": 4903,
@@ -100,7 +143,7 @@
    "backing_m": 0.003
   }
  },
- "lens_faces_turned": 701,
+ "lens_faces_turned": 616,
  "tail_white_details": {
   "left_trunk": {
    "tris": 32,
@@ -118,6 +161,10 @@
    "tris": 119,
    "role": "outer_trim"
   }
+ },
+ "solid_reflector": {
+  "tris": 85,
+  "removed": 101
  },
  "fog": {
   "lod": "B",
@@ -146,7 +193,7 @@
    "RIGHT"
   ],
   "head": 1066,
-  "brake": 2460
+  "brake": 2375
  },
  "tail_paint_under_lens_removed": {
   "body": 287,
@@ -260,7 +307,7 @@
   [
    "0x5a00e244",
    "0xfedee40",
-   93
+   49
   ],
   [
    "0x7b916d49",
@@ -285,7 +332,7 @@
   [
    "0x2af3d244",
    "0x2787edab",
-   1791
+   1876
   ],
   [
    "0x5a006de9",
@@ -310,8 +357,8 @@
  ],
  "budget": {
   "body": 20582,
-  "trunk": 7515,
-  "base": 21231
+  "trunk": 7473,
+  "base": 21272
  },
  "markers": {
   "LEFT_BRAKELIGHT": [
@@ -360,57 +407,91 @@
    1.207
   ]
  },
+ "paint_normals_kept": {
+  "MUSTANGGT_KIT00_BODY_A": 1216,
+  "MUSTANGGT_KITW01_BODY_A": 1216,
+  "MUSTANGGT_KITW02_BODY_A": 1216,
+  "MUSTANGGT_KITW03_BODY_A": 1216,
+  "MUSTANGGT_KITW04_BODY_A": 1216,
+  "MUSTANGGT_KIT00_TRUNK_A": 313,
+  "MUSTANGGT_BASE_A": 115,
+  "MUSTANGGT_KIT00_FRONT_WHEEL_A": 0,
+  "MUSTANGGT_DECAL_FRONT_WINDOW_WIDE_MEDIUM_A": 0,
+  "MUSTANGGT_DECAL_REAR_WINDOW_WIDE_MEDIUM_A": 0,
+  "MUSTANGGT_DECAL_LEFT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE1_DECAL_LEFT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE2_DECAL_LEFT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE3_DECAL_LEFT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE4_DECAL_LEFT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE1_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE2_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE3_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE4_DECAL_LEFT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE1_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE2_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE3_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE4_DECAL_RIGHT_DOOR_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE1_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE2_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE3_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_WIDE4_DECAL_RIGHT_QUARTER_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_DECAL_HOOD_RECT_MEDIUM_A": 0,
+  "MUSTANGGT_DECAL_HOOD_RECT_SMALL_A": 0
+ },
  "normals_fixed": {
-  "MUSTANGGT_KIT00_BODY_A": 2016,
-  "MUSTANGGT_KITW01_BODY_A": 2016,
-  "MUSTANGGT_KITW02_BODY_A": 2016,
-  "MUSTANGGT_KITW03_BODY_A": 2016,
-  "MUSTANGGT_KITW04_BODY_A": 2016,
-  "MUSTANGGT_KIT00_TRUNK_A": 1204,
-  "MUSTANGGT_BASE_A": 1411,
+  "MUSTANGGT_KIT00_BODY_A": 84,
+  "MUSTANGGT_KITW01_BODY_A": 84,
+  "MUSTANGGT_KITW02_BODY_A": 84,
+  "MUSTANGGT_KITW03_BODY_A": 84,
+  "MUSTANGGT_KITW04_BODY_A": 84,
+  "MUSTANGGT_KIT00_TRUNK_A": 175,
+  "MUSTANGGT_BASE_A": 1192,
   "MUSTANGGT_KIT00_FRONT_WHEEL_A": 44
  },
  "solids": {
   "MUSTANGGT_KIT00_BODY_A": {
    "tris": 20582,
    "indices": 61746,
-   "verts": 26424,
+   "verts": 26352,
    "groups": 3
   },
   "MUSTANGGT_KITW01_BODY_A": {
    "tris": 20582,
    "indices": 61746,
-   "verts": 26424,
+   "verts": 26352,
    "groups": 3
   },
   "MUSTANGGT_KITW02_BODY_A": {
    "tris": 20582,
    "indices": 61746,
-   "verts": 26424,
+   "verts": 26352,
    "groups": 3
   },
   "MUSTANGGT_KITW03_BODY_A": {
    "tris": 20582,
    "indices": 61746,
-   "verts": 26424,
+   "verts": 26352,
    "groups": 3
   },
   "MUSTANGGT_KITW04_BODY_A": {
    "tris": 20582,
    "indices": 61746,
-   "verts": 26424,
+   "verts": 26352,
    "groups": 3
   },
   "MUSTANGGT_KIT00_TRUNK_A": {
-   "tris": 7515,
-   "indices": 22545,
-   "verts": 8590,
+   "tris": 7473,
+   "indices": 22419,
+   "verts": 8441,
    "groups": 3
   },
   "MUSTANGGT_BASE_A": {
-   "tris": 21222,
-   "indices": 63666,
-   "verts": 21172,
+   "tris": 21263,
+   "indices": 63789,
+   "verts": 21198,
    "groups": 11
   },
   "MUSTANGGT_KIT00_FRONT_WHEEL_A": {
@@ -565,11 +646,11 @@
   }
  },
  "fixed_normals": {
-  "MUSTANGGT_BASE_A": 16
+  "MUSTANGGT_BASE_A": 15
  },
  "wheel_donor": {
   "slot": "FOCUS",
-  "sha256": "cd9c0f7f555daf61a0c3f1db9a599b40752444523b2fd35be81b6e9eb0193349"
+  "sha256": "7a4d5b489c22137788690568eb3f1d34d34168b818460db112a5b49078244df6"
  },
  "decals": {
   "DECAL_FRONT_WINDOW_WIDE_MEDIUM_A": 208,
@@ -581,9 +662,9 @@
   "DECAL_HOOD_RECT_MEDIUM_A": 800,
   "DECAL_HOOD_RECT_SMALL_A": 1600
  },
- "trunk_lid": 6000,
+ "trunk_lid": 5999,
  "hood": 2623,
- "geometry_bytes": 7201280,
+ "geometry_bytes": 7183488,
  "textures_unused_dropped": [
   "MUSTANGGT_BRAKELIGHT_GLASS"
  ],

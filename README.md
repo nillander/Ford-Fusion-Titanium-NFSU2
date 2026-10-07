@@ -1,5 +1,7 @@
 # Ford Fusion — Need for Speed Underground 2
 
+> **Release v1.5 (06/10/2026):** carrocerias lisas nos dois carros, aprovadas no jogo. A pintura usa as normais do LOD A do MW, com faces orientadas por elas, e a frente foi suavizada. No 2012, a tampa e o para-choque traseiro passam a vir do LOD A, e a pintura plana passa a ser decimada a partir dele. A lente da lanterna do 2012 tem uma só camada, sem manchas. Os refletores inferiores do 2018 recebem o acabamento do 2012. [Carroceria lisa](docs/CARROCERIA-2012-v12.md) · [v12.2](docs/CARROCERIA-v12.2.md).
+
 > **Release v1.4 (07/10/2026):** luzes do 2012 aprovadas no jogo. Faróis, faróis de milha e lanternas não apareciam porque o UG2 só vincula as texturas de carro cujos nomes ele mesmo monta (`%s_MISC`, `%s_SIDELIGHT`, `%s_CENTRE_BRAKELIGHT`, `<lâmpada>_GLASS_OFF`...). As folhas das lâmpadas foram renomeadas para esses nomes. Os refletores do 2012 ficaram com uma única camada e normal plana. O farol de milha do 2018 agora é desenhado como o farol principal. As texturas vinculadas foram reduzidas, porque a memória dos carros está no limite: com o 2012 v11, o 2018 fechava o jogo. [Luzes do 2012](docs/LUZES-2012-v11.md) · [refletores](docs/REFLETORES-2012.md) · [farol de milha do 2018](docs/fog-2018-v11.2/).
 
 > **Release v1.3 (06/10/2026):** Fusion 2018 aprovado no jogo com friso em gradiente metálico e lentes brancas claras, mantendo o formato da v1.2 e a pintura da tampa em 6.000 faces. Dois ZIPs com instaladores; arquivos do 2012 preservados. [Referências, prévias e validação](docs/FRISO-v10.16.md).
@@ -17,18 +19,18 @@ O Fusion Titanium 2012 reaproveita o caminho do 2018 (corte, vidros, adesivos, v
 
 > **Estado:** em 06/10/2026 os dois carros foram reexportados da release **v2.7** do Most Wanted e instalados para teste (v10): o Fusion Titanium 2018 AWD em `CARS/MUSTANGGT`, no lugar do Ford Mustang GT, e o Fusion Titanium 2012 FWD em `CARS/FOCUS`, no lugar do Ford Focus. A v9 do 2018, aprovada no jogo em 27/09/2026 no slot do Focus, é a das capturas abaixo. O histórico está em [TODO.md](TODO.md).
 
-A v1.4 acrescenta as luzes do 2012 e o farol de milha do 2018. Da v1.3 vêm as pontas do friso limitadas antes da lateral da lente e recupera seu gradiente metálico, com branco claro separado nas lentes. As normais das superfícies foram recuperadas para evitar o aspecto plano. O usuário aprovou o resultado no jogo: “perfeito”.
+A v1.5 deixa as duas carrocerias lisas e uniformes. A v1.4 acrescentou as luzes do 2012 e o farol de milha do 2018. Da v1.3 vêm as pontas do friso limitadas antes da lateral da lente e recupera seu gradiente metálico, com branco claro separado nas lentes. As normais das superfícies foram recuperadas para evitar o aspecto plano. O usuário aprovou o resultado no jogo: “perfeito”.
 
-## Downloads — v1.4
+## Downloads — v1.5
 
 Uma tag e uma release para os dois veículos, como no projeto MW2005. As versões públicas usam `vX.X`; os números v10.x abaixo registram as etapas internas do diagnóstico. Releases e tags anteriores foram removidas; o histórico do git as mantém.
 
 | Pacote | Substitui | Estado |
 | --- | --- | --- |
-| [Fusion 2018 AWD](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/download/v1.4/Fusion2018_AWD_NFSU2.zip) | Mustang GT (`MUSTANGGT`) | v11.3: lanternas, friso e rodas aprovados; farol de milha como o farol principal |
-| [Fusion 2012 FWD](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/download/v1.4/Fusion2012_FWD_NFSU2.zip) | Focus (`FOCUS`) | v11.1 aprovada no jogo: faróis, faróis de milha, lanternas e refletores |
+| [Fusion 2018 AWD](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/download/v1.5/Fusion2018_AWD_NFSU2.zip) | Mustang GT (`MUSTANGGT`) | v12.2 aprovada no jogo: carroceria lisa, farol de milha como o farol principal, refletores corrigidos |
+| [Fusion 2012 FWD](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/download/v1.5/Fusion2012_FWD_NFSU2.zip) | Focus (`FOCUS`) | v12.2 aprovada no jogo: luzes completas, carroceria lisa, traseira em LOD A |
 
-[Release e hashes dos arquivos](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/tag/v1.4). Cada ZIP inclui seu instalador, patch PowerShell, instruções e manifesto SHA-256.
+[Release e hashes dos arquivos](https://github.com/nillander/Ford-Fusion-Titanium-NFSU2/releases/tag/v1.5). Cada ZIP inclui seu instalador, patch PowerShell, instruções e manifesto SHA-256.
 
 ## No jogo
 
@@ -105,21 +107,21 @@ Estas prévias registram a tentativa v10.10; o resultado atual aprovado aparece 
 
 ### Peças
 
-Contagens abaixo: arquivos do 2018 incluídos na release v1.4 (v11.3).
+Contagens abaixo: arquivos do 2018 incluídos na release v1.5 (v12.2).
 
 | Peça UG2 | Origem (MW z10) | Triângulos |
 | --- | --- | --- |
 | `KIT00_BODY_A` e `KITW01–04` | pintura LOD B nas áreas planas + LOD A no bico, na frente do teto e no para-choque traseiro. As cinco carrocerias são a mesma malha | 20.582 |
-| `KIT00_TRUNK_A` | tampa LOD A com pintura reduzida para 6.000 triângulos, lentes internas e friso original branco | 7.515 |
-| `BASE_A` | base, capô LOD B, bico/teto LOD A, vidros, luzes externas, faróis de milha (LOD B), interior e motorista | 21.222 |
+| `KIT00_TRUNK_A` | tampa LOD A com pintura reduzida para 6.000 triângulos, lentes internas, friso original branco e refletores | 7.473 |
+| `BASE_A` | base, capô LOD B, bico/teto LOD A, vidros, luzes externas, faróis de milha (LOD B), interior e motorista | 21.263 |
 | `KIT00_FRONT_WHEEL_A` | roda de 20 raios, aro 18" (LOD B) | 8.614 |
 
 O 2012 tem faróis e lanternas nos dois lados e cerca de 2,5 vezes mais triângulos neles e na traseira, em todos os LODs. Para caber, a distribuição muda (valores em `scripts/ports.py`, explicados em [docs/PORTAR-PARA-NFSU2.md](docs/PORTAR-PARA-NFSU2.md)):
 
 | Peça UG2 (2012) | Conteúdo | Triângulos |
 | --- | --- | --- |
-| `KIT00_BODY_A` e `KITW01–04` | pintura LOD B, bico e frente do teto em LOD A, faróis LOD D com lente LOD C | 20.957 |
-| `KIT00_TRUNK_A` | tampa LOD B, para-choque traseiro LOD B, as lanternas LOD D e os refletores | 20.148 |
+| `KIT00_BODY_A` e `KITW01–04` | pintura plana decimada do LOD A, bico e frente do teto em LOD A, faróis LOD D com lente LOD C | 20.957 |
+| `KIT00_TRUNK_A` | tampa e para-choque traseiro LOD A decimados para 14.800, lanternas LOD D com lente de uma camada e os refletores | 20.122 |
 | `BASE_A` | base, peças pintadas da base, capô, vidros, interior e motorista | 21.299 |
 | `KIT00_FRONT_WHEEL_A` | a mesma roda do 2018 | 8.614 |
 
@@ -250,7 +252,7 @@ Valores finais em `docs/globalb_2018.json` (`MUSTANGGT`) e `docs/globalb_2012.js
 
 ## Instalação
 
-Baixe o ZIP do veículo na release v1.4, extraia e execute `instalar.bat` com o jogo fechado. Cada pacote detecta seu slot. Para instalar os dois, execute o instalador de cada pasta. Na cópia do repositório, `release/instalar.bat` instala o 2018; `release/instalar.bat 2012` seleciona o 2012.
+Baixe o ZIP do veículo na release v1.5, extraia e execute `instalar.bat` com o jogo fechado. Cada pacote detecta seu slot. Para instalar os dois, execute o instalador de cada pasta. Na cópia do repositório, `release/instalar.bat` instala o 2018; `release/instalar.bat 2012` seleciona o 2012.
 
 Mantenha `globalb_patch.ps1` ao lado do BAT. O instalador aceita GlobalB original compactado em JDLZ ou já descompactado; não exige Python nem Nikki. Ele ajusta somente o veículo selecionado e, no 2018, as tabelas dos ids 5/6/10/28. Os BIN anteriores ficam com sufixo `.antes-fusion`; o banco anterior fica em `GLOBAL/GlobalB.lzc.antes-fusion` (backup inicial compartilhado pelos dois instaladores).
 
@@ -258,9 +260,9 @@ A release inclui os carros e o patch, sem distribuir o GlobalB ou o idioma compl
 
 | Arquivo publicado | SHA-256 |
 | --- | --- |
-| `CARS/MUSTANGGT/GEOMETRY.BIN` | `C72E3FE8FD7FCF29B9EB742BEFA4EBEDDBE794F9CCC8C16D151C7191B215C407` |
+| `CARS/MUSTANGGT/GEOMETRY.BIN` | `512144F6B3EB31D44977788ED60334FC948DFEF6E3DF08CDC0F9E0D2B0E2CFBE` |
 | `CARS/MUSTANGGT/TEXTURES.BIN` | `91BDED226DE00FEE9F34606F82AA127E842D9AFD77E19CCFE53F03D5E3FA6439` |
-| `CARS/FOCUS/GEOMETRY.BIN` | `7A4D5B489C22137788690568EB3F1D34D34168B818460DB112A5B49078244DF6` |
+| `CARS/FOCUS/GEOMETRY.BIN` | `950DD961F690E3AA35733721620267AE6F2B7E18978309B58E1F77E62A60400B` |
 | `CARS/FOCUS/TEXTURES.BIN` | `52596C87E4877574F90028C4F32D2ACD16F02FB0003CE1518A70E4E754C16231` |
 
 ## Reconstruir

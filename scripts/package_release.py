@@ -16,8 +16,8 @@ vehicles = [('2018', 'AWD', 'MUSTANGGT', 'Ford Mustang GT'),
 assets = []
 content_hashes = []
 for year, drive, slot, replaces in vehicles:
-    status = ('2018 v11.3: lanternas, friso e rodas aprovados; farol de milha desenhado como o farol principal, com texturas vinculadas pelo jogo.'
-              if year == '2018' else '2012 v11.1 aprovado no jogo: faróis, faróis de milha, lanternas e refletores visíveis.')
+    status = ('2018 v12.2 aprovado no jogo: lateral, portas e para-lama traseiro lisos; faróis sem craquelado; refletores inferiores corrigidos.'
+              if year == '2018' else '2012 v12.2 aprovado no jogo: carroceria lisa, traseira em LOD A, faróis suavizados e lanternas sem manchas.')
     readme = f'''Ford Fusion Titanium {year} {drive} — NFS Underground 2 — {version}
 
 Substitui: {replaces} ({slot}).
@@ -46,7 +46,7 @@ https://github.com/nillander/Ford-Fusion-Titanium-NFSU2
     name = f'Fusion{year}_{drive}_NFSU2.zip'
     with zipfile.ZipFile(out / name, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for entry, data in files.items():
-            info = zipfile.ZipInfo(entry, (2026, 10, 7, 0, 0, 0))
+            info = zipfile.ZipInfo(entry, (2026, 10, 6, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             archive.writestr(info, data)
     with zipfile.ZipFile(out / name) as archive:
