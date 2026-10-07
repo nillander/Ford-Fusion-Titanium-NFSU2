@@ -41,8 +41,10 @@ PORTS = {
         'tex_cells': {'KIT00_HEADLIGHT': [((4, 4), (5, 4), 0.65)]},
         # v11: names the game binds (see TEX_ALIAS in build.py). FOCUS_KIT00_HEADLIGHT_GLASS_OFF is the retail
         # Focus headlight lens; SIDELIGHT is drawn by the retail BASE; the other two are unused car slots.
+        # v11.1: HEADLIGHT_GLASS (41 small BASE triangles) stays unbound to save memory.
         'tex_alias': {'KIT00_HEADLIGHT': 'SIDELIGHT', 'HEADLIGHT_LENS': 'KIT00_HEADLIGHT_GLASS_OFF',
-                      'HEADLIGHT_GLASS': 'DOOR_HANDLE', 'BRAKELIGHT_GLASS': 'CENTRE_BRAKELIGHT'},
+                      'BRAKELIGHT_GLASS': 'CENTRE_BRAKELIGHT'},
+        'tex_size': {'HEADLIGHT_LENS': 128, 'BRAKELIGHT_GLASS': 128, 'BADGING': 256},
     },
 }
 

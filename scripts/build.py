@@ -804,8 +804,17 @@ tmpl_dxt1 = next(t for t in tex_e if _fmt(t) == 'DXT1')
 tmpl_dxt3 = next(t for t in tex_e if _fmt(t) == 'DXT3')
 out_tex = []
 place = 0
+# v11.1: textures the game binds stay resident. With the 2012 lamps bound (v11), viewing the 2018 closed the
+# game, as when its own trunk got heavier (v10.14): the car memory is tight. Leave out sheets no solid uses and
+# let 'tex_size' shrink sheets (lens copies, badging) so the resident total stays below the working v10.x.
+USED = {t for s in solids for t in s['tex']}
+SIZES = PORT.get('tex_size', {})
 for name, spec in TEX.items():
     suffix, sz, fmt = spec[:3]
+    if bh(alias(name)) not in USED:
+        LOG.setdefault('textures_unused_dropped', []).append(name)
+        continue
+    sz = SIZES.get(name[len(UG2) + 1:], sz)
     if suffix == '@solid_lamps':
         full = solid_lamps.atlas(sz)
     else:
